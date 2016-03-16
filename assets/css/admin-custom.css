@@ -1,0 +1,84 @@
+img#loader {
+    margin: 60px auto;
+    display: block;
+}
+
+ul.wysihtml5-toolbar > li > a {
+    color: #837C17 !important;
+}
+.error{
+    color: #C52929;
+    font-size: 13px;
+}
+.products-list .product-img img {
+    width: 50px;
+    height: 50px;
+}
+.products-list .product-title {
+    font-weight: 600;
+}
+
+.products-list .product-info {
+    margin-left: 60px;
+}
+.products-list .product-img {
+    float: left;
+}
+
+ul.products-list
+{
+    list-style-type: none;
+}
+
+.users-list>li img {
+    border-radius: 50%;
+    max-width: 100%;
+    height: 72px;
+    width: 80px;
+}
+
+.users-list>li {
+    width: 25%;
+    float: left;
+    padding: 10px;
+    text-align: center;
+}
+
+.users-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.border-bottom{
+    border-bottom: 1px solid #D8D0D0;
+    margin: 1px;
+    padding: 10px;
+}
+
+.pdf_delete {
+    top: -40px;
+    position: relative;
+    left: 40px;
+    color: #E42D2D !important;
+}
+
+.checkbox_images{
+    position: relative;
+    top: -58px;
+    left: 37px;
+}
+
+.image_instagram{
+    border: 7px solid #DAD189;
+    margin: 10px;
+}
+
+.dropdown-menu > li > a {
+        color: #987C17 !important;
+}
+
+.dropdown-menu > li > a:hover {
+    background-color: #DAD189 !important;
+    color: #ffffff !important;
+}
