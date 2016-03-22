@@ -1024,6 +1024,7 @@ class Api extends REST_Controller {
         }
 
         $order_detail         = $this->order->get_order_detail($order_id);
+        $order_detail["products"] = $this->product->get_order_products($order_id);
         $data["header"]["error"] = "0";
         $data['body']            = array("order_detail"=>$order_detail);
         $this->response($data, 200);   
