@@ -35,6 +35,13 @@ Class Product extends CI_Model
         return $this->db->insert_id();
     }
 
+    function edit_product($product_id, $data)
+    {
+        $this->db->where('product_id', $product_id);
+        $this->db->update('products',$data);
+        return ($this->db->affected_rows() != 1) ? false : true;
+    }
+
     function add_product_media($data)
     {
         $this->db->insert('product_media',$data);

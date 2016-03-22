@@ -770,7 +770,7 @@ class Api extends REST_Controller {
             $data["header"]["message"] = "Provide product description";
             $this->response($data, 200);
         }
-        if(!isset($product_id))
+        if(!isset($price))
         {
             $data["header"]["error"] = "1";
             $data["header"]["message"] = "Provide product price";
@@ -810,7 +810,7 @@ class Api extends REST_Controller {
 
         $data["header"]["error"]   = "0";
         $data["header"]["message"] = "Success";
-        $data['body']              = array();
+        $data['body']              = array("product_id"=>$product_id);
         $this->response($data, 200);
     }
 
