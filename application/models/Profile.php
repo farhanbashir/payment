@@ -2,9 +2,13 @@
 Class Profile extends CI_Model
 {
 
-    function get_user_profile($user_id)
+    function get_user_detail($user_id)
     {
-        $sql = "select * from user_details where user_id=$user_id" ;
+        $sql = "select u.name, u.email,u.role_id, ud.security_question_id, ud.security_answer,ub.bank_id, ub.bank_name, ub.account_number, ub.status as bank_status,us.store_id, us.name as store_name,us.logo, us.status as store_status from users u 
+            left join user_details ud on u.user_id=ud.user_id 
+            left join user_banks ub on u.user_id=ub.user_id 
+            left join user_stores us on u.user_id=us.user_id 
+            where u.user_id=$user_id" ;
         $query = $this->db->query($sql);
         $result = $query->result_array();
         $query->free_result();
@@ -99,10 +103,24 @@ Class Profile extends CI_Model
         return $this->db->insert_id();
     }
 
+    function edit_user_bank($bank_id, $data)
+    {
+        $this->db->where('bank_id', $bank_id);
+        $this->db->update('user_banks',$data);
+        return ($this->db->affected_rows() != 1) ? false : true;
+    }
+
     function add_user_store($data)
     {
         $this->db->insert('user_stores',$data);
         return $this->db->insert_id();
+    }
+
+    function edit_user_store($store_id, $data)
+    {
+        $this->db->where('store_id', $store_id);
+        $this->db->update('user_stores',$data);
+        return ($this->db->affected_rows() != 1) ? false : true;
     }
 
     function delete_profile($user_id)

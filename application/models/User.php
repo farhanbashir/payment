@@ -26,6 +26,45 @@ Class User extends CI_Model
         }
     }
 
+    function validStore($user_id, $store_id)
+    {
+        $sql_user = "select * from users where user_id=$user_id limit 1";
+        $query = $this->db->query($sql_user);
+        $result = $query->result_array();
+        $query->free_result();
+        if(count($result) > 0)
+        {
+            if($result[0]['role_id'] == 3)
+            {
+                $sql = "select store_id from user_stores where user_id=".$result[0]['parent_user_id'];
+            }
+            elseif($result[0]['role_id'] == 2)
+            {
+                $sql = "select store_id from user_stores where user_id=$user_id";
+            }
+            else
+            {
+                return false;
+            }
+
+            $query = $this->db->query($sql);
+            $result = $query->result_array();
+            $query->free_result();
+            if(count($result) > 0 && $result[0]['store_id'] == $store_id)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }    
+        }
+        else
+        {
+            return false;
+        }    
+    }
+
     function facebookLogin($facebook_id, $is_admin)
     {
         $this -> db -> select('user_id, email, password');
@@ -46,11 +85,11 @@ Class User extends CI_Model
         }
     }
 
-    function checkUser($name)
+    function checkUser($email)
     {
         $this -> db -> select('user_id, name, email');
         $this -> db -> from('users');
-        $this -> db -> where('name', $name);
+        $this -> db -> where('email', $email);
         //$this -> db -> where('is_admin', $is_admin);
         //$this -> db -> where('password', $password);
         $this -> db -> limit(1);

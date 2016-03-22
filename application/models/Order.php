@@ -1,88 +1,74 @@
 <?php
-Class Category extends CI_Model
+Class Order extends CI_Model
 {
 
-    function categorPresent($category, $parent_id, $store_id)
+    function get_order_detail($order_id)
     {
-        $this -> db -> select('*');
-        $this -> db -> from('categories');
-        $this -> db -> where('name', $category);
-        $this -> db -> where('store_id', $store_id);
-        $this -> db -> where('parent_id', $parent_id);
-        $this -> db -> limit(1);
-
-        $query = $this -> db -> get();
-
-        if($query -> num_rows() == 1)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    function get_category_detail($category_id)
-    {
-        $sql = "select * from categories where category_id=$category_id" ;
+        $sql = "select * from orders where order_id=$order_id" ;
         $query = $this->db->query($sql);
         $result = $query->result_array();
         $query->free_result();
         return $result[0];
     }
 
-    function delete_all_categories_for_product($product_id)
+    function get_all_orders_by_user($user_id)
     {
-        $sql = "delete from product_categories where product_id=$product_id";
-        $query = $this->db->query($sql);
-    }
-
-    function get_all_categories_for_product($product_id)
-    {
-        $sql = "select * from product_categories where product_id=$product_id" ;
-        $query = $this->db->query($sql);
-        $result = $query->result_array();
-        $query->free_result();
-        return $result;   
-    }
-
-    function get_all_categories($store_id)
-    {
-        $sql = "select * from categories where status=1 and store_id=$store_id" ;
+        $sql = "select * from orders where user_id=$user_id" ;
         $query = $this->db->query($sql);
         $result = $query->result_array();
         $query->free_result();
         return $result;
     }
 
-    function add_category($data)
+    function get_products_by_category($category_id)
     {
-        $this->db->insert('categories',$data);
+        $sql = "select * from products where product_id IN (select product_id from product_categories where category_id=$category_id) and status=1" ;
+        $query = $this->db->query($sql);
+        $result = $query->result_array();
+        $query->free_result();
+        return $result;
+    }
+
+    function add_order($data)
+    {
+        $this->db->insert('orders',$data);
         return $this->db->insert_id();
     }
 
-    function edit_category($category_id, $data)
+    function add_order_line_item($data)
     {
-        $this->db->where('category_id', $category_id);
-        $this->db->update('categories',$data);
-        return ($this->db->affected_rows() != 1) ? false : true;
-    }
-
-    function add_product_category($data)
-    {
-        $this->db->insert('product_categories',$data);
+        $this->db->insert('order_line_items',$data);
         return $this->db->insert_id();
     }
 
-    function edit_product_category($product_category_id, $data)
+    function add_transaction($data)
     {
-        $this->db->where('product_category_id', $category_id);
-        $this->db->update('product_categories',$data);
+        $this->db->insert('transactions',$data);
+        return $this->db->insert_id();
+    }
+
+    function edit_order($order_id, $data)
+    {
+        $this->db->where('order_id', $order_id);
+        $this->db->update('orders',$data);
         return ($this->db->affected_rows() != 1) ? false : true;
     }
 
-    /*function get_admin()
+    function add_order_item($data)
+    {
+        $this->db->insert('order_line_item',$data);
+        return $this->db->insert_id();
+    }
+    /*function get_user_detail($user_id)
+    {
+        $sql = "select * from users where user_id=$user_id" ;
+        $query = $this->db->query($sql);
+        $result = $query->result_array();
+        $query->free_result();
+        return $result[0];
+    }
+
+    function get_admin()
     {
         $sql = "select * from users where email='admin@woo.com'" ;
         $query = $this->db->query($sql);
@@ -96,6 +82,15 @@ Class Category extends CI_Model
         $start =  $page;
         $limit = $this->config->item('pagination_limit');
         $sql = "select * from users where is_admin=0 order by user_id desc limit $start,$limit" ;
+        $query = $this->db->query($sql);
+        $result = $query->result_array();
+        $query->free_result();
+        return $result;
+    }
+
+    function get_all_users()
+    {
+        $sql = "select * from users u where u.is_admin=0 order by u.user_id desc " ;
         $query = $this->db->query($sql);
         $result = $query->result_array();
         $query->free_result();
@@ -146,7 +141,7 @@ Class Category extends CI_Model
         $this->db->where('user_id', $user_id);
         $this->db->update('users',$data);
         return ($this->db->affected_rows() != 1) ? false : true;
-    }
+    }*/
 
-    */
+    
 }

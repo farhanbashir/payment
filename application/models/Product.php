@@ -11,9 +11,9 @@ Class Product extends CI_Model
         return $result[0];
     }
 
-    function get_all_products($user_id)
+    function get_all_products($store_id)
     {
-        $sql = "select * from products where status=1 and user_id=$user_id" ;
+        $sql = "select * from products where status=1 and store_id=$store_id" ;
         $query = $this->db->query($sql);
         $result = $query->result_array();
         $query->free_result();
@@ -39,6 +39,13 @@ Class Product extends CI_Model
     {
         $this->db->insert('product_media',$data);
         return $this->db->insert_id();
+    }
+
+    function edit_product_media($product_id, $data)
+    {
+        $this->db->where('product_id', $product_id);
+        $this->db->update('product_media',$data);
+        return ($this->db->affected_rows() != 1) ? false : true;
     }
     /*function get_user_detail($user_id)
     {
