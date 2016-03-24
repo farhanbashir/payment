@@ -59,6 +59,20 @@ Class Order extends CI_Model
         $this->db->insert('order_line_item',$data);
         return $this->db->insert_id();
     }
+	
+	
+	function get_order_transactions($order_id)
+    {
+		 $sql = "select t.type, t.amount_cc, t.amount_cash, t.is_cc_swipe, t.cc_number, t.created from transactions t 
+inner join orders o on t.order_id=o.order_id
+where t.order_id=$order_id";
+
+        $query = $this->db->query($sql);
+        $result = $query->result_array();
+        $query->free_result();
+        return $result;
+    }
+	
     /*function get_user_detail($user_id)
     {
         $sql = "select * from users where user_id=$user_id" ;

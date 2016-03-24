@@ -1,0 +1,9 @@
+*March 24, 2016:
+=================
+ALTER TABLE `transactions` 
+	ADD `cc_name` VARCHAR(100) NULL AFTER `is_cc_swipe`, 
+	ADD `cc_number` VARCHAR(100) NULL AFTER `cc_name`, 
+	ADD `cc_expiry_year` INT(11) NULL DEFAULT '0' AFTER `cc_number`, 
+	ADD `cc_expiry_month` INT(11) NULL DEFAULT '0' AFTER `cc_expiry_year`;
+	
+ALTER TABLE `transactions` DROP `cc_details`;

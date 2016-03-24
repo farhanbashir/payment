@@ -129,7 +129,7 @@ Class User extends CI_Model
 
     function checkUserById($user_id)
     {
-        $this -> db -> select('user_id, username, password');
+        $this -> db -> select('user_id, password');
         $this -> db -> from('users');
         $this -> db -> where('user_id', $user_id);
         //$this -> db -> where('is_admin', $is_admin);
