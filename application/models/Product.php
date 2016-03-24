@@ -22,7 +22,7 @@ Class Product extends CI_Model
 
     function get_order_products($order_id)
     {
-        $sql = "select ol.product_id,p.name,ol.quantity from order_line_items ol 
+        $sql = "select ol.product_id,p.name,ol.quantity, ol.product_price from order_line_items ol 
 inner join products p on ol.product_id=p.product_id
 where ol.order_id=$order_id";
         $query = $this->db->query($sql);

@@ -563,13 +563,28 @@ class Api extends REST_Controller {
     {
         $old_password = $this->post('old_password');
         $new_password = $this->post('new_password');
+		
+		
+		if(!$old_password)
+        {
+            $data["header"]["error"] = "1";
+            $data["header"]["message"] = "Current password is required";
+            $this->response($data, 200);
+        }
+		
+		if(!$new_password)
+        {
+            $data["header"]["error"] = "1";
+            $data["header"]["message"] = "New password is required";
+            $this->response($data, 200);
+        }
 
         $user = $this->user->checkUserById($this->user_id);
 
         if(md5($old_password) !== $user[0]->password)
         {
             $data["header"]["error"] = "1";
-            $data["header"]["message"] = "Please provide correct old password";
+            $data["header"]["message"] = "Please provide correct current password";
             $this->response($data, 200);
         }    
         else
@@ -953,7 +968,7 @@ class Api extends REST_Controller {
             $this->response($data, 200);
         }
 
-        $category_detail         = $this->product->get_product_detail($product_id);
+        $product_detail         = $this->product->get_product_detail($product_id);
         $data["header"]["error"] = "0";
         $data['body']            = array("product_detail"=>$product_detail);
         $this->response($data, 200);   
@@ -965,18 +980,70 @@ class Api extends REST_Controller {
         $store_id = $this->store_id;
         $json = $this->post('product_data');
 
-
         $input_data = json_decode($json,true);
-        
+		
+		if(!$input_data)
+        {
+            $data["header"]["error"] = "1";
+            $data["header"]["message"] = "Please provide product data";
+            $this->response($data, 200);
+        }
+		
+		$total_amount = $input_data["total_amount"];
+		$pay_by_cash_amount = $input_data['pay_by_cash']['amount'];
+		
+		$pay_by_credit_card_amount = $total_amount - $pay_by_cash_amount;
+		
+		if($pay_by_credit_card_amount <= 0) // negative value to zero
+		{
+			$pay_by_credit_card_amount = 0;
+		}
 
-        $order_data = array("store_id"=>$store_id,"user_id"=>$this->user_id,"total_amount"=>$input_data["total_amount"],"created"=>$created,"customer_email"=>$input_data['customer_info']['email'],"description"=>serialize($input_data['pay_by_credit_card']));
+        $order_data = array("store_id"=>$store_id,"user_id"=>$this->user_id,"total_amount"=>$total_amount,"created"=>$created,"customer_email"=>$input_data['customer_info']['email'],"description"=>'');
         try
         {
             //insert order
             $order_id = $this->order->add_order($order_data);
+			
+			// cc number!
+			$cc_number = '';
+			if(@$input_data['pay_by_credit_card']['cc_number'])
+			{
+				$cc_number = $input_data['pay_by_credit_card']['cc_number'];
+				
+				if($cc_number)
+				{
+					$cc_number = 'XXXX-XXXX-XXXX-'.substr($cc_number, -4);
+				}
+			}
+			
+			// cc swipe!
+			$is_cc_swipe = 0;
+			if(@$input_data['pay_by_credit_card']['is_swipe'])
+			{
+				$is_swipe = $input_data['pay_by_credit_card']['is_swipe'];
+				
+				if($is_swipe == 1)
+				{
+					$is_cc_swipe = 1;
+				}
+			}
 
             //insert into transaction
-            $transaction_data = array("store_id"=>$store_id,"user_id"=>$this->user_id,"order_id"=>$order_id,"type"=>1,"created"=>$created,"amount_cc"=> $input_data['numeric_pad']['amount'],"amount_cash"=> $input_data['pay_by_cash']['amount'], "is_cc_swipe"=> $input_data['pay_by_credit_card']['is_swipe'], "cc_details"=>$input_data['pay_by_credit_card']['cc_number']);
+            $transaction_data = array(
+										"store_id"=>$store_id,
+										"user_id"=>$this->user_id,
+										"order_id"=>$order_id,
+										"type"=>1, //1=payment, 2=refund
+										"created"=>$created,
+										"amount_cc"=> $pay_by_credit_card_amount,
+										"amount_cash"=> $pay_by_cash_amount,  
+										"is_cc_swipe"=> $is_cc_swipe, 
+										"cc_name"=> @$input_data['pay_by_credit_card']['cc_name'],
+										"cc_number"=> $cc_number,
+										"cc_expiry_year"=> @$input_data['pay_by_credit_card']['cc_expiry_year'],
+										"cc_expiry_month"=> @$input_data['pay_by_credit_card']['cc_expiry_month'],
+									);
 
             $this->order->add_transaction($transaction_data);
 
@@ -989,6 +1056,22 @@ class Api extends REST_Controller {
 
                 $this->order->add_order_line_item($order_line_item_data);
             }
+			
+			// for numeric pad product!
+			if(isset($input_data["numeric_pad"]))
+			{
+				if(isset($input_data["numeric_pad"]["amount"]))
+				{
+					$_numeric_pad_amount = $input_data["numeric_pad"]["amount"];
+					
+					if($_numeric_pad_amount > 0)
+					{
+						$order_line_item_data = array("order_id"=>$order_id,"product_id"=>-1,"quantity"=>1,"product_price"=>$_numeric_pad_amount,"created"=>$created);
+
+						$this->order->add_order_line_item($order_line_item_data);
+					}
+				}
+			}
 
             $data["header"]["error"] = "0";
             $data['body']            = array("order_id"=>$order_id);
@@ -1025,6 +1108,8 @@ class Api extends REST_Controller {
 
         $order_detail         = $this->order->get_order_detail($order_id);
         $order_detail["products"] = $this->product->get_order_products($order_id);
+		$order_detail["transactions"] = $this->order->get_order_transactions($order_id);
+		
         $data["header"]["error"] = "0";
         $data['body']            = array("order_detail"=>$order_detail);
         $this->response($data, 200);   
@@ -1067,7 +1152,7 @@ class Api extends REST_Controller {
 
         $amount = $amount_cc + $amount_cash;
         $total_amount = $order_detail['total_amount'] - $amount;
-        $this->order->edit_order($order_id, array('total_refund'=>$amount,'total_amount'=>$total_amount));
+        $this->order->edit_order($order_id, array('total_refund'=>$order_detail['total_refund']+$amount,'total_amount'=>$total_amount));
 
         $transaction_data = array("order_id"=>$order_id,"store_id"=>$this->store_id,"user_id"=>$this->user_id,"type"=>2,"amount_cc"=>$amount_cc,"amount_cash"=>$amount_cash,"created"=>$created);
         $this->order->add_transaction($transaction_data);
