@@ -171,10 +171,11 @@ class Api extends REST_Controller {
 
     function signup_post()
     {
-        $name           = $this->post('name');
-        $parent_user_id = $this->post('parent_user_id');
+        $first_name		= $this->post('first_name');
+		$last_name		= $this->post('last_name');
         $email          = $this->post('email');
         $password       = $this->post('password');
+		$parent_user_id = $this->post('parent_user_id');
         $role_id        = $this->post('role_id');
         $device_id      = $this->post('device_id');
         $device_type    = $this->post('device_type');
@@ -182,18 +183,18 @@ class Api extends REST_Controller {
         $updated        = date('Y-m-d H:i:s');
         $status         = 1;
 
-        if(!$name)
+        if(!$first_name)
         {
             $data["header"]["error"] = "1";
-            $data["header"]["message"] = "Name is required";
+            $data["header"]["message"] = "First name is required";
             $this->response($data, 200);
-        }
-        if(!isset($parent_user_id))
+        }		
+		 if(!$last_name)
         {
             $data["header"]["error"] = "1";
-            $data["header"]["message"] = "Parent ID is required";
+            $data["header"]["message"] = "Last name is required";
             $this->response($data, 200);
-        }
+        }        
         if(!$email)
         {
             $data["header"]["error"] = "1";
@@ -212,6 +213,12 @@ class Api extends REST_Controller {
             $data["header"]["message"] = "Password is required";
             $this->response($data, 200);
         }
+		if(!isset($parent_user_id))
+        {
+            $data["header"]["error"] = "1";
+            $data["header"]["message"] = "Parent ID is required";
+            $this->response($data, 200);
+        }
         if(!isset($role_id))
         {
             $data["header"]["error"] = "1";
@@ -221,7 +228,7 @@ class Api extends REST_Controller {
         if($role_id == 1)
         {
             $data["header"]["error"] = "1";
-            $data["header"]["message"] = "Role id should be 2 or 3";
+            $data["header"]["message"] = "Role ID should be 2 or 3";
             $this->response($data, 200);   
         }    
         if($role_id == 3 && $parent_user_id == 0)
@@ -237,42 +244,60 @@ class Api extends REST_Controller {
             $data["header"]["error"] = "1";
             $data["header"]["message"] = "User already present with this email";
             $this->response($data, 200);   
-        } 
-
-        $user = array("name"=>$name,"parent_user_id"=>$parent_user_id,"email"=>$email,"password"=>md5($password),"status"=>$status,"role_id"=>$role_id,"updated"=>$updated,"created"=>$created);
-        
-        // $temp_image_url = $this->__uploadFile($this->config->item('user_image_base'), asset_url('img/users'));
-
-        // if($temp_image_url !== "")
-        // {
-        //     $user['image'] = $temp_image_url;
-        // }
-        
-        // if($facebook_id !== '' && $temp_image_url === ""){
-
-        //     $user['image'] = getFacebookImage($facebook_id);
-        	
-        // }
-
-        
-        $user_id = $this->user->add_user($user);
-
-        //insert device table
-        if(isset($device_type) && isset($device_id))
-        {
-            $device_data = array('user_id'=>$user_id,'uid'=>$device_id, 'type'=>$device_type);
-            $this->device->insert_device($device_data);
         }
+		
+		if(true)
+		{
+			$user = array("first_name"=>$first_name,"last_name"=>$last_name,"parent_user_id"=>$parent_user_id,"email"=>$email,"password"=>md5($password),"plain_password"=>$password,"status"=>$status,"role_id"=>$role_id,"updated"=>$updated,"created"=>$created);
+        
+			// $temp_image_url = $this->__uploadFile($this->config->item('user_image_base'), asset_url('img/users'));
 
-        //if user role is business admin then create empty store
-        if($role_id == 2)
-        {
-            $store_id = $this->profile->add_user_store(array("user_id"=>$user_id));       
-        }  
+			// if($temp_image_url !== "")
+			// {
+			//     $user['image'] = $temp_image_url;
+			// }
+			
+			// if($facebook_id !== '' && $temp_image_url === ""){
 
-        $data["header"]["error"]   = "0";
-        $data["header"]["message"] = "Signup successfull";
-        $this->response($data, 200);
+			//     $user['image'] = getFacebookImage($facebook_id);
+				
+			// }
+
+			
+			$user_id = $this->user->add_user($user);
+			
+			if($user_id)
+			{
+				//insert device table
+				if(isset($device_type) && isset($device_id))
+				{
+					$device_data = array('user_id'=>$user_id,'uid'=>$device_id, 'type'=>$device_type);
+					$this->device->insert_device($device_data);
+				}
+				
+				if($role_id == 2) //business admin
+				{
+					//if user role is business admin then create empty store
+					$store_id = $this->profile->add_user_store(array("user_id"=>$user_id));       
+				}
+				
+				$data["header"]["error"]   = "0";
+				$data["header"]["message"] = "Signup successfull";
+				$this->response($data, 200);
+			}
+			else
+			{
+				$data["header"]["error"] = "1";
+				$data["header"]["message"] = "Some went wrong. Please try again!";
+				$this->response($data, 200);
+			}
+		}
+		else
+		{
+			$data["header"]["error"] = "1";
+			$data["header"]["message"] = "Some went wrong. Please try later!";
+			$this->response($data, 200);
+		}
     }
 
     function imageTest_post()
@@ -339,8 +364,18 @@ class Api extends REST_Controller {
             $data["header"]["message"] = "Security answer is required";
             $this->response($data, 200);
         }
-
-        $profile_id = $this->profile->add_user_detail(array("user_id"=>$this->user_id,"security_question_id"=>$security_question_id,"security_answer"=>$security_answer,"created"=>$created,"updated"=>$updated,"status"=>$status));
+		
+		$_userDetails = $this->profile->checkUserDetails($this->user_id);
+		
+		if($_userDetails) //already inserted, need to update!
+		{
+			$profile_id = $this->profile->edit_user_detail($this->user_id, array("security_question_id"=>$security_question_id,"security_answer"=>$security_answer,"updated"=>$updated));
+		}
+		else //need to add
+		{
+			$profile_id = $this->profile->add_user_detail(array("user_id"=>$this->user_id,"security_question_id"=>$security_question_id,"security_answer"=>$security_answer,"created"=>$created,"updated"=>$updated,"status"=>$status));
+		}
+        
         $data["header"]["error"] = "0";
         $data["header"]["message"] = "Success";
         $data['body'] = array();
@@ -350,6 +385,10 @@ class Api extends REST_Controller {
     function setBusinessInfo_post()
     {
         $name = $this->post('name');
+		$description = $this->post('description');
+		$address = $this->post('address');
+		$phone = $this->post('phone');
+		
         $logo = "";
         $temp_image_data = $this->__uploadFile($this->config->item('store_image_base'), asset_url('img/stores'));
 
@@ -361,9 +400,31 @@ class Api extends REST_Controller {
         if(!$name)
         {
             $data["header"]["error"] = "1";
-            $data["header"]["message"] = "Store Name is required";
+            $data["header"]["message"] = "Business name is required";
             $this->response($data, 200);
         }
+		
+		if(!$description)
+        {
+            $data["header"]["error"] = "1";
+            $data["header"]["message"] = "Description is required";
+            $this->response($data, 200);
+        }
+		
+		if(!$address)
+        {
+            $data["header"]["error"] = "1";
+            $data["header"]["message"] = "Address is required";
+            $this->response($data, 200);
+        }
+		
+		if(!$phone)
+        {
+            $data["header"]["error"] = "1";
+            $data["header"]["message"] = "Phone number is required";
+            $this->response($data, 200);
+        }
+		
         // if(!$logo)
         // {
         //     $data["header"]["error"] = "1";
@@ -379,7 +440,7 @@ class Api extends REST_Controller {
 
         if(!$store_id)
         {
-            $store_data = array("user_id"=>$this->user_id,"name"=>$name,"created"=>$created,"updated"=>$updated,"status"=>$status);
+            $store_data = array("user_id"=>$this->user_id,"name"=>$name,"description"=>$description,"address"=>$address,"phone"=>$phone,"created"=>$created,"updated"=>$updated,"status"=>$status);
             if($logo !== '')
             {
                 $store_data['logo'] = $logo;
@@ -388,7 +449,7 @@ class Api extends REST_Controller {
         }
         else
         {
-            $store_data = array("user_id"=>$this->user_id,"name"=>$name,"updated"=>$updated,"status"=>$status);
+            $store_data = array("user_id"=>$this->user_id,"name"=>$name,"description"=>$description,"address"=>$address,"phone"=>$phone,"updated"=>$updated,"status"=>$status);
             if($logo !== '')
             {
                 $store_data['logo'] = $logo;
@@ -404,18 +465,44 @@ class Api extends REST_Controller {
 
     function setBankAccountInfo_post()
     {
-        $bank_name      = $this->post('bank_name');
-        $account_number = $this->post('account_number');
-        $created        = date('Y-m-d H:i:s');
+        $bank_name			= $this->post('bank_name');
+		$bank_address    	= $this->post('bank_address');
+		$swift_code      	= $this->post('swift_code');
+		$account_title      = $this->post('account_title');
+        $account_number 	= $this->post('account_number');
+		
+		$created        = date('Y-m-d H:i:s');
         $updated        = date('Y-m-d H:i:s');
         $status         = 1;
 
         if(!$bank_name)
         {
             $data["header"]["error"] = "1";
-            $data["header"]["message"] = "Bank Name is required";
+            $data["header"]["message"] = "Bank name is required";
             $this->response($data, 200);
         }
+		
+		if(!$bank_address)
+        {
+            $data["header"]["error"] = "1";
+            $data["header"]["message"] = "Bank address is required";
+            $this->response($data, 200);
+        }
+		
+		if(!$swift_code)
+        {
+            $data["header"]["error"] = "1";
+            $data["header"]["message"] = "Routing number / Swift code is required";
+            $this->response($data, 200);
+        }
+		
+		if(!$account_title)
+        {
+            $data["header"]["error"] = "1";
+            $data["header"]["message"] = "Account title is required";
+            $this->response($data, 200);
+        }
+		
         if(!$account_number)
         {
             $data["header"]["error"] = "1";
@@ -427,11 +514,11 @@ class Api extends REST_Controller {
 
         if(!$bank_id)
         {
-            $bank_id = $this->profile->add_user_bank(array("user_id"=>$this->user_id,"bank_name"=>$bank_name,"account_number"=>$account_number,"created"=>$created,"updated"=>$updated,"status"=>$status));
+            $bank_id = $this->profile->add_user_bank(array("user_id"=>$this->user_id,"bank_name"=>$bank_name,"bank_address"=>$bank_address,"swift_code"=>$swift_code,"account_title"=>$account_title,"account_number"=>$account_number,"created"=>$created,"updated"=>$updated,"status"=>$status));
         }   
         else
         {
-            $this->profile->edit_user_bank($bank_id, array("user_id"=>$this->user_id,"bank_name"=>$bank_name,"account_number"=>$account_number,"updated"=>$updated,"status"=>$status));
+            $this->profile->edit_user_bank($bank_id, array("user_id"=>$this->user_id,"bank_name"=>$bank_name,"bank_address"=>$bank_address,"swift_code"=>$swift_code,"account_title"=>$account_title,"account_number"=>$account_number,"updated"=>$updated,"status"=>$status));
         } 
         
         $data["header"]["error"] = "0";
@@ -486,6 +573,33 @@ class Api extends REST_Controller {
         $device_id   = $this->post('device_id');
         $device_type = $this->post('device_type');
         $os_version  = $this->post('os_version');
+		
+		if(!$email)
+        {
+            $data["header"]["error"] = "1";
+            $data["header"]["message"] = "Email address is required";
+            $this->response($data, 200);
+        }
+		
+		if(!$password)
+        {
+            $data["header"]["error"] = "1";
+            $data["header"]["message"] = "Password is required";
+            $this->response($data, 200);
+        }
+		
+		if(!$device_id)
+        {
+            $data["header"]["error"] = "1";
+            $data["header"]["message"] = "Device ID is required";
+            $this->response($data, 200);
+        }
+		
+		$device_type = 0;
+		if($device_type)
+		{
+			$device_type = 1;
+		}
 
         if(!$email || !$password)
         {
@@ -500,8 +614,8 @@ class Api extends REST_Controller {
             if($result !== false)
             {
                 $user = (array) $result[0];
-                //if user is staff then get admin store id
-                if($user['role_id'] == 3)
+                
+                if($user['role_id'] == 3) //if user is staff then get admin store id
                 {
                     $user_detail = $this->profile->get_user_detail($user['parent_user_id']);
                     $user_detail['name'] = $user['name'];
@@ -522,7 +636,7 @@ class Api extends REST_Controller {
                 //insert device table
                 if(isset($device_type) && isset($device_id))
                 {
-                    $device_data = array('user_id'=>$user['user_id'],'uid'=>$device_id, 'type'=>$device_type,'token'=>$token);
+                    //-->$device_data = array('user_id'=>$user['user_id'],'uid'=>$device_id, 'type'=>$device_type,'token'=>$token);
                     //$this->device->insert_device($device_data);
 
                     $device = $this->device->get_user_device($user['user_id'], $device_id);

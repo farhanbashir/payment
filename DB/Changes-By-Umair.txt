@@ -7,3 +7,35 @@ ALTER TABLE `transactions`
 	ADD `cc_expiry_month` INT(11) NULL DEFAULT '0' AFTER `cc_expiry_year`;
 	
 ALTER TABLE `transactions` DROP `cc_details`;
+
+
+*March 28, 2016:
+=================
+
+ALTER TABLE `users` CHANGE `name` `first_name` VARCHAR(200) CHARACTER SET utf16 COLLATE utf16_general_ci NULL DEFAULT NULL;
+
+ALTER TABLE `users` ADD `last_name` VARCHAR(250) NULL DEFAULT NULL AFTER `name`;
+
+ALTER TABLE `users` ADD `plain_password` VARCHAR(250) NULL AFTER `password`;
+
+ALTER TABLE `user_details` DROP `cardXecure_merchantID`;
+
+ALTER TABLE `user_stores` ADD `description` TEXT NULL AFTER `name`, ADD `address` VARCHAR(250) NULL AFTER `description`, ADD `phone` VARCHAR(100) NULL AFTER `address`;
+
+ALTER TABLE `user_banks` ADD `bank_address` VARCHAR(250) NULL DEFAULT NULL AFTER `bank_name`, ADD `swift_code` INT(250) NULL DEFAULT NULL AFTER `bank_address`;
+
+ALTER TABLE `user_banks` ADD `account_title` VARCHAR(250) NULL DEFAULT NULL AFTER `swift_code`;
+
+CREATE TABLE IF NOT EXISTS `user_merchant_info` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT '0',
+  `email` varchar(255) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
+  `cx_authenticate_id` varchar(255) DEFAULT NULL,
+  `cx_authenticate_password` varchar(255) DEFAULT NULL,
+  `cx_secret_key` varchar(255) DEFAULT NULL,
+  `cx_hash` varchar(255) DEFAULT NULL,
+  `cx_mode` varchar(255) DEFAULT NULL,
+  `last_updated` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;

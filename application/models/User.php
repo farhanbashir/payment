@@ -87,7 +87,7 @@ Class User extends CI_Model
 
     function checkUser($email)
     {
-        $this -> db -> select('user_id, name, email');
+        $this -> db -> select('user_id, first_name, last_name, email');
         $this -> db -> from('users');
         $this -> db -> where('email', $email);
         //$this -> db -> where('is_admin', $is_admin);
