@@ -7,8 +7,16 @@ Class Product extends CI_Model
         $sql = "select * from products where product_id=$product_id" ;
         $query = $this->db->query($sql);
         $result = $query->result_array();
-        $query->free_result();
-        return $result[0];
+		
+		if($result)
+		{
+			$query->free_result();
+			return $result[0];
+		}
+		else			
+		{
+			return false;
+		}
     }
 
     function get_all_products($store_id)

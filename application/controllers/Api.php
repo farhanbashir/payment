@@ -175,13 +175,23 @@ class Api extends REST_Controller {
 		$last_name		= $this->post('last_name');
         $email          = $this->post('email');
         $password       = $this->post('password');
-		$parent_user_id = $this->post('parent_user_id');
-        $role_id        = $this->post('role_id');
+		$parent_user_id = 0; //-->$this->post('parent_user_id');
+        $role_id        = CONST_ROLE_ID_BUSINESS_ADMIN; //-->$this->post('role_id');
         $device_id      = $this->post('device_id');
         $device_type    = $this->post('device_type');
         $created        = date('Y-m-d H:i:s');
         $updated        = date('Y-m-d H:i:s');
         $status         = 1;
+		
+		if(!$device_id)
+		{
+			$device_id = uniqid('d_');
+		}
+		
+		if(!$device_type)
+		{
+			$device_type  = 1; //1=iphone, 2=android
+		}
 
         if(!$first_name)
         {
@@ -225,13 +235,13 @@ class Api extends REST_Controller {
             $data["header"]["message"] = "Role is required";
             $this->response($data, 200);
         }
-        if($role_id == 1)
+        if($role_id == CONST_ROLE_ID_SUPER_ADMIN)
         {
             $data["header"]["error"] = "1";
-            $data["header"]["message"] = "Role ID should be 2 or 3";
+            $data["header"]["message"] = "Role ID should be ".CONST_ROLE_ID_BUSINESS_ADMIN." or ".CONST_ROLE_ID_BUSINESS_STAFF;
             $this->response($data, 200);   
         }    
-        if($role_id == 3 && $parent_user_id == 0)
+        if($role_id == CONST_ROLE_ID_BUSINESS_STAFF && $parent_user_id == 0)
         {
             $data["header"]["error"] = "1";
             $data["header"]["message"] = "Parent ID is not valid";
@@ -268,14 +278,16 @@ class Api extends REST_Controller {
 			
 			if($user_id)
 			{
+				/* //UJ: Not needed at signup!
 				//insert device table
 				if(isset($device_type) && isset($device_id))
 				{
 					$device_data = array('user_id'=>$user_id,'uid'=>$device_id, 'type'=>$device_type);
 					$this->device->insert_device($device_data);
 				}
+				*/
 				
-				if($role_id == 2) //business admin
+				if($role_id == CONST_ROLE_ID_BUSINESS_ADMIN) //business admin
 				{
 					//if user role is business admin then create empty store
 					$store_id = $this->profile->add_user_store(array("user_id"=>$user_id));       
@@ -288,14 +300,14 @@ class Api extends REST_Controller {
 			else
 			{
 				$data["header"]["error"] = "1";
-				$data["header"]["message"] = "Some went wrong. Please try again!";
+				$data["header"]["message"] = "Something went wrong. Please try again!";
 				$this->response($data, 200);
 			}
 		}
 		else
 		{
 			$data["header"]["error"] = "1";
-			$data["header"]["message"] = "Some went wrong. Please try later!";
+			$data["header"]["message"] = "Something went wrong. Please try later!";
 			$this->response($data, 200);
 		}
     }
@@ -404,12 +416,14 @@ class Api extends REST_Controller {
             $this->response($data, 200);
         }
 		
+		/*
 		if(!$description)
         {
             $data["header"]["error"] = "1";
             $data["header"]["message"] = "Description is required";
             $this->response($data, 200);
         }
+		*/
 		
 		if(!$address)
         {
@@ -523,7 +537,7 @@ class Api extends REST_Controller {
 			else
 			{
 				$data["header"]["error"] = "1";
-				$data["header"]["message"] = "Some went wrong. Please try later!";
+				$data["header"]["message"] = "Something went wrong. Please try later!";
 				$this->response($data, 200);
 			}			
 		}
@@ -652,7 +666,7 @@ class Api extends REST_Controller {
 				else
 				{
 					$data["header"]["error"] = "1";
-					$data["header"]["message"] = "Some went wrong. Please try later!";
+					$data["header"]["message"] = "Something went wrong. Please try later!";
 					$this->response($data, 200);
 				}
 			}   
@@ -714,6 +728,16 @@ class Api extends REST_Controller {
         $device_type = $this->post('device_type');
         $os_version  = $this->post('os_version');
 		
+		if(!$device_id)
+		{
+			$device_id = uniqid('d_');
+		}
+		
+		if(!$device_type)
+		{
+			$device_type  = 1; //1=iphone, 2=android
+		}
+		
 		if(!$email)
         {
             $data["header"]["error"] = "1";
@@ -734,12 +758,6 @@ class Api extends REST_Controller {
             $data["header"]["message"] = "Device ID is required";
             $this->response($data, 200);
         }
-		
-		$device_type = 0;
-		if($device_type)
-		{
-			$device_type = 1;
-		}
 
         if(!$email || !$password)
         {
@@ -755,7 +773,7 @@ class Api extends REST_Controller {
             {
                 $user = (array) $result[0];
                 
-                if($user['role_id'] == 3) //if user is staff then get admin store id
+                if($user['role_id'] == CONST_ROLE_ID_BUSINESS_STAFF) //if user is staff then get admin store id
                 {
                     $user_detail = $this->profile->get_user_detail($user['parent_user_id']);
                     $user_detail['name'] = $user['name'];
@@ -797,7 +815,7 @@ class Api extends REST_Controller {
                 $array['user_id']          = $user['user_id'];
                 $array['token']            = $token;
                 $array['store_id']         = $user_detail['store_id'];
-                $array['role_id']         = $user['role_id'];
+                $array['role_id']          = $user['role_id'];
                 $array['user']             = $user_detail;
                 $data["header"]["error"]   = "0";
                 $data["header"]["message"] = "Login successfully";
@@ -1229,21 +1247,84 @@ class Api extends REST_Controller {
 
     function createOrder_post()
     {
-        $created      = date('Y-m-d H:i:s');
-        $store_id = $this->store_id;
-        $json = $this->post('data');
+        $created	= date('Y-m-d H:i:s');
+        $store_id	= $this->store_id;
+        $json		= $this->post('data');
 
         $input_data = json_decode($json,true);
 		
 		if(!$input_data)
         {
             $data["header"]["error"] = "1";
-            $data["header"]["message"] = "Please provide product data";
+            $data["header"]["message"] = "Please provide data";
             $this->response($data, 200);
         }
 		
-		$total_amount = $input_data["total_amount"];
-		$pay_by_cash_amount = $input_data['pay_by_cash']['amount'];
+		//customer info!
+		$customer_info		= @$input_data['customer_info'];
+		
+		$customer_email 	= @$customer_info['email'];
+		$customer_address1 	= @$customer_info['address1'];
+		$customer_address2 	= @$customer_info['address2'];
+		$customer_city 		= @$customer_info['city'];
+		$customer_state 	= @$customer_info['state'];
+		$customer_zipcode 	= @$customer_info['zipcode'];
+		$customer_phone 	= @$customer_info['phone'];
+		
+		//products!
+		$products 			= @$input_data['products'];
+		
+		$numeric_pad_amount = @$input_data['numeric_pad_amount'];
+		
+		$total_amount 		= @$input_data['total_amount'];
+		
+		$pay_by_cash_amount = @$input_data['pay_by_cash_amount'];
+		
+		//credit card info!
+		$pay_by_credit_card = @$input_data['pay_by_credit_card'];
+		
+		$cc_swipe			= @$pay_by_credit_card['is_swipe'];
+		$cc_name			= @$pay_by_credit_card['cc_name'];
+		$cc_number			= @$pay_by_credit_card['cc_number'];
+		$cc_expiry_year		= @$pay_by_credit_card['cc_expiry_year'];
+		$cc_expiry_month	= @$pay_by_credit_card['cc_expiry_month'];
+		$cc_code			= @$pay_by_credit_card['cc_code'];
+		
+		// cc swipe!
+		$is_cc_swipe = 0;
+		if($cc_swipe == 1)
+		{
+			$is_cc_swipe = 1;
+		}
+		
+		//validations start!
+		if(!$customer_email)
+		{
+			$data["header"]["error"] = "1";
+            $data["header"]["message"] = "Customer email address is required";
+            $this->response($data, 200);
+		}
+		
+		if(!valid_email($customer_email))
+        {
+            $data["header"]["error"] = "1";
+            $data["header"]["message"] = "Please provide valid email address";
+            $this->response($data, 200);
+        }
+		
+		if(!$total_amount || $total_amount <= 0)
+		{
+			$data["header"]["error"] = "1";
+            $data["header"]["message"] = "Total amount is required field";
+            $this->response($data, 200);
+		}
+		
+		if($pay_by_cash_amount > $total_amount)
+		{
+			$data["header"]["error"] = "1";
+            $data["header"]["message"] = "Pay via cash amount can not be greater than total amount";
+            $this->response($data, 200);
+		}
 		
 		$pay_by_credit_card_amount = $total_amount - $pay_by_cash_amount;
 		
@@ -1252,121 +1333,210 @@ class Api extends REST_Controller {
 			$pay_by_credit_card_amount = 0;
 		}
 		
-		//pay by credit card!
-		if($pay_by_credit_card_amount > 0)
+		$apiStatus = true;
+		$cx_transaction_id = 0;
+		$random_order_id = 0;
+		if($pay_by_credit_card_amount > 0) //pay by credit card!
 		{
-			/* TODO: In-Progress work!
+			if(!$cc_name)
+			{
+				$data["header"]["error"] = "1";
+				$data["header"]["message"] = "Name on credit card is required";
+				$this->response($data, 200);
+			}
+			
+			if(!$cc_number)
+			{
+				$data["header"]["error"] = "1";
+				$data["header"]["message"] = "Credit card number is required";
+				$this->response($data, 200);
+			}
+			
+			if(!$cc_expiry_year)
+			{
+				$data["header"]["error"] = "1";
+				$data["header"]["message"] = "Expiry year for credit card is required";
+				$this->response($data, 200);
+			}
+			
+			if(!$cc_expiry_month)
+			{
+				$data["header"]["error"] = "1";
+				$data["header"]["message"] = "Expiry month for credit card is required";
+				$this->response($data, 200);
+			}
+			
+			if(!$cc_code)
+			{
+				$data["header"]["error"] = "1";
+				$data["header"]["message"] = "CVV2 for credit card is required";
+				$this->response($data, 200);
+			}
+			
+			$arrNames = splitName($cc_name);
+			
+			$apiStatus = false;
+			
+			$custom_order_id = uniqid('ORD-');
+			
 			$postParams = array();
 			$postParams['amount'] 			= $pay_by_credit_card_amount;
-			$postParams['authenticate_id'] 	= 'f521db864807b9a09f4abb3deb828c29';
-			$postParams['authenticate_pw'] 	= '2e9120d98798cb6b04eda313966604ad';
-			$postParams['ccn'] 				= @$input_data['pay_by_credit_card']['cc_number'];
-			$postParams['city'] 			= 'NYC';
-			$postParams['country'] 			= 'USA';
-			$postParams['currency'] 		= 'USD';
-			$postParams['customerip'] 		= '127.0.0.1';
-			$postParams['cvc_code'] 		= @$input_data['pay_by_credit_card']['cc_code'];
-			$postParams['email'] 			= $input_data['customer_info']['email'];
-			$postParams['exp_month'] 		= @$input_data['pay_by_credit_card']['cc_expiry_month'];
-			$postParams['exp_year'] 		= @$input_data['pay_by_credit_card']['cc_expiry_year'];
-			$postParams['firstname'] 		= 'abc';
-			$postParams['lastname'] 		= 'xyz';
-			$postParams['orderid']	 		= '101';
-			$postParams['phone'] 			= '111-222-333-4';
-			$postParams['state'] 			= 'NY';
-			$postParams['street'] 			= 'ABC Street';
-			$postParams['transaction_type'] = 'A';
-			$postParams['zip'] 				= '12345';
+			$postParams['cc_number'] 		= $cc_number;
+			$postParams['cc_expiry_month'] 	= $cc_expiry_month;
+			$postParams['cc_expiry_year'] 	= $cc_expiry_year;
+			$postParams['cc_code'] 			= $cc_code;
 			
-			chargePaymentFromCreditCard($postParams);
-			*/
-		}
-
-        $order_data = array("store_id"=>$store_id,"user_id"=>$this->user_id,"total_amount"=>$total_amount,"created"=>$created,"customer_email"=>$input_data['customer_info']['email'],"description"=>'');
-        try
-        {
-            //insert order
-            $order_id = $this->order->add_order($order_data);
+			$postParams['customer_fname'] 	= $arrNames['first_name'];
+			$postParams['customer_lname'] 	= $arrNames['last_name'];
+			$postParams['customer_email']	= $customer_email;
+			$postParams['customer_phone'] 	= $customer_phone;
+			$postParams['customer_country']	= CONST_DEFAULT_COUNTRY;
+			$postParams['customer_state'] 	= $customer_state;
+			$postParams['customer_city']	= $customer_city;
+			$postParams['customer_address'] = trim($customer_address1.' '.$customer_address2);
+			$postParams['customer_zip'] 	= $customer_zipcode;			
+		
+			$postParams['order_id']	 		= $custom_order_id; //UJ: Passing this, becuase actual order is inserting after this API call
 			
-			// cc number!
-			$cc_number = '';
-			if(@$input_data['pay_by_credit_card']['cc_number'])
-			{
-				$cc_number = $input_data['pay_by_credit_card']['cc_number'];
+			$apiResponse = chargePaymentFromCreditCard($this->user_id, $postParams);
 				
+			if($apiResponse)
+			{
+				if(isset($apiResponse['error']))
+				{
+					$data["header"]["error"] = "1";
+					$data["header"]["message"] = $apiResponse['error'];
+					$this->response($data, 200);
+				}
+				else if(isset($apiResponse['success']))
+				{
+					$apiStatus = true;
+					
+					$apiData = $apiResponse['data'];
+					
+					$cx_transaction_id = @$apiData['transaction_id'];
+				}
+			}
+		}
+		
+		if($apiStatus)
+		{
+			$order_data = array(
+									"store_id"			=> $store_id,
+									"user_id"			=> $this->user_id,
+									"total_amount"		=> $total_amount,
+									"created"			=> $created,
+									"customer_email"	=> $customer_email,
+									"description"		=> '',
+									"custom_order_id"	=> $custom_order_id
+								);
+			try
+			{
+				//insert order
+				$order_id = $this->order->add_order($order_data);
+				
+				// cc number - save only last 4 numbers!
 				if($cc_number)
 				{
 					$cc_number = 'XXXX-XXXX-XXXX-'.substr($cc_number, -4);
 				}
-			}
-			
-			// cc swipe!
-			$is_cc_swipe = 0;
-			if(@$input_data['pay_by_credit_card']['is_swipe'])
-			{
-				$is_swipe = $input_data['pay_by_credit_card']['is_swipe'];
 				
-				if($is_swipe == 1)
+				//insert into transaction
+				$transaction_data = array(
+											"store_id"			=> $store_id,
+											"user_id"			=> $this->user_id,
+											"order_id"			=> $order_id,
+											"type"				=> 1, //1=payment, 2=refund
+											"created"			=> $created,
+											"amount_cc"			=> $pay_by_credit_card_amount,
+											"amount_cash"		=> $pay_by_cash_amount,  
+											"is_cc_swipe"		=> $is_cc_swipe, 
+											"cc_name"			=> $cc_name,
+											"cc_number"			=> $cc_number,
+											"cc_expiry_year"	=> $cc_expiry_year,
+											"cc_expiry_month"	=> $cc_expiry_month,
+											"cc_code"			=> $cc_code,
+											'cx_transaction_id' => $cx_transaction_id
+										);
+
+				$this->order->add_transaction($transaction_data);
+
+				//insert each product
+				if(is_array($products) && count($products) > 0)
 				{
-					$is_cc_swipe = 1;
-				}
-			}
-
-            //insert into transaction
-            $transaction_data = array(
-										"store_id"=>$store_id,
-										"user_id"=>$this->user_id,
-										"order_id"=>$order_id,
-										"type"=>1, //1=payment, 2=refund
-										"created"=>$created,
-										"amount_cc"=> $pay_by_credit_card_amount,
-										"amount_cash"=> $pay_by_cash_amount,  
-										"is_cc_swipe"=> $is_cc_swipe, 
-										"cc_name"=> @$input_data['pay_by_credit_card']['cc_name'],
-										"cc_number"=> $cc_number,
-										"cc_expiry_year"=> @$input_data['pay_by_credit_card']['cc_expiry_year'],
-										"cc_expiry_month"=> @$input_data['pay_by_credit_card']['cc_expiry_month'],
-										"cc_code"=> @$input_data['pay_by_credit_card']['cc_code'],
-									);
-
-            $this->order->add_transaction($transaction_data);
-
-            //insert each product
-            foreach($input_data['products'] as $product)
-            {
-                $product_detail = $this->product->get_product_detail($product['product_id']);
-                $items_amount = $product['quantity'] * $product_detail['price'];
-                $order_line_item_data = array("order_id"=>$order_id,"product_id"=>$product['product_id'],"quantity"=>$product['quantity'],"product_price"=>$product_detail['price'],"created"=>$created);
-
-                $this->order->add_order_line_item($order_line_item_data);
-            }
-			
-			// for numeric pad product!
-			if(isset($input_data["numeric_pad"]))
-			{
-				if(isset($input_data["numeric_pad"]["amount"]))
-				{
-					$_numeric_pad_amount = $input_data["numeric_pad"]["amount"];
-					
-					if($_numeric_pad_amount > 0)
+					foreach($products as $product)
 					{
-						$order_line_item_data = array("order_id"=>$order_id,"product_id"=>-1,"quantity"=>1,"product_price"=>$_numeric_pad_amount,"created"=>$created);
+						if(isset($product['product_id']))
+						{
+							$product_id = $product['product_id'];
+							
+							if($product_id)
+							{
+								$product_detail = $this->product->get_product_detail($product_id);
+						
+								if($product_detail)
+								{
+									$product_price = $product_detail['price'];
+									
+									$product_qty = 1;
+									if(isset($product['quantity']))
+									{
+										$_product_qty = $product['quantity'];
+										
+										if($_product_qty > 1)
+										{
+											$product_qty = $_product_qty;
+										}
+									}									
+									
+									//-->$items_amount = $product_qty * $product_price; //UJ: not needed!
+									
+									$order_line_item_data = array(
+																	"order_id"		=> $order_id,
+																	"product_id"	=> $product_id,
+																	"quantity"		=> $product_qty,
+																	"product_price"	=> $product_price,
+																	"created"		=> $created);
 
-						$this->order->add_order_line_item($order_line_item_data);
+									$this->order->add_order_line_item($order_line_item_data);
+								}
+							}
+						}
 					}
 				}
-			}
+				
+				
+				// for numeric pad product!
+				if($numeric_pad_amount > 0)
+				{
+					$order_line_item_data = array(
+													"order_id"		=> $order_id,
+													"product_id"	=> CONST_PRODUCT_ID_NUMPAD,
+													"quantity"		=> 1,
+													"product_price"	=> $numeric_pad_amount,
+													"created"		=> $created
+												);
 
-            $data["header"]["error"] = "0";
-            $data['body']            = array("order_id"=>$order_id);
-            $this->response($data, 200);
-        }
-        catch(Exception $ex)
-        {
-            $data["header"]["error"] = "1";
-            $data["header"]["message"] = "Some error while processing order";
-            $this->response($data, 200);
-        }
+					$this->order->add_order_line_item($order_line_item_data);
+				}
+
+				$data["header"]["error"] = "0";
+				$data['body']            = array("order_id"=>$order_id);
+				$this->response($data, 200);
+			}
+			catch(Exception $ex)
+			{
+				$data["header"]["error"] = "1";
+				$data["header"]["message"] = "Something went wrong processing order";
+				$this->response($data, 200);
+			}
+		}
+		else
+		{
+			$data["header"]["error"] = "1";
+			$data["header"]["message"] = "Something went wrong. Please try later!";
+			$this->response($data, 200);
+		}
     }
 
     function getOrdersByUser_post()

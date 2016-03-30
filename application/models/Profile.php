@@ -189,4 +189,25 @@ Class Profile extends CI_Model
         $this->db->insert('user_merchant_info', $data);
         return $this->db->insert_id();
     }
+	
+	function checkUserMerchantDetails($user_id=0)
+    {
+        $this->db->select('*');
+        $this->db->from('user_merchant_info');
+        $this->db->where('user_id', $user_id);
+        $this->db->limit(1);
+
+        $query = $this->db->get();
+
+        if($query->num_rows() == 1)
+        {	
+			$result = $query->result_array();
+			$query->free_result();
+			return $result[0];
+        }
+        else
+        {
+            return false;
+        }
+    }
 }

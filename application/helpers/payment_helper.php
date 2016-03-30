@@ -5,6 +5,17 @@ define('CONST_PAYMENT_API_KEY',		'28966ac8a0af1447d6f5bfba0e1428fc');
 define('CONST_PAYMENT_TEST_URL',	'https://pay.icannpay.com/dev/index.php/');
 define('CONST_PAYMENT_LIVE_URL',	'https://icannpay.com/index.php/');
 
+//products!
+define('CONST_PRODUCT_ID_NUMPAD',	   -1);
+
+//roles!
+define('CONST_ROLE_ID_SUPER_ADMIN',		1);
+define('CONST_ROLE_ID_BUSINESS_ADMIN',	2);
+define('CONST_ROLE_ID_BUSINESS_STAFF',	3);
+
+define('CONST_DEFAULT_COUNTRY',			'USA');
+define('CONST_DEFAULT_CURRENCY',		'USD');
+
 function merchantSignup($_postParams=array())
 {
 	/*
@@ -236,8 +247,8 @@ function getMerchantBankAccountStatus($_postParams=array())
 	return $apiResult;
 }
 
-function chargePaymentFromCreditCard($postParams=array())
-{
+function chargePaymentFromCreditCard($userId=0, $_postParams=array())
+{	
 	/*
 		https://cardxecure.com/pay/authorize  TO DEV Interface URL: https://cardxecure.com/dev/authorize
 
@@ -277,18 +288,124 @@ function chargePaymentFromCreditCard($postParams=array())
 		
 		Result:		
 			transactionid=500000115&status=1&errorcode=&errormessage=&amount=1.00&currency=USD&orderid=ORD-5001&descriptor=some txt		
+			
+			(
+				[transactionid] => 500000119
+				[status] => 1
+				[errorcode] => 
+				[errormessage] => 
+				[amount] => 1300
+				[currency] => USD
+				[orderid] => 101
+				[descriptor] => some txt
+			)
 	*/
+	
+	$CI =& get_instance();
+	$merchantInfo = $CI->profile->checkUserMerchantDetails($userId);
+	
+	if(!$_postParams['customer_lname'])
+	{
+		$_postParams['customer_lname'] = 'Jaffar';
+	}
+	
+	if($_postParams['cc_expiry_year'])
+	{
+		$_postParams['cc_expiry_year'] = substr($_postParams['cc_expiry_year'], -2);
+		
+	}
+	
+	$postParams = array();
+	$postParams['currency'] 		= CONST_DEFAULT_CURRENCY;
+	$postParams['amount'] 			= $_postParams['amount'];
+	$postParams['authenticate_id'] 	= 'f521db864807b9a09f4abb3deb828c29'; //-->@$merchantInfo['cx_authenticate_id'];
+	$postParams['authenticate_pw'] 	= '2e9120d98798cb6b04eda313966604ad'; //-->@$merchantInfo['cx_authenticate_password'];
+	$postParams['ccn'] 				= $_postParams['cc_number'];
+	$postParams['exp_month'] 		= $_postParams['cc_expiry_month'];
+	$postParams['exp_year'] 		= $_postParams['cc_expiry_year'];
+	$postParams['cvc_code'] 		= $_postParams['cc_code'];
+	
+	$postParams['firstname'] 		= $_postParams['customer_fname'];
+	$postParams['lastname'] 		= $_postParams['customer_lname'];
+	$postParams['email'] 			= $_postParams['customer_email'];
+	$postParams['phone'] 			= $_postParams['customer_phone'];
+	$postParams['country'] 			= $_postParams['customer_country'];
+	$postParams['state'] 			= $_postParams['customer_state'];
+	$postParams['city'] 			= $_postParams['customer_city'];
+	$postParams['street'] 			= $_postParams['customer_address'];
+	$postParams['zip'] 				= $_postParams['customer_zip'];
+	
+	$postParams['orderid']	 		= $_postParams['order_id'];
+	$postParams['customerip'] 		= '127.0.0.1';
+	$postParams['transaction_type'] = 'A';
 	
 	$signature = getCardXecureSignature($postParams);
 
 	$postParams['signature'] = $signature;
 	
-	$apiResponse = sendRequestToPaymentGateway('https://pay.icannpay.com/dev/authorize', $postParams, 'query_string');
+	/**
+	$postParams = array();
+
+	$postParams['amount'] 			= $_postParams['amount'];
+	$postParams['authenticate_id'] 	= 'f521db864807b9a09f4abb3deb828c29'; //-->@$merchantInfo['cx_authenticate_id'];
+	$postParams['authenticate_pw'] 	= '2e9120d98798cb6b04eda313966604ad'; //-->@$merchantInfo['cx_authenticate_password'];
+	$postParams['ccn'] 				= $_postParams['cc_number'];
+	$postParams['city'] 			= $_postParams['customer_city'];
+	$postParams['country'] 			= $_postParams['customer_country'];
+	$postParams['currency'] 		= CONST_DEFAULT_CURRENCY;
+	$postParams['customerip'] 		= '127.0.0.1';
+	$postParams['cvc_code'] 		= $_postParams['cc_code'];
+	$postParams['email'] 			= $_postParams['customer_email'];
+	$postParams['exp_month'] 		= $_postParams['cc_expiry_month'];
+	$postParams['exp_year'] 		= $_postParams['cc_expiry_year'];
+	$postParams['firstname'] 		= $_postParams['customer_fname'];
+	$postParams['lastname'] 		= $_postParams['customer_lname'];
+	$postParams['orderid']	 		= $_postParams['order_id'];
+	$postParams['phone'] 			= $_postParams['customer_phone'];
+	$postParams['state'] 			= $_postParams['customer_state'];
+	$postParams['street'] 			= $_postParams['customer_address'];
+	$postParams['transaction_type'] = 'A';
+	$postParams['zip'] 				= $_postParams['customer_zip'];
 	
-	debug($apiResponse);
-	exit;
+	$signature = getCardXecureSignature($postParams);
+
+	$postParams['signature'] = $signature;
+	**/
 	
-	return $apiResponse;
+	$apiResponse = sendRequestToPaymentGateway(CONST_PAYMENT_TEST_URL.'authorize', $postParams, 'query_string');
+	
+	$apiErrorMessage 	= '';
+	$apiSuccessMessage 	= '';
+	$apiData 			= array();
+	if($apiResponse)
+	{
+		if(isset($apiResponse['error']))
+		{
+			$apiErrorMessage = $apiResponse['error'];
+		}
+		else if(isset($apiResponse['success']))
+		{
+			$apiSuccessMessage = 1;
+			
+			$apiData = array(
+								'transaction_id'	=> @$apiResponse['data']['transactionid'],
+								'amount'			=> @$apiResponse['data']['amount']
+				);
+		}
+	}
+	
+	$apiResult = array();
+	if($apiErrorMessage)
+	{
+		$apiResult['error'] = $apiErrorMessage;
+	}
+	else if($apiSuccessMessage)
+	{
+		$apiResult['success'] = $apiSuccessMessage;
+		$apiResult['data'] = $apiData;
+	}
+	
+	return $apiResult;
 }
 
 function refundPayment($postParams)
@@ -412,18 +529,34 @@ function sendRequestToPaymentGateway($urlToRequest, $postParams=array(), $result
 			
 			if(is_array($apiResponse) && count($apiResponse) > 0)
 			{
-				$apiResponse['response'] = (array) $apiResponse['response'];
+				if(isset($apiResponse['status']))
+				{
+					$_apiResponse_Status = $apiResponse['status'];
 					
-					if(isset($apiResponse['response']['error']))
+					if($_apiResponse_Status == 1) //success!
 					{
-						$apiErrorMessage = $apiResponse['response']['error'];
+						$apiSuccessMessage = 1;					
+						$apiData = $apiResponse;
 					}
-					else if(isset($apiResponse['response']['success']))
+					else //error!
 					{
-						$apiSuccessMessage = 1;
-						
-						$apiData = $apiResponse['response'];
+						if(isset($apiResponse['errorcode']))
+						{
+							if(isset($apiResponse['errormessage']))
+							{
+								if($apiResponse['errormessage'])
+								{
+									$apiErrorMessage = $apiResponse['errormessage'];
+								}
+								
+								if($apiResponse['errorcode'])
+								{
+									$apiErrorMessage .= ' ('. $apiResponse['errorcode'] .')';
+								}
+							}
+						}
 					}
+				}
 			}
 		}
 		else //take care for other formats!

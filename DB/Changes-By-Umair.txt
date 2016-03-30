@@ -44,3 +44,13 @@ CREATE TABLE IF NOT EXISTS `user_merchant_info` (
 *March 29, 2016:
 =================
 ALTER TABLE `transactions` ADD `cc_code` VARCHAR(50) NULL DEFAULT NULL AFTER `cc_expiry_month`;
+
+*March 30, 2016:
+=================
+ALTER TABLE `devices` CHANGE `type` `type` TINYINT(1) NULL DEFAULT NULL COMMENT '1=iphone,2=android';
+
+ALTER TABLE `transactions` CHANGE `auth_code` `cx_transaction_id` VARCHAR(250) CHARACTER SET utf16 COLLATE utf16_general_ci NULL DEFAULT NULL COMMENT 'also store ALL the confirmation details sent by cardXecure API';
+
+ALTER TABLE `transactions` CHANGE `cx_transaction_id` `cx_transaction_id` VARCHAR(250) CHARACTER SET utf16 COLLATE utf16_general_ci NULL DEFAULT NULL;
+
+ALTER TABLE `orders` ADD `custom_order_id` VARCHAR(250) NULL DEFAULT NULL AFTER `user_id`;
