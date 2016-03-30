@@ -46,6 +46,18 @@ function merchantSignup($_postParams=array())
 			}
 	*/
 	
+	$postParams					= array();
+	
+	if(!$_postParams['phone'])
+	{
+		$_postParams['phone'] = '111-222-333-4';
+	}
+	
+	if(!$_postParams['store_name'])
+	{
+		$_postParams['store_name'] = $_postParams['first_name'].' Company';
+	}
+	
 	$postParams['api_key']		= CONST_PAYMENT_API_KEY;
 	$postParams['email'] 		= $_postParams['email'];
 	$postParams['password'] 	= $_postParams['password'];
@@ -53,53 +65,44 @@ function merchantSignup($_postParams=array())
 	$postParams['fname'] 		= $_postParams['first_name'];
 	$postParams['lname'] 		= $_postParams['last_name'];
 	$postParams['cname'] 		= trim($_postParams['first_name'].' '.$_postParams['last_name']);
-	$postParams['phone'] 		= '1112223334';		//Required Field: The Phone field is required.
-	$postParams['ccompany'] 	= 'iCannPay';		//Required Field: The Company Name field is required.
-	$postParams['cdomain'] 		= 'iCannPay.com';	//Required Field: The Domain Name field is required.
-	$postParams['accname'] 		= 'Umair';			//Required Field: The Your bank account name field is required.
-	$postParams['accno'] 		= '123';			//Required Field: The Your bank account number field is required.
-	$postParams['bname'] 		= 'SCB';			//Required Field: The Name of bank field is required.
-	$postParams['baddress'] 	= 'Abc Xyz Street';				//Required Field: The Address of your bank field is required.
-	$postParams['swiftcode'] 	= '12345';			//Required Field: The Swift code field is required*/
+	$postParams['phone'] 		= $_postParams['phone'];				//Required Field: The Phone field is required.
+	$postParams['ccompany'] 	= $_postParams['store_name'];			//Required Field: The Company Name field is required.
+	$postParams['cdomain'] 		= 'iCannPay.com';						//Required Field: The Domain Name field is required.
+	$postParams['accname'] 		= $_postParams['bank_account_title'];	//Required Field: The Your bank account name field is required.
+	$postParams['accno'] 		= $_postParams['bank_account_number'];	//Required Field: The Your bank account number field is required.
+	$postParams['bname'] 		= $_postParams['bank_name'];			//Required Field: The Name of bank field is required.
+	$postParams['baddress'] 	= $_postParams['bank_address'];			//Required Field: The Address of your bank field is required.
+	$postParams['swiftcode'] 	= $_postParams['bank_swift_code'];		//Required Field: The Swift code field is required
 	
 	$apiResponse = sendRequestToPaymentGateway(CONST_PAYMENT_TEST_URL.'api/apiSignup', $postParams);
-	
-	//-->debug($apiResponse);
 	
 	$apiErrorMessage 	= '';
 	$apiSuccessMessage 	= '';
 	$apiData 			= array();
 	if($apiResponse)
 	{
-		$apiResponse = (array) json_decode($apiResponse);
-		
-		if(isset($apiResponse['response']))
+		if(isset($apiResponse['error']))
 		{
-			$apiResponse['response'] = (array) $apiResponse['response'];
+			$apiErrorMessage = $apiResponse['error'];
+		}
+		else if(isset($apiResponse['success']))
+		{
+			$apiSuccessMessage = 1;
 			
-			if(isset($apiResponse['response']['error']))
-			{
-				$apiErrorMessage = $apiResponse['response']['error'];
-			}
-			else if(isset($apiResponse['response']['success']))
-			{
-				$apiSuccessMessage = 1;
-				
-				$apiData = array(
-									'authenticate_id' 			=> @$apiResponse['response']['Authenticate Id'],
-									'authenticate_password' 	=> @$apiResponse['response']['Authenticate Password'],
-									'secret_key' 				=> @$apiResponse['response']['Secret key'],
-									'mode' 						=> @$apiResponse['response']['mode'],
-									'hash' 						=> @$apiResponse['response']['hash']
-					);
-			}
+			$apiData = array(
+								'authenticate_id' 			=> @$apiResponse['data']['Authenticate Id'],
+								'authenticate_password' 	=> @$apiResponse['data']['Authenticate Password'],
+								'secret_key' 				=> @$apiResponse['data']['Secret key'],
+								'mode' 						=> @$apiResponse['data']['mode'],
+								'hash' 						=> @$apiResponse['data']['hash']
+				);
 		}
 	}
 	
 	$apiResult = array();
 	if($apiErrorMessage)
 	{
-		$apiResult['error'] = 'CardX: '.$apiErrorMessage;
+		$apiResult['error'] = $apiErrorMessage;
 	}
 	else if($apiSuccessMessage)
 	{
@@ -165,7 +168,7 @@ function changeMerchantPaymentMode($postParams)
 	return sendRequestToPaymentGateway(CONST_PAYMENT_TEST_URL.'api/changePaymentMode', $postParams);
 }
 
-function getMerchantBankAccountStatus($postParams)
+function getMerchantBankAccountStatus($_postParams=array())
 {
 	/*
 		Params:
@@ -183,11 +186,57 @@ function getMerchantBankAccountStatus($postParams)
 				}
 			}
 	*/
+	$postParams					= array();
 	
-	return sendRequestToPaymentGateway(CONST_PAYMENT_TEST_URL.'api/getBankAccStatus', $postParams);
+	$postParams['api_key']		= CONST_PAYMENT_API_KEY;
+	$postParams['email'] 		= $_postParams['email'];
+	$postParams['password'] 	= $_postParams['password'];
+	
+	$apiResponse = sendRequestToPaymentGateway(CONST_PAYMENT_TEST_URL.'api/getBankAccStatus', $postParams);
+	
+	$apiErrorMessage 	= '';
+	$apiSuccessMessage 	= '';
+	$apiData 			= array();
+	if($apiResponse)
+	{
+		if(isset($apiResponse['error']))
+		{
+			$apiErrorMessage = $apiResponse['error'];
+		}
+		else if(isset($apiResponse['success']))
+		{
+			$apiSuccessMessage = 1;
+			
+			$_apiResponse_Status = @$apiResponse['data']['status'];
+			
+			$status = 0;// Not Verified 
+			if($_apiResponse_Status == 'Verified')
+			{
+				$status = 1;// Verified
+			}
+			
+			$apiData = array(
+								'status'	=> $status,
+								'message'	=> $_apiResponse_Status
+				);
+		}
+	}
+	
+	$apiResult = array();
+	if($apiErrorMessage)
+	{
+		$apiResult['error'] = $apiErrorMessage;
+	}
+	else if($apiSuccessMessage)
+	{
+		$apiResult['success'] = $apiSuccessMessage;
+		$apiResult['data'] = $apiData;
+	}
+	
+	return $apiResult;
 }
 
-function chargePaymentFromCreditCard($postParams)
+function chargePaymentFromCreditCard($postParams=array())
 {
 	/*
 		https://cardxecure.com/pay/authorize  TO DEV Interface URL: https://cardxecure.com/dev/authorize
@@ -230,7 +279,16 @@ function chargePaymentFromCreditCard($postParams)
 			transactionid=500000115&status=1&errorcode=&errormessage=&amount=1.00&currency=USD&orderid=ORD-5001&descriptor=some txt		
 	*/
 	
-	return sendRequestToPaymentGateway(CONST_PAYMENT_TEST_URL.'authorize', $postParams);
+	$signature = getCardXecureSignature($postParams);
+
+	$postParams['signature'] = $signature;
+	
+	$apiResponse = sendRequestToPaymentGateway('https://pay.icannpay.com/dev/authorize', $postParams, 'query_string');
+	
+	debug($apiResponse);
+	exit;
+	
+	return $apiResponse;
 }
 
 function refundPayment($postParams)
@@ -263,7 +321,12 @@ function refundPayment($postParams)
 
 	*/
 	
-	return sendRequestToPaymentGateway(CONST_PAYMENT_TEST_URL.'refund', $postParams);
+	$apiResponse = sendRequestToPaymentGateway(CONST_PAYMENT_TEST_URL.'refund', $postParams, 'query_string');
+	
+	my_debug($apiResponse);
+	exit;
+	
+	return $apiResponse;
 }
 
 /*************************************************************************/
@@ -294,7 +357,7 @@ function getCardXecureSignature($postParams=array())
 	return $signature;
 }
 
-function sendRequestToPaymentGateway($urlToRequest, $postParams=array())
+function sendRequestToPaymentGateway($urlToRequest, $postParams=array(), $resultType='json')
 {
 	if(!$postParams)
 	{
@@ -316,6 +379,71 @@ function sendRequestToPaymentGateway($urlToRequest, $postParams=array())
 	$result = curl_exec ($ch);
 	$info   = curl_getinfo($ch);
 	
+	if($result)
+	{
+		$apiResponse 		= $result;
+		$apiErrorMessage 	= '';
+		$apiSuccessMessage 	= '';
+		$apiData 			= array();
+	
+		if($resultType == 'json')
+		{
+			$apiResponse = (array) json_decode($apiResponse);
+		
+			if(isset($apiResponse['response']))
+			{
+				$apiResponse['response'] = (array) $apiResponse['response'];
+				
+				if(isset($apiResponse['response']['error']))
+				{
+					$apiErrorMessage = $apiResponse['response']['error'];
+				}
+				else if(isset($apiResponse['response']['success']))
+				{
+					$apiSuccessMessage = 1;
+					
+					$apiData = $apiResponse['response'];
+				}
+			}
+		}
+		else if($resultType == 'query_string')
+		{
+			parse_str($result, $apiResponse);
+			
+			if(is_array($apiResponse) && count($apiResponse) > 0)
+			{
+				$apiResponse['response'] = (array) $apiResponse['response'];
+					
+					if(isset($apiResponse['response']['error']))
+					{
+						$apiErrorMessage = $apiResponse['response']['error'];
+					}
+					else if(isset($apiResponse['response']['success']))
+					{
+						$apiSuccessMessage = 1;
+						
+						$apiData = $apiResponse['response'];
+					}
+			}
+		}
+		else //take care for other formats!
+		{
+		}
+		
+		$apiResult = array();
+		if($apiErrorMessage)
+		{
+			$apiResult['error'] = 'API: '.$apiErrorMessage;
+		}
+		else if($apiSuccessMessage)
+		{
+			$apiResult['success'] = $apiSuccessMessage;
+			$apiResult['data'] = $apiData;
+		}
+		
+		return $apiResult;
+	}
+	
 	/* -- 
 	echo "urlToRequest: --".$urlToRequest."--<br />";
 	echo "Result: --";
@@ -331,15 +459,6 @@ function sendRequestToPaymentGateway($urlToRequest, $postParams=array())
 	echo "Info: --";
 	my_debug($info);
 	exit;*/
-	
-	$return = array();
-	
-	/*
-	if($result)
-	{
-		$return = json_decode($result, true);
-	}
-	*/
 	
 	return $result;
 }

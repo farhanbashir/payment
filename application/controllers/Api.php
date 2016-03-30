@@ -462,70 +462,210 @@ class Api extends REST_Controller {
         $data['body'] = array("store_id"=>$store_id);
         $this->response($data, 200);
     }
+	
+	function getBankAccountStatus_post()
+    {
+		$updated = date('Y-m-d H:i:s');
+		$bankInfo = $this->profile->checkUserBankDetails($this->user_id);
+		
+		if($bankInfo)
+		{
+			$bank_id = $bankInfo['bank_id'];
+			$user = $this->user->get_user_detail($this->user_id);
+			
+			$postParams = array();
+			$postParams['email'] 	= @$user['email'];
+			$postParams['password']	= @$user['plain_password'];
+			
+			$apiStatus = false;
+			$apiData = array();
+			$apiResponse = getMerchantBankAccountStatus($postParams);
+			
+			if($apiResponse)
+			{
+				if(isset($apiResponse['error']))
+				{
+					$data["header"]["error"] = "1";
+					$data["header"]["message"] = $apiResponse['error'];
+					$this->response($data, 200);
+				}
+				else if(isset($apiResponse['success']))
+				{
+					$apiStatus = true;
+					
+					$apiData = $apiResponse['data'];
+				}
+			}
+			
+			if($apiStatus)
+			{
+				$_apiData_Status = $apiData['status'];
+				$_apiData_Message = $apiData['message'];
+				
+				if($_apiData_Status) //verified!
+				{
+					$this->profile->edit_user_bank($bank_id, array("updated"=>$updated,"status"=>2)); //2=verified, 1=Not Verified
+					
+					$data["header"]["error"] = "0";
+					$data["header"]["message"] = $_apiData_Message;
+					$data['body'] = array("bank_id"=>$bank_id);
+					$this->response($data, 200);
+				}
+				else  //not-verified!
+				{
+					$this->profile->edit_user_bank($bank_id, array("updated"=>$updated,"status"=>1)); //2=verified, 1=Not Verified
+					
+					$data["header"]["error"] = "1";
+					$data["header"]["message"] = $_apiData_Message;
+					$this->response($data, 200);
+				}
+			}
+			else
+			{
+				$data["header"]["error"] = "1";
+				$data["header"]["message"] = "Some went wrong. Please try later!";
+				$this->response($data, 200);
+			}			
+		}
+		else
+		{
+			$data["header"]["error"] = "1";
+			$data["header"]["message"] = "No bank linked with this user!";
+			$this->response($data, 200);
+		}		
+	}
 
     function setBankAccountInfo_post()
-    {
-        $bank_name			= $this->post('bank_name');
-		$bank_address    	= $this->post('bank_address');
-		$swift_code      	= $this->post('swift_code');
-		$account_title      = $this->post('account_title');
-        $account_number 	= $this->post('account_number');
+    {	
+		$bankInfo = $this->profile->checkUserBankDetails($this->user_id);
 		
-		$created        = date('Y-m-d H:i:s');
-        $updated        = date('Y-m-d H:i:s');
-        $status         = 1;
+		if($bankInfo)
+		{
+			$this->getBankAccountStatus_post();
+		}
+		else //user can save this, if bank is not previouly inserted by the user! - becauase user will have only 1 bank linked.
+		{
+			$bank_name			= $this->post('bank_name');
+			$bank_address    	= $this->post('bank_address');
+			$swift_code      	= $this->post('swift_code');
+			$account_title      = $this->post('account_title');
+			$account_number 	= $this->post('account_number');
+			
+			$created        = date('Y-m-d H:i:s');
+			$updated        = date('Y-m-d H:i:s');
+			$status         = 1;
 
-        if(!$bank_name)
-        {
-            $data["header"]["error"] = "1";
-            $data["header"]["message"] = "Bank name is required";
-            $this->response($data, 200);
-        }
-		
-		if(!$bank_address)
-        {
-            $data["header"]["error"] = "1";
-            $data["header"]["message"] = "Bank address is required";
-            $this->response($data, 200);
-        }
-		
-		if(!$swift_code)
-        {
-            $data["header"]["error"] = "1";
-            $data["header"]["message"] = "Routing number / Swift code is required";
-            $this->response($data, 200);
-        }
-		
-		if(!$account_title)
-        {
-            $data["header"]["error"] = "1";
-            $data["header"]["message"] = "Account title is required";
-            $this->response($data, 200);
-        }
-		
-        if(!$account_number)
-        {
-            $data["header"]["error"] = "1";
-            $data["header"]["message"] = "Account Number is required";
-            $this->response($data, 200);
-        }
+			if(!$bank_name)
+			{
+				$data["header"]["error"] = "1";
+				$data["header"]["message"] = "Bank name is required";
+				$this->response($data, 200);
+			}
+			
+			if(!$bank_address)
+			{
+				$data["header"]["error"] = "1";
+				$data["header"]["message"] = "Bank address is required";
+				$this->response($data, 200);
+			}
+			
+			if(!$swift_code)
+			{
+				$data["header"]["error"] = "1";
+				$data["header"]["message"] = "Routing number / Swift code is required";
+				$this->response($data, 200);
+			}
+			
+			if(!$account_title)
+			{
+				$data["header"]["error"] = "1";
+				$data["header"]["message"] = "Account title is required";
+				$this->response($data, 200);
+			}
+			
+			if(!$account_number)
+			{
+				$data["header"]["error"] = "1";
+				$data["header"]["message"] = "Account Number is required";
+				$this->response($data, 200);
+			}
 
-        $bank_id = $this->post('bank_id');
+			$bank_id = $this->post('bank_id');
 
-        if(!$bank_id)
-        {
-            $bank_id = $this->profile->add_user_bank(array("user_id"=>$this->user_id,"bank_name"=>$bank_name,"bank_address"=>$bank_address,"swift_code"=>$swift_code,"account_title"=>$account_title,"account_number"=>$account_number,"created"=>$created,"updated"=>$updated,"status"=>$status));
-        }   
-        else
-        {
-            $this->profile->edit_user_bank($bank_id, array("user_id"=>$this->user_id,"bank_name"=>$bank_name,"bank_address"=>$bank_address,"swift_code"=>$swift_code,"account_title"=>$account_title,"account_number"=>$account_number,"updated"=>$updated,"status"=>$status));
-        } 
-        
-        $data["header"]["error"] = "0";
-        $data["header"]["message"] = "Success";
-        $data['body'] = array("bank_id"=>$bank_id);
-        $this->response($data, 200);
-
+			if(!$bank_id)
+			{
+				$user = $this->user->get_user_detail($this->user_id);
+				
+				$store_details = $this->profile->get_store_detail($this->store_id);
+				
+				$postParams = array();
+				$postParams['email'] 				= @$user['email'];
+				$postParams['password'] 			= @$user['plain_password'];
+				$postParams['first_name'] 			= @$user['first_name'];
+				$postParams['last_name'] 			= @$user['last_name'];
+				$postParams['phone'] 				= @$store_details['phone'];
+				$postParams['store_name'] 			= @$store_details['name'];
+				$postParams['bank_name'] 			= $bank_name;
+				$postParams['bank_address'] 		= $bank_address;
+				$postParams['bank_swift_code'] 		= $swift_code;
+				$postParams['bank_account_title'] 	= $account_title;
+				$postParams['bank_account_number'] 	= $account_number;
+				
+				$apiStatus = false;
+				$apiData = array();
+				$apiResponse = merchantSignup($postParams);
+				
+				if($apiResponse)
+				{
+					if(isset($apiResponse['error']))
+					{
+						$data["header"]["error"] = "1";
+						$data["header"]["message"] = $apiResponse['error'];
+						$this->response($data, 200);
+					}
+					else if(isset($apiResponse['success']))
+					{
+						$apiStatus = true;
+						
+						$apiData = $apiResponse['data'];
+					}
+				}
+				
+				if($apiStatus)
+				{
+					$bank_id = $this->profile->add_user_bank(array("user_id"=>$this->user_id,"bank_name"=>$bank_name,"bank_address"=>$bank_address,"swift_code"=>$swift_code,"account_title"=>$account_title,"account_number"=>$account_number,"created"=>$created,"updated"=>$updated,"status"=>$status));
+					
+					//insert into merchant info
+					$merchant_info = array();
+					$merchant_info['user_id'] 					= $this->user_id;
+					$merchant_info['email'] 					= @$user['email'];
+					$merchant_info['password'] 					= @$user['plain_password'];
+					$merchant_info['cx_authenticate_id'] 		= @$apiData['authenticate_id'];
+					$merchant_info['cx_authenticate_password'] 	= @$apiData['authenticate_password'];
+					$merchant_info['cx_secret_key'] 			= @$apiData['secret_key'];
+					$merchant_info['cx_hash'] 					= @$apiData['mode'];
+					$merchant_info['cx_mode'] 					= @$apiData['hash'];
+					$merchant_info['last_updated'] 				= $created;
+					
+					$this->profile->add_user_merchant_info($merchant_info);
+				}
+				else
+				{
+					$data["header"]["error"] = "1";
+					$data["header"]["message"] = "Some went wrong. Please try later!";
+					$this->response($data, 200);
+				}
+			}   
+			else
+			{
+				$this->profile->edit_user_bank($bank_id, array("user_id"=>$this->user_id,"bank_name"=>$bank_name,"bank_address"=>$bank_address,"swift_code"=>$swift_code,"account_title"=>$account_title,"account_number"=>$account_number,"updated"=>$updated,"status"=>$status));
+			} 
+			
+			$data["header"]["error"] = "0";
+			$data["header"]["message"] = "Success";
+			$data['body'] = array("bank_id"=>$bank_id);
+			$this->response($data, 200);
+		}
     }
 
     /*function editProfile_post()
@@ -856,8 +996,7 @@ class Api extends REST_Controller {
             $data["header"]["error"]   = "1";
             $data["header"]["message"] = "Some error";
             $this->response($data,200);
-        }    
-        
+        }
     }
 
     function getCategory_post()
@@ -1092,7 +1231,7 @@ class Api extends REST_Controller {
     {
         $created      = date('Y-m-d H:i:s');
         $store_id = $this->store_id;
-        $json = $this->post('product_data');
+        $json = $this->post('data');
 
         $input_data = json_decode($json,true);
 		
@@ -1111,6 +1250,36 @@ class Api extends REST_Controller {
 		if($pay_by_credit_card_amount <= 0) // negative value to zero
 		{
 			$pay_by_credit_card_amount = 0;
+		}
+		
+		//pay by credit card!
+		if($pay_by_credit_card_amount > 0)
+		{
+			/* TODO: In-Progress work!
+			$postParams = array();
+			$postParams['amount'] 			= $pay_by_credit_card_amount;
+			$postParams['authenticate_id'] 	= 'f521db864807b9a09f4abb3deb828c29';
+			$postParams['authenticate_pw'] 	= '2e9120d98798cb6b04eda313966604ad';
+			$postParams['ccn'] 				= @$input_data['pay_by_credit_card']['cc_number'];
+			$postParams['city'] 			= 'NYC';
+			$postParams['country'] 			= 'USA';
+			$postParams['currency'] 		= 'USD';
+			$postParams['customerip'] 		= '127.0.0.1';
+			$postParams['cvc_code'] 		= @$input_data['pay_by_credit_card']['cc_code'];
+			$postParams['email'] 			= $input_data['customer_info']['email'];
+			$postParams['exp_month'] 		= @$input_data['pay_by_credit_card']['cc_expiry_month'];
+			$postParams['exp_year'] 		= @$input_data['pay_by_credit_card']['cc_expiry_year'];
+			$postParams['firstname'] 		= 'abc';
+			$postParams['lastname'] 		= 'xyz';
+			$postParams['orderid']	 		= '101';
+			$postParams['phone'] 			= '111-222-333-4';
+			$postParams['state'] 			= 'NY';
+			$postParams['street'] 			= 'ABC Street';
+			$postParams['transaction_type'] = 'A';
+			$postParams['zip'] 				= '12345';
+			
+			chargePaymentFromCreditCard($postParams);
+			*/
 		}
 
         $order_data = array("store_id"=>$store_id,"user_id"=>$this->user_id,"total_amount"=>$total_amount,"created"=>$created,"customer_email"=>$input_data['customer_info']['email'],"description"=>'');
@@ -1157,6 +1326,7 @@ class Api extends REST_Controller {
 										"cc_number"=> $cc_number,
 										"cc_expiry_year"=> @$input_data['pay_by_credit_card']['cc_expiry_year'],
 										"cc_expiry_month"=> @$input_data['pay_by_credit_card']['cc_expiry_month'],
+										"cc_code"=> @$input_data['pay_by_credit_card']['cc_code'],
 									);
 
             $this->order->add_transaction($transaction_data);
@@ -1194,12 +1364,9 @@ class Api extends REST_Controller {
         catch(Exception $ex)
         {
             $data["header"]["error"] = "1";
-            $data["header"]["message"] = "Some error";
+            $data["header"]["message"] = "Some error while processing order";
             $this->response($data, 200);
         }
-
-        
-
     }
 
     function getOrdersByUser_post()

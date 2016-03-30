@@ -121,6 +121,27 @@ Class Profile extends CI_Model
         $this->db->insert('user_details',$data);
         return $this->db->insert_id();
     }
+	
+	function checkUserBankDetails($user_id=0)
+    {
+        $this->db->select('*');
+        $this->db->from('user_banks');
+        $this->db->where('user_id', $user_id);
+        $this->db->limit(1);
+
+        $query = $this->db->get();
+
+        if($query->num_rows() == 1)
+        {	
+			$result = $query->result_array();
+			$query->free_result();
+			return $result[0];
+        }
+        else
+        {
+            return false;
+        }
+    }
 
     function add_user_bank($data)
     {
@@ -133,6 +154,15 @@ Class Profile extends CI_Model
         $this->db->where('bank_id', $bank_id);
         $this->db->update('user_banks',$data);
         return ($this->db->affected_rows() != 1) ? false : true;
+    }
+	
+	function get_store_detail($store_id)
+    {
+        $sql = "select * from user_stores where store_id=$store_id" ;
+        $query = $this->db->query($sql);
+        $result = $query->result_array();
+        $query->free_result();
+        return $result[0];
     }
 
     function add_user_store($data)
