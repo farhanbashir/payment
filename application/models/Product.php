@@ -19,9 +19,17 @@ Class Product extends CI_Model
 		}
     }
 
-    function get_all_products($store_id)
+    function get_all_products($store_id=0)
     {
-        $sql = "select * from products where status=1 and store_id=$store_id" ;
+		if($store_id)
+		{
+			$sql = "select * from products where status=1 and store_id=$store_id" ;
+		}
+		else
+		{
+			$sql = "select * from products where status=1 AND product_id!='". CONST_PRODUCT_ID_NUMPAD ."'" ;
+		}
+        
         $query = $this->db->query($sql);
         $result = $query->result_array();
         $query->free_result();
