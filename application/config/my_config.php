@@ -13,3 +13,5 @@ $config["android_notification_title"] = "The-Woo";
 $config["product_image_base"] = './assets/img/products/';
 $config["store_image_base"] = './assets/img/stores/';
 $config["user_image_base"] = './assets/img/users/';
+$config["order_signature_image_base"] = './assets/img/orders/signature/';
+$config["order_recipts_image_base"] = './assets/img/orders/recipts/';

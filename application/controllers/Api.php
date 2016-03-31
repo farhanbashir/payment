@@ -30,6 +30,7 @@ class Api extends REST_Controller {
         $this->load->model('profile','',TRUE);
         $this->load->model('product','',TRUE);
 		$this->load->model('order','',TRUE);
+		$this->load->model('customer','',TRUE);
     	
         $this->user_id  = '';
         $this->token    = '';
@@ -1263,6 +1264,7 @@ class Api extends REST_Controller {
 		//customer info!
 		$customer_info		= @$input_data['customer_info'];
 		
+		$customer_country 	= CONST_DEFAULT_COUNTRY;
 		$customer_email 	= @$customer_info['email'];
 		$customer_address1 	= @$customer_info['address1'];
 		$customer_address2 	= @$customer_info['address2'];
@@ -1298,19 +1300,23 @@ class Api extends REST_Controller {
 		}
 		
 		//validations start!
+		/*
 		if(!$customer_email)
 		{
 			$data["header"]["error"] = "1";
             $data["header"]["message"] = "Customer email address is required";
             $this->response($data, 200);
-		}
+		}*/
 		
-		if(!valid_email($customer_email))
-        {
-            $data["header"]["error"] = "1";
-            $data["header"]["message"] = "Please provide valid email address";
-            $this->response($data, 200);
-        }
+		if($customer_email)
+		{
+			if(!valid_email($customer_email))
+			{
+				$data["header"]["error"] = "1";
+				$data["header"]["message"] = "Please provide valid email address";
+				$this->response($data, 200);
+			}
+		}
 		
 		if(!$total_amount || $total_amount <= 0)
 		{
@@ -1390,7 +1396,7 @@ class Api extends REST_Controller {
 			$postParams['customer_lname'] 	= $arrNames['last_name'];
 			$postParams['customer_email']	= $customer_email;
 			$postParams['customer_phone'] 	= $customer_phone;
-			$postParams['customer_country']	= CONST_DEFAULT_COUNTRY;
+			$postParams['customer_country']	= $customer_country;
 			$postParams['customer_state'] 	= $customer_state;
 			$postParams['customer_city']	= $customer_city;
 			$postParams['customer_address'] = trim($customer_address1.' '.$customer_address2);
@@ -1421,108 +1427,171 @@ class Api extends REST_Controller {
 		
 		if($apiStatus)
 		{
+			$customer_id = 0;
+			$isNewCustomer = false;
+			if($customer_email)
+			{
+				$customerInfo = $this->customer->checkCustomerByEmail($customer_email);
+				
+				if($customerInfo)
+				{
+					$customer_id = $customerInfo['customer_id'];
+				}
+				else
+				{
+					$isNewCustomer = true;
+					
+					$customer_data = array(
+											'email' 			=> $customer_email,
+											'created_order_id'	=> 0,
+											'created_store_id'	=> $this->store_id,
+											'created_user_id'	=> $this->user_id,
+											'created'			=> $created
+					
+					);
+					
+					$customer_id = $this->customer->add_customer($customer_data);
+				}
+			}
+			
+			$signature = '';
+			$signature_image_data = $this->__uploadFile($this->config->item('order_signature_image_base'), asset_url('img/orders/signature'));
+
+			if(is_array($signature_image_data) && count($signature_image_data) > 0)
+			{
+				if(isset($signature_image_data['path']))
+				{
+					$signature    = $signature_image_data['path'];
+				}
+			}
+			
 			$order_data = array(
-									"store_id"			=> $store_id,
-									"user_id"			=> $this->user_id,
-									"total_amount"		=> $total_amount,
-									"created"			=> $created,
-									"customer_email"	=> $customer_email,
-									"description"		=> '',
-									"custom_order_id"	=> $custom_order_id
+									"store_id"				=> $store_id,
+									"user_id"				=> $this->user_id,
+									"total_amount"			=> $total_amount,
+									"created"				=> $created,
+									"customer_signature"	=> $signature,
+									"customer_id"			=> $customer_id,
+									"customer_email"		=> $customer_email,
+									"customer_phone"		=> $customer_phone,
+									"customer_country"		=> $customer_country,
+									"customer_state"		=> $customer_state,
+									"customer_city"			=> $customer_city,
+									"customer_address1"		=> $customer_address1,
+									"customer_address2"		=> $customer_address2,
+									"customer_zipcode"		=> $customer_zipcode,
+									"description"			=> '',
+									"custom_order_id"		=> $custom_order_id
 								);
 			try
 			{
 				//insert order
 				$order_id = $this->order->add_order($order_data);
 				
-				// cc number - save only last 4 numbers!
-				if($cc_number)
+				if($order_id)
 				{
-					$cc_number = 'XXXX-XXXX-XXXX-'.substr($cc_number, -4);
-				}
-				
-				//insert into transaction
-				$transaction_data = array(
-											"store_id"			=> $store_id,
-											"user_id"			=> $this->user_id,
-											"order_id"			=> $order_id,
-											"type"				=> 1, //1=payment, 2=refund
-											"created"			=> $created,
-											"amount_cc"			=> $pay_by_credit_card_amount,
-											"amount_cash"		=> $pay_by_cash_amount,  
-											"is_cc_swipe"		=> $is_cc_swipe, 
-											"cc_name"			=> $cc_name,
-											"cc_number"			=> $cc_number,
-											"cc_expiry_year"	=> $cc_expiry_year,
-											"cc_expiry_month"	=> $cc_expiry_month,
-											"cc_code"			=> $cc_code,
-											'cx_transaction_id' => $cx_transaction_id
-										);
-
-				$this->order->add_transaction($transaction_data);
-
-				//insert each product
-				if(is_array($products) && count($products) > 0)
-				{
-					foreach($products as $product)
+					if($isNewCustomer)
 					{
-						if(isset($product['product_id']))
+						if($customer_id)
 						{
-							$product_id = $product['product_id'];
-							
-							if($product_id)
-							{
-								$product_detail = $this->product->get_product_detail($product_id);
-						
-								if($product_detail)
-								{
-									$product_price = $product_detail['price'];
-									
-									$product_qty = 1;
-									if(isset($product['quantity']))
-									{
-										$_product_qty = $product['quantity'];
-										
-										if($_product_qty > 1)
-										{
-											$product_qty = $_product_qty;
-										}
-									}									
-									
-									//-->$items_amount = $product_qty * $product_price; //UJ: not needed!
-									
-									$order_line_item_data = array(
-																	"order_id"		=> $order_id,
-																	"product_id"	=> $product_id,
-																	"quantity"		=> $product_qty,
-																	"product_price"	=> $product_price,
-																	"created"		=> $created);
+							$customer_id = $this->customer->edit_customer($customer_id, array('created_order_id' => $order_id));
+						}
+					}
+					
+					// cc number - save only last 4 numbers!
+					if($cc_number)
+					{
+						$cc_number = 'XXXX-XXXX-XXXX-'.substr($cc_number, -4);
+					}
+					
+					//insert into transaction
+					$transaction_data = array(
+												"store_id"			=> $store_id,
+												"user_id"			=> $this->user_id,
+												"order_id"			=> $order_id,
+												"type"				=> CONST_TRANSACTION_TYPE_PAYMENT, //1=payment, 2=refund
+												"created"			=> $created,
+												"amount_cc"			=> $pay_by_credit_card_amount,
+												"amount_cash"		=> $pay_by_cash_amount,  
+												"is_cc_swipe"		=> $is_cc_swipe, 
+												"cc_name"			=> $cc_name,
+												"cc_number"			=> $cc_number,
+												"cc_expiry_year"	=> $cc_expiry_year,
+												"cc_expiry_month"	=> $cc_expiry_month,
+												"cc_code"			=> $cc_code,
+												'cx_transaction_id' => $cx_transaction_id
+											);
 
-									$this->order->add_order_line_item($order_line_item_data);
+					$this->order->add_transaction($transaction_data);
+
+					//insert each product
+					if(is_array($products) && count($products) > 0)
+					{
+						foreach($products as $product)
+						{
+							if(isset($product['product_id']))
+							{
+								$product_id = $product['product_id'];
+								
+								if($product_id)
+								{
+									$product_detail = $this->product->get_product_detail($product_id);
+							
+									if($product_detail)
+									{
+										$product_price = $product_detail['price'];
+										
+										$product_qty = 1;
+										if(isset($product['quantity']))
+										{
+											$_product_qty = $product['quantity'];
+											
+											if($_product_qty > 1)
+											{
+												$product_qty = $_product_qty;
+											}
+										}									
+										
+										//-->$items_amount = $product_qty * $product_price; //UJ: not needed!
+										
+										$order_line_item_data = array(
+																		"order_id"		=> $order_id,
+																		"product_id"	=> $product_id,
+																		"quantity"		=> $product_qty,
+																		"product_price"	=> $product_price,
+																		"created"		=> $created);
+
+										$this->order->add_order_line_item($order_line_item_data);
+									}
 								}
 							}
 						}
+					}					
+					
+					// for numeric pad product!
+					if($numeric_pad_amount > 0)
+					{
+						$order_line_item_data = array(
+														"order_id"		=> $order_id,
+														"product_id"	=> CONST_PRODUCT_ID_NUMPAD,
+														"quantity"		=> 1,
+														"product_price"	=> $numeric_pad_amount,
+														"created"		=> $created
+													);
+
+						$this->order->add_order_line_item($order_line_item_data);
 					}
+
+					$data["header"]["error"] = "0";
+					$data['body']            = array("order_id"=>$order_id);
+					$this->response($data, 200);
 				}
-				
-				
-				// for numeric pad product!
-				if($numeric_pad_amount > 0)
+				else
 				{
-					$order_line_item_data = array(
-													"order_id"		=> $order_id,
-													"product_id"	=> CONST_PRODUCT_ID_NUMPAD,
-													"quantity"		=> 1,
-													"product_price"	=> $numeric_pad_amount,
-													"created"		=> $created
-												);
-
-					$this->order->add_order_line_item($order_line_item_data);
+					$data["header"]["error"] = "1";
+					$data["header"]["message"] = "Something went wrong for order";
+					$this->response($data, 200);
 				}
-
-				$data["header"]["error"] = "0";
-				$data['body']            = array("order_id"=>$order_id);
-				$this->response($data, 200);
 			}
 			catch(Exception $ex)
 			{
@@ -1538,6 +1607,122 @@ class Api extends REST_Controller {
 			$this->response($data, 200);
 		}
     }
+	
+	function setCustomerInfoForOrder_post()
+	{
+		$created			= date('Y-m-d H:i:s');
+		$updated			= date('Y-m-d H:i:s');
+		 
+		$order_id 			= $this->post('order_id');
+		
+		$customer_country 	= CONST_DEFAULT_COUNTRY;
+		$customer_email 	= $this->post('email');
+		$customer_address1 	= $this->post('address1');
+		$customer_address2 	= $this->post('address2');
+		$customer_city 		= $this->post('city');
+		$customer_state 	= $this->post('state');
+		$customer_zipcode 	= $this->post('zipcode');
+		$customer_phone 	= $this->post('phone');
+		
+		if(!$order_id)
+		{
+			$data["header"]["error"] = "1";
+            $data["header"]["message"] = "Order ID is required";
+            $this->response($data, 200);
+		}
+		
+		$order_detail = $this->order->get_order_detail($order_id);
+		if($order_detail)
+		{
+			if($order_detail['user_id'] !== $this->user_id)
+			{
+				$data["header"]["error"] = "1";
+				$data["header"]["message"] = "Order do not belong to this user";
+				$this->response($data, 200);   
+			}
+		}
+		else
+		{	
+			$data["header"]["error"] = "1";
+			$data["header"]["message"] = "Order ID is not valid";
+			$this->response($data, 200);   
+		}
+		
+		if(!$customer_email)
+		{
+			$data["header"]["error"] = "1";
+            $data["header"]["message"] = "Customer email address is required";
+            $this->response($data, 200);
+		}
+		
+		if($customer_email)
+		{
+			if(!valid_email($customer_email))
+			{
+				$data["header"]["error"] = "1";
+				$data["header"]["message"] = "Please provide valid email address";
+				$this->response($data, 200);
+			}
+		}
+		
+		$customer_id = 0;
+		$isNewCustomer = false;
+		if($customer_email)
+		{
+			$customerInfo = $this->customer->checkCustomerByEmail($customer_email);
+			
+			if($customerInfo)
+			{
+				$customer_id = $customerInfo['customer_id'];
+			}
+			else
+			{
+				$isNewCustomer = true;
+				
+				$customer_data = array(
+										'email' 			=> $customer_email,
+										'created_order_id'	=> $order_id,
+										'created_store_id'	=> $this->store_id,
+										'created_user_id'	=> $this->user_id,
+										'created'			=> $created
+				
+				);
+				
+				$customer_id = $this->customer->add_customer($customer_data);
+			}
+		}
+		
+		$signature = '';
+		$signature_image_data = $this->__uploadFile($this->config->item('order_signature_image_base'), asset_url('img/orders/signature'));
+
+		if(is_array($signature_image_data) && count($signature_image_data) > 0)
+		{
+			if(isset($signature_image_data['path']))
+			{
+				$signature    = $signature_image_data['path'];
+			}
+		}
+		
+		$order_data = array(
+								"customer_signature" 	=> $signature,
+								"customer_id"			=> $customer_id,
+								"customer_email"		=> $customer_email,
+								"customer_phone"		=> $customer_phone,
+								"customer_country"		=> $customer_country,
+								"customer_state"		=> $customer_state,
+								"customer_city"			=> $customer_city,
+								"customer_address1"		=> $customer_address1,
+								"customer_address2"		=> $customer_address2,
+								"customer_zipcode"		=> $customer_zipcode,
+								"updated"				=> $updated,
+						);
+		// update order
+		$order_id = $this->order->edit_order($order_id, $order_data);
+		
+		$data["header"]["error"]   = "0";
+		$data["header"]["message"] = "Customer details has been successfully saved for the order";
+		$this->response($data, 200);				
+	}
 
     function getOrdersByUser_post()
     {
@@ -1605,7 +1790,7 @@ class Api extends REST_Controller {
         $total_amount = $order_detail['total_amount'] - $amount;
         $this->order->edit_order($order_id, array('total_refund'=>$order_detail['total_refund']+$amount,'total_amount'=>$total_amount));
 
-        $transaction_data = array("order_id"=>$order_id,"store_id"=>$this->store_id,"user_id"=>$this->user_id,"type"=>2,"amount_cc"=>$amount_cc,"amount_cash"=>$amount_cash,"created"=>$created);
+        $transaction_data = array("order_id"=>$order_id,"store_id"=>$this->store_id,"user_id"=>$this->user_id,"type"=>CONST_TRANSACTION_TYPE_REFUND,"amount_cc"=>$amount_cc,"amount_cash"=>$amount_cash,"created"=>$created);
         $this->order->add_transaction($transaction_data);
 
 

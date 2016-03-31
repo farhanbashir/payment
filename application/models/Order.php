@@ -7,8 +7,16 @@ Class Order extends CI_Model
         $sql = "select * from orders where order_id=$order_id" ;
         $query = $this->db->query($sql);
         $result = $query->result_array();
-        $query->free_result();
-        return $result[0];
+		
+		if($result)
+		{
+			$query->free_result();
+			return $result[0];
+		}
+		else			
+		{
+			return false;
+		}
     }
 
     function get_all_orders_by_user($user_id)

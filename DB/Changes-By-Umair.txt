@@ -54,3 +54,26 @@ ALTER TABLE `transactions` CHANGE `auth_code` `cx_transaction_id` VARCHAR(250) C
 ALTER TABLE `transactions` CHANGE `cx_transaction_id` `cx_transaction_id` VARCHAR(250) CHARACTER SET utf16 COLLATE utf16_general_ci NULL DEFAULT NULL;
 
 ALTER TABLE `orders` ADD `custom_order_id` VARCHAR(250) NULL DEFAULT NULL AFTER `user_id`;
+
+*March 31, 2016:
+=================
+ALTER TABLE `orders` DROP `type`;
+
+ALTER TABLE `orders` ADD `customer_phone` VARCHAR(250) NULL DEFAULT NULL AFTER `customer_email`, ADD `customer_country` VARCHAR(250) NULL DEFAULT NULL AFTER `customer_phone`, ADD `customer_state` VARCHAR(250) NULL DEFAULT NULL AFTER `customer_country`, ADD `customer_city` VARCHAR(250) NULL DEFAULT NULL AFTER `customer_state`, ADD `customer_address1` VARCHAR(250) NULL DEFAULT NULL AFTER `customer_city`, ADD `customer_address2` VARCHAR(250) NULL DEFAULT NULL AFTER `customer_address1`;
+
+ALTER TABLE `orders` ADD `customer_zipcode` VARCHAR(250) NULL DEFAULT NULL AFTER `customer_address2`;
+
+
+CREATE TABLE IF NOT EXISTS `customers` (
+  `customer_id` int(11) NOT NULL AUTO_INCREMENT,
+  `email` varchar(250) DEFAULT NULL,
+  `created_order_id` int(11) DEFAULT '0',
+  `created_store_id` int(11) DEFAULT '0',
+  `created_user_id` int(11) DEFAULT '0',
+  `created` datetime DEFAULT NULL,
+  PRIMARY KEY (`customer_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
+
+ALTER TABLE `orders` ADD `customer_id` INT(11) NULL DEFAULT '0' AFTER `customer_signature`;
+
+ALTER TABLE `orders` ADD `updated` DATETIME NULL DEFAULT NULL AFTER `status`;
