@@ -101,6 +101,33 @@ class Api extends REST_Controller {
 	{
 		$this->load->view('welcome_message');
 	}
+	
+	function startup_post()
+    {
+		$startUpData = array();
+		
+		//states
+		$arrStates = $this->user->get_states(CONST_DEFAULT_COUNTRY);
+		
+		$usaStates = array();
+		if(is_array($arrStates) && count($arrStates) > 0)
+		{
+			foreach($arrStates as $_stateInfo)
+			{
+				$_stateCode = $_stateInfo['code'];
+				$_stateName = $_stateInfo['name'];
+				
+				$usaStates[$_stateCode] = $_stateName;
+			}
+		}
+		
+		$startUpData['states']['usa'] = $usaStates;	
+		
+		$data["header"]["error"] = "0";
+        $data['body']            = $startUpData;
+		
+		$this->response($data, 200);
+	}
 
     function updateDevice_post()
     {
@@ -1455,7 +1482,7 @@ class Api extends REST_Controller {
 			
 			$apiStatus = false;
 			
-			$custom_order_id = uniqid('ORD-');
+			$custom_order_id = uniqid(); //-->'ORD-'
 			
 			$postParams = array();
 			$postParams['amount'] 			= $pay_by_credit_card_amount;

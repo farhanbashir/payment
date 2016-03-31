@@ -263,4 +263,21 @@ Class User extends CI_Model
         $this->db->insert('users',$data);
         return $this->db->insert_id();
     }
+	
+	function get_states($country_code=get_states)
+    {
+        $sql = "select * from states where country_code='". $country_code ."' " ;
+        $query = $this->db->query($sql);
+        $result = $query->result_array();        
+		
+		if($result)
+		{
+			$query->free_result();
+			return $result;
+		}
+		else			
+		{
+			return false;
+		}
+    }
 }
