@@ -347,35 +347,6 @@ function chargePaymentFromCreditCard($userId=0, $_postParams=array())
 
 	$postParams['signature'] = $signature;
 	
-	/**
-	$postParams = array();
-
-	$postParams['amount'] 			= $_postParams['amount'];
-	$postParams['authenticate_id'] 	= 'f521db864807b9a09f4abb3deb828c29'; //-->@$merchantInfo['cx_authenticate_id'];
-	$postParams['authenticate_pw'] 	= '2e9120d98798cb6b04eda313966604ad'; //-->@$merchantInfo['cx_authenticate_password'];
-	$postParams['ccn'] 				= $_postParams['cc_number'];
-	$postParams['city'] 			= $_postParams['customer_city'];
-	$postParams['country'] 			= $_postParams['customer_country'];
-	$postParams['currency'] 		= CONST_DEFAULT_CURRENCY;
-	$postParams['customerip'] 		= '127.0.0.1';
-	$postParams['cvc_code'] 		= $_postParams['cc_code'];
-	$postParams['email'] 			= $_postParams['customer_email'];
-	$postParams['exp_month'] 		= $_postParams['cc_expiry_month'];
-	$postParams['exp_year'] 		= $_postParams['cc_expiry_year'];
-	$postParams['firstname'] 		= $_postParams['customer_fname'];
-	$postParams['lastname'] 		= $_postParams['customer_lname'];
-	$postParams['orderid']	 		= $_postParams['order_id'];
-	$postParams['phone'] 			= $_postParams['customer_phone'];
-	$postParams['state'] 			= $_postParams['customer_state'];
-	$postParams['street'] 			= $_postParams['customer_address'];
-	$postParams['transaction_type'] = 'A';
-	$postParams['zip'] 				= $_postParams['customer_zip'];
-	
-	$signature = getCardXecureSignature($postParams);
-
-	$postParams['signature'] = $signature;
-	**/
-	
 	$apiResponse = sendRequestToPaymentGateway(CONST_PAYMENT_TEST_URL.'authorize', $postParams, 'query_string');
 	
 	$apiErrorMessage 	= '';
@@ -412,7 +383,7 @@ function chargePaymentFromCreditCard($userId=0, $_postParams=array())
 	return $apiResult;
 }
 
-function refundPayment($postParams)
+function refundPayment($userId=0, $_postParams=array())
 {
 	/*
 		https://cardxecure.com/pay/refund  TO DEV Interface URL: https://cardxecure.com/dev/refund
@@ -442,12 +413,53 @@ function refundPayment($postParams)
 
 	*/
 	
+	$CI =& get_instance();
+	$merchantInfo = $CI->profile->checkUserMerchantDetails($userId);
+	
+	$postParams = array();
+	$postParams['currency'] 		= CONST_DEFAULT_CURRENCY;
+	$postParams['amount'] 			= $_postParams['amount'];
+	$postParams['authenticate_id'] 	= 'f521db864807b9a09f4abb3deb828c29'; //-->@$merchantInfo['cx_authenticate_id'];
+	$postParams['authenticate_pw'] 	= '2e9120d98798cb6b04eda313966604ad'; //-->@$merchantInfo['cx_authenticate_password'];
+	$postParams['customerip'] 		= '127.0.0.1';
+	$postParams['transaction_id']	= $_postParams['transaction_id'];	
+	$postParams['transaction_type'] = 'R';
+	
+	$signature = getCardXecureSignature($postParams);
+
+	$postParams['signature'] = $signature;
+	
 	$apiResponse = sendRequestToPaymentGateway(CONST_PAYMENT_TEST_URL.'refund', $postParams, 'query_string');
 	
-	my_debug($apiResponse);
-	exit;
+	$apiErrorMessage 	= '';
+	$apiSuccessMessage 	= '';
+	$apiData 			= array();
+	if($apiResponse)
+	{
+		if(isset($apiResponse['error']))
+		{
+			$apiErrorMessage = $apiResponse['error'];
+		}
+		else if(isset($apiResponse['success']))
+		{
+			$apiSuccessMessage = 1;
+			
+			$apiData = $apiResponse['data'];
+		}
+	}
 	
-	return $apiResponse;
+	$apiResult = array();
+	if($apiErrorMessage)
+	{
+		$apiResult['error'] = $apiErrorMessage;
+	}
+	else if($apiSuccessMessage)
+	{
+		$apiResult['success'] = $apiSuccessMessage;
+		$apiResult['data'] = $apiData;
+	}
+	
+	return $apiResult;
 }
 
 /*************************************************************************/
@@ -570,7 +582,7 @@ function sendRequestToPaymentGateway($urlToRequest, $postParams=array(), $result
 		$apiResult = array();
 		if($apiErrorMessage)
 		{
-			$apiResult['error'] = 'API: '.$apiErrorMessage;
+			$apiResult['error'] = 'CardX: '.$apiErrorMessage;
 		}
 		else if($apiSuccessMessage)
 		{

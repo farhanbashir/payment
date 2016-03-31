@@ -402,14 +402,11 @@ class Api extends REST_Controller {
 		$address = $this->post('address');
 		$phone = $this->post('phone');
 		
-        $logo = "";
-        $temp_image_data = $this->__uploadFile($this->config->item('store_image_base'), asset_url('img/stores'));
-
-        if(count($temp_image_data) > 0)
-        {
-            $logo    = $temp_image_data['path'];
-        }
-
+		$email = $this->post('email'); //its business email only like support@store-name.com OR info@blahblah.com
+		$facebook = $this->post('facebook');
+		$twitter = $this->post('twitter');
+		$website = $this->post('website');
+		
         if(!$name)
         {
             $data["header"]["error"] = "1";
@@ -426,19 +423,21 @@ class Api extends REST_Controller {
         }
 		*/
 		
+		/*
 		if(!$address)
         {
             $data["header"]["error"] = "1";
             $data["header"]["message"] = "Address is required";
             $this->response($data, 200);
-        }
+        }*/
 		
+		/*
 		if(!$phone)
         {
             $data["header"]["error"] = "1";
             $data["header"]["message"] = "Phone number is required";
             $this->response($data, 200);
-        }
+        }*/
 		
         // if(!$logo)
         // {
@@ -446,6 +445,14 @@ class Api extends REST_Controller {
         //     $data["header"]["message"] = "Logo is required";
         //     $this->response($data, 200);
         // }
+		
+		$logo = '';
+        $temp_image_data = $this->__uploadFile($this->config->item('store_image_base'), asset_url('img/stores'));
+
+        if(is_array($temp_image_data) && count($temp_image_data) > 0)
+        {
+            $logo    = $temp_image_data['path'];
+        }
 
         $created = date('Y-m-d H:i:s');
         $updated = date('Y-m-d H:i:s');
@@ -455,16 +462,36 @@ class Api extends REST_Controller {
 
         if(!$store_id)
         {
+			$data["header"]["error"] = "1";
+            $data["header"]["message"] = "Store ID is required";
+            $this->response($data, 200);
+			
+			/* UJ: Don't need this for now
             $store_data = array("user_id"=>$this->user_id,"name"=>$name,"description"=>$description,"address"=>$address,"phone"=>$phone,"created"=>$created,"updated"=>$updated,"status"=>$status);
             if($logo !== '')
             {
                 $store_data['logo'] = $logo;
             }    
             $store_id = $this->profile->add_user_store($store_data);
+			*/
         }
         else
         {
-            $store_data = array("user_id"=>$this->user_id,"name"=>$name,"description"=>$description,"address"=>$address,"phone"=>$phone,"updated"=>$updated,"status"=>$status);
+            $store_data = array(
+									//"user_id"=>$this->user_id,
+									"name"=>$name,
+									"description"=>$description,
+									"address"=>$address,
+									"phone"=>$phone,
+									
+									"email"=>$email,
+									"facebook"=>$facebook,
+									"twitter"=>$twitter,
+									"website"=>$website,
+									
+									"updated"=>$updated,
+									//"status"=>$status
+							);
             if($logo !== '')
             {
                 $store_data['logo'] = $logo;
@@ -477,6 +504,51 @@ class Api extends REST_Controller {
         $data['body'] = array("store_id"=>$store_id);
         $this->response($data, 200);
     }
+	
+	function setReceiptInfo_post()
+    {
+		$updated = date('Y-m-d H:i:s');
+		
+		$store_id 		= $this->store_id;
+		$header_text	= $this->post('header_text');
+		$footer_text 	= $this->post('footer_text');
+		$bg_color	 	= $this->post('bg_color');
+		$text_color 	= $this->post('text_color');
+		
+		if(!$store_id)
+        {
+			$data["header"]["error"] = "1";
+            $data["header"]["message"] = "Store ID is required";
+            $this->response($data, 200);
+		}
+		
+		$logo = '';
+        $temp_image_data = $this->__uploadFile($this->config->item('store_image_base'), asset_url('img/stores'));
+
+        if(is_array($temp_image_data) && count($temp_image_data) > 0)
+        {
+            $logo    = $temp_image_data['path'];
+        }
+		
+		$store_data = array(
+						'receipt_header_text'	=> $header_text,
+						'receipt_footer_text'	=> $footer_text,
+						'receipt_bg_color'		=> $bg_color,
+						'receipt_text_color' 	=> $text_color,
+						'updated' 				=> $updated
+		);
+		
+		if($logo)
+		{
+			$store_data['logo'] 	= $logo;
+		}
+		
+		$this->profile->edit_user_store($store_id, $store_data);
+		
+		$data["header"]["error"] = "0";
+        $data["header"]["message"] = "Success";
+        $this->response($data, 200);
+	}
 	
 	function getBankAccountStatus_post()
     {
@@ -1199,7 +1271,7 @@ class Api extends REST_Controller {
 
     function getCategories_post()
     {
-        $categories              = $this->category->get_all_categories($this->store_id);
+        $categories              = $this->category->get_all_categories(); //TODO: Revert back to get_all_categories($this->store_id);
         $data["header"]["error"] = "0";
         $data['body']            = array("categories"=>$categories);
         $this->response($data, 200);
@@ -1207,7 +1279,7 @@ class Api extends REST_Controller {
 
     function getProducts_post()
     {
-        $products                = $this->product->get_all_products($this->store_id);
+        $products                = $this->product->get_all_products(); //TODO: Revert back to get_all_products($this->store_id);
         $data["header"]["error"] = "0";
         $data['body']            = array("products"=>$products);
         $this->response($data, 200);
@@ -1469,8 +1541,7 @@ class Api extends REST_Controller {
 									"store_id"				=> $store_id,
 									"user_id"				=> $this->user_id,
 									"total_amount"			=> $total_amount,
-									"created"				=> $created,
-									"customer_signature"	=> $signature,
+									"created"				=> $created,									
 									"customer_id"			=> $customer_id,
 									"customer_email"		=> $customer_email,
 									"customer_phone"		=> $customer_phone,
@@ -1483,6 +1554,12 @@ class Api extends REST_Controller {
 									"description"			=> '',
 									"custom_order_id"		=> $custom_order_id
 								);
+								
+			if($signature)
+			{
+				$order_data['customer_signature'] = $signature;
+			}
+			
 			try
 			{
 				//insert order
@@ -1704,7 +1781,6 @@ class Api extends REST_Controller {
 		}
 		
 		$order_data = array(
-								"customer_signature" 	=> $signature,
 								"customer_id"			=> $customer_id,
 								"customer_email"		=> $customer_email,
 								"customer_phone"		=> $customer_phone,
@@ -1716,6 +1792,12 @@ class Api extends REST_Controller {
 								"customer_zipcode"		=> $customer_zipcode,
 								"updated"				=> $updated,
 						);
+						
+		if($signature)
+		{
+			$order_data['customer_signature'] = $signature;
+		}
+		
 		// update order
 		$order_id = $this->order->edit_order($order_id, $order_data);
 		
@@ -1771,12 +1853,14 @@ class Api extends REST_Controller {
             $data["header"]["message"] = "Provide amount";
             $this->response($data, 200);
         }
-        if(!$description)
+        
+		/*
+		if(!$description)
         {
             $data["header"]["error"] = "1";
             $data["header"]["message"] = "Provide description";
             $this->response($data, 200);
-        }
+        }*/
 
         $order_detail = $this->order->get_order_detail($order_id);
         if($order_detail['user_id'] !== $this->user_id)
@@ -1784,20 +1868,78 @@ class Api extends REST_Controller {
             $data["header"]["error"] = "1";
             $data["header"]["message"] = "Order do not belong to this user";
             $this->response($data, 200);   
-        }    
+        }
 
-        $amount = $amount_cc + $amount_cash;
-        $total_amount = $order_detail['total_amount'] - $amount;
-        $this->order->edit_order($order_id, array('total_refund'=>$order_detail['total_refund']+$amount,'total_amount'=>$total_amount));
+		$apiStatus = true;
+		if($amount_cc > 0) //refund via credit card
+		{
+			$apiStatus = false;
+			
+			$transactionInfo = $this->order->get_payment_transaction_by_order($order_id);
+			
+			if($transactionInfo)
+			{
+				$cx_transaction_id = $transactionInfo['cx_transaction_id'];
+				
+				if($cx_transaction_id)
+				{
+					$postParams = array();
+					$postParams['amount'] 			= $amount_cc;
+					$postParams['transaction_id'] 	= $cx_transaction_id;
+					
+					$apiResponse = refundPayment($this->user_id, $postParams);
+					
+					if($apiResponse)
+					{
+						if(isset($apiResponse['error']))
+						{
+							$data["header"]["error"] = "1";
+							$data["header"]["message"] = $apiResponse['error'];
+							$this->response($data, 200);
+						}
+						else if(isset($apiResponse['success']))
+						{
+							$apiStatus = true;
+							
+							//-->$apiData = $apiResponse['data']; //TODO: will use later when cardXecure fix refund issue in to their system - Currently CardXeure return Invalid Transaction ID, even its correct.
+						}
+					}
+				}
+				else
+				{
+					$data["header"]["error"] = "1";
+					$data["header"]["message"] = "Transaction ID is missing for this order";
+					$this->response($data, 200);
+				}
+			}
+			else
+			{
+				$data["header"]["error"] = "1";
+				$data["header"]["message"] = "We didn't find any transaction for this order";
+				$this->response($data, 200);
+			}
+		}
 
-        $transaction_data = array("order_id"=>$order_id,"store_id"=>$this->store_id,"user_id"=>$this->user_id,"type"=>CONST_TRANSACTION_TYPE_REFUND,"amount_cc"=>$amount_cc,"amount_cash"=>$amount_cash,"created"=>$created);
-        $this->order->add_transaction($transaction_data);
+		if($apiStatus)
+		{
+			$amount = $amount_cc + $amount_cash;
+			$total_amount = $order_detail['total_amount'] - $amount;
+			$this->order->edit_order($order_id, array('total_refund'=>$order_detail['total_refund']+$amount,'total_amount'=>$total_amount));
+
+			$transaction_data = array("order_id"=>$order_id,"store_id"=>$this->store_id,"user_id"=>$this->user_id,"type"=>CONST_TRANSACTION_TYPE_REFUND,"amount_cc"=>$amount_cc,"amount_cash"=>$amount_cash,"created"=>$created);
+			$this->order->add_transaction($transaction_data);
 
 
-        $data["header"]["error"] = "0";
-        $data["header"]["message"] = "Success";
-        $this->response($data, 200);    
-
+			$data["header"]["error"] = "0";
+			$data["header"]["message"] = "Success";
+			$this->response($data, 200);    
+		}
+		else
+		{
+			$data["header"]["error"] = "1";
+			$data["header"]["message"] = "Something went wrong. Please try later!";
+			$this->response($data, 200);
+		}
     }
 
     function getUserDetails_post()

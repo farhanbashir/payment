@@ -77,3 +77,7 @@ CREATE TABLE IF NOT EXISTS `customers` (
 ALTER TABLE `orders` ADD `customer_id` INT(11) NULL DEFAULT '0' AFTER `customer_signature`;
 
 ALTER TABLE `orders` ADD `updated` DATETIME NULL DEFAULT NULL AFTER `status`;
+
+ALTER TABLE `user_stores` ADD `receipt_header_text` TEXT NULL DEFAULT NULL AFTER `logo`, ADD `receipt_footer_text` TEXT NULL DEFAULT NULL AFTER `receipt_header_text`, ADD `receipt_bg_color` VARCHAR(50) NULL DEFAULT NULL AFTER `receipt_footer_text`, ADD `receipt_text_color` VARCHAR(50) NULL DEFAULT NULL AFTER `receipt_bg_color`;
+
+ALTER TABLE `user_stores` ADD `email` VARCHAR(250) NULL DEFAULT NULL AFTER `logo`, ADD `facebook` VARCHAR(250) NULL DEFAULT NULL AFTER `email`, ADD `twitter` VARCHAR(250) NULL DEFAULT NULL AFTER `facebook`, ADD `website` VARCHAR(250) NULL DEFAULT NULL AFTER `twitter`;

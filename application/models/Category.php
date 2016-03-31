@@ -55,9 +55,17 @@ Class Category extends CI_Model
         return $result;   
     }
 
-    function get_all_categories($store_id)
+    function get_all_categories($store_id=0)
     {
-        $sql = "select * from categories where status=1 and store_id=$store_id" ;
+		if($store_id)
+		{
+			$sql = "select * from categories where status=1 and store_id=$store_id" ;
+		}
+		else
+		{
+			$sql = "select * from categories where status=1" ;
+		}
+        
         $query = $this->db->query($sql);
         $result = $query->result_array();
         $query->free_result();
