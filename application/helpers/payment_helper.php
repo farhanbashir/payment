@@ -308,15 +308,54 @@ function chargePaymentFromCreditCard($userId=0, $_postParams=array())
 	$CI =& get_instance();
 	$merchantInfo = $CI->profile->checkUserMerchantDetails($userId);
 	
+	if(!$_postParams['customer_fname'])
+	{
+		$_postParams['customer_fname'] = 'F';
+	}
+	
 	if(!$_postParams['customer_lname'])
 	{
-		$_postParams['customer_lname'] = 'Jaffar';
+		$_postParams['customer_lname'] = 'L';
+	}
+	
+	if(!$_postParams['customer_email'])
+	{
+		$_postParams['customer_email'] = 'test@gmail.com';
+	}
+	
+	if(!$_postParams['customer_phone'])
+	{
+		$_postParams['customer_phone'] = '111-222-333-4';
+	}
+	
+	if(!$_postParams['customer_country'])
+	{
+		$_postParams['customer_country'] = CONST_DEFAULT_COUNTRY;
+	}
+	
+	if(!$_postParams['customer_state'])
+	{
+		$_postParams['customer_state'] = 'NY';
+	}
+	
+	if(!$_postParams['customer_city'])
+	{
+		$_postParams['customer_city'] = 'NYC';
+	}
+	
+	if(!$_postParams['customer_address'])
+	{
+		$_postParams['customer_address'] = 'Test';
+	}
+	
+	if(!$_postParams['customer_zip'])
+	{
+		$_postParams['customer_zip'] = '12345';
 	}
 	
 	if($_postParams['cc_expiry_year'])
 	{
 		$_postParams['cc_expiry_year'] = substr($_postParams['cc_expiry_year'], -2);
-		
 	}
 	
 	$postParams = array();
