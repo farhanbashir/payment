@@ -16,6 +16,10 @@ define('CONST_ROLE_ID_BUSINESS_STAFF',	3);
 define('CONST_DEFAULT_COUNTRY',			'USA');
 define('CONST_DEFAULT_CURRENCY',		'USD');
 
+//transaction types
+define('CONST_TRANSACTION_TYPE_PAYMENT',	1);
+define('CONST_TRANSACTION_TYPE_REFUND',		2);
+
 function merchantSignup($_postParams=array())
 {
 	/*
