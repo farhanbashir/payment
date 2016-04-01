@@ -142,3 +142,21 @@ INSERT INTO `states` (`state_id`, `country_code`, `name`, `code`) VALUES
 (49, 'USA', 'West Virginia', 'WV'),
 (50, 'USA', 'Wisconsin', 'WI'),
 (51, 'USA', 'Wyoming', 'WY');
+
+
+*April 01, 2016:
+=================
+
+CREATE TABLE IF NOT EXISTS `logs_apis` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT '0',
+  `service` varchar(200) DEFAULT NULL,
+  `header_params` text,
+  `post_params` text,
+  `response` text,
+  `request_time` datetime DEFAULT NULL,
+  `response_time` datetime DEFAULT NULL,
+  `total_seconds` varchar(100) DEFAULT NULL,
+  `ip_address` varchar(200) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;

@@ -3,7 +3,7 @@
 define('CONST_PAYMENT_MODE', 		'test'); //test | live
 define('CONST_PAYMENT_API_KEY',		'28966ac8a0af1447d6f5bfba0e1428fc');
 define('CONST_PAYMENT_TEST_URL',	'https://pay.icannpay.com/dev/index.php/');
-define('CONST_PAYMENT_LIVE_URL',	'https://icannpay.com/index.php/');
+define('CONST_PAYMENT_LIVE_URL',	'https://pay.icannpay.com/index.php/'); //-->https://icannpay.com/index.php/
 
 //products!
 define('CONST_PRODUCT_ID_NUMPAD',	   -1);
@@ -89,7 +89,7 @@ function merchantSignup($_postParams=array())
 	$postParams['baddress'] 	= $_postParams['bank_address'];			//Required Field: The Address of your bank field is required.
 	$postParams['swiftcode'] 	= $_postParams['bank_swift_code'];		//Required Field: The Swift code field is required
 	
-	$apiResponse = sendRequestToPaymentGateway(CONST_PAYMENT_TEST_URL.'api/apiSignup', $postParams);
+	$apiResponse = sendRequestToPaymentGateway('signupMerchant', $postParams);
 	
 	$apiErrorMessage 	= '';
 	$apiSuccessMessage 	= '';
@@ -152,7 +152,7 @@ function getMerchantPaymentMode($postParams)
 			}
 	*/
 	
-	return sendRequestToPaymentGateway(CONST_PAYMENT_TEST_URL.'api/getPaymentMode', $postParams);
+	return sendRequestToPaymentGateway('getPaymentMode', $postParams);
 }
 
 function changeMerchantPaymentMode($postParams)
@@ -180,7 +180,7 @@ function changeMerchantPaymentMode($postParams)
 			}
 	*/
 	
-	return sendRequestToPaymentGateway(CONST_PAYMENT_TEST_URL.'api/changePaymentMode', $postParams);
+	return sendRequestToPaymentGateway('changePaymentMode', $postParams);
 }
 
 function getMerchantBankAccountStatus($_postParams=array())
@@ -207,7 +207,7 @@ function getMerchantBankAccountStatus($_postParams=array())
 	$postParams['email'] 		= $_postParams['email'];
 	$postParams['password'] 	= $_postParams['password'];
 	
-	$apiResponse = sendRequestToPaymentGateway(CONST_PAYMENT_TEST_URL.'api/getBankAccStatus', $postParams);
+	$apiResponse = sendRequestToPaymentGateway('getBankAccountStatus', $postParams);
 	
 	$apiErrorMessage 	= '';
 	$apiSuccessMessage 	= '';
@@ -254,13 +254,6 @@ function getMerchantBankAccountStatus($_postParams=array())
 function chargePaymentFromCreditCard($userId=0, $_postParams=array())
 {	
 	/*
-		https://cardxecure.com/pay/authorize  TO DEV Interface URL: https://cardxecure.com/dev/authorize
-
-		If use pay.icannpay.com
-
-		https://pay.icannpay.com/pay/authorize  TO DEV Interface URL:https://pay.icannpay.com/dev/authorize
-		
-		
 		Params:
 		
 			$postParams = array();
@@ -361,8 +354,8 @@ function chargePaymentFromCreditCard($userId=0, $_postParams=array())
 	$postParams = array();
 	$postParams['currency'] 		= CONST_DEFAULT_CURRENCY;
 	$postParams['amount'] 			= $_postParams['amount'];
-	$postParams['authenticate_id'] 	= 'f521db864807b9a09f4abb3deb828c29'; //-->@$merchantInfo['cx_authenticate_id'];
-	$postParams['authenticate_pw'] 	= '2e9120d98798cb6b04eda313966604ad'; //-->@$merchantInfo['cx_authenticate_password'];
+	$postParams['authenticate_id'] 	= @$merchantInfo['cx_authenticate_id'];
+	$postParams['authenticate_pw'] 	= @$merchantInfo['cx_authenticate_password'];
 	$postParams['ccn'] 				= $_postParams['cc_number'];
 	$postParams['exp_month'] 		= $_postParams['cc_expiry_month'];
 	$postParams['exp_year'] 		= $_postParams['cc_expiry_year'];
@@ -382,11 +375,11 @@ function chargePaymentFromCreditCard($userId=0, $_postParams=array())
 	$postParams['customerip'] 		= '127.0.0.1';
 	$postParams['transaction_type'] = 'A';
 	
-	$signature = getCardXecureSignature($postParams);
+	$signature = getCardXecureSignature($postParams, $merchantInfo);
 
 	$postParams['signature'] = $signature;
 	
-	$apiResponse = sendRequestToPaymentGateway(CONST_PAYMENT_TEST_URL.'authorize', $postParams, 'query_string');
+	$apiResponse = sendRequestToPaymentGateway('paymentAuthorize', $postParams, 'query_string');
 	
 	$apiErrorMessage 	= '';
 	$apiSuccessMessage 	= '';
@@ -425,12 +418,6 @@ function chargePaymentFromCreditCard($userId=0, $_postParams=array())
 function refundPayment($userId=0, $_postParams=array())
 {
 	/*
-		https://cardxecure.com/pay/refund  TO DEV Interface URL: https://cardxecure.com/dev/refund
-
-		If use pay.icannpay.com
-
-		https://pay.icannpay.com/pay/refund  TO DEV Interface URL:https://pay.icannpay.com/dev/refund
-		
 		Params:
 		
 			$postParams = array();
@@ -458,17 +445,17 @@ function refundPayment($userId=0, $_postParams=array())
 	$postParams = array();
 	$postParams['currency'] 		= CONST_DEFAULT_CURRENCY;
 	$postParams['amount'] 			= $_postParams['amount'];
-	$postParams['authenticate_id'] 	= 'f521db864807b9a09f4abb3deb828c29'; //-->@$merchantInfo['cx_authenticate_id'];
-	$postParams['authenticate_pw'] 	= '2e9120d98798cb6b04eda313966604ad'; //-->@$merchantInfo['cx_authenticate_password'];
+	$postParams['authenticate_id'] 	= @$merchantInfo['cx_authenticate_id'];
+	$postParams['authenticate_pw'] 	= @$merchantInfo['cx_authenticate_password'];
 	$postParams['customerip'] 		= '127.0.0.1';
 	$postParams['transaction_id']	= $_postParams['transaction_id'];	
 	$postParams['transaction_type'] = 'R';
 	
-	$signature = getCardXecureSignature($postParams);
+	$signature = getCardXecureSignature($postParams, $merchantInfo);
 
 	$postParams['signature'] = $signature;
 	
-	$apiResponse = sendRequestToPaymentGateway(CONST_PAYMENT_TEST_URL.'refund', $postParams, 'query_string');
+	$apiResponse = sendRequestToPaymentGateway('paymentRefund', $postParams, 'query_string');
 	
 	$apiErrorMessage 	= '';
 	$apiSuccessMessage 	= '';
@@ -503,7 +490,7 @@ function refundPayment($userId=0, $_postParams=array())
 
 /*************************************************************************/
 
-function getCardXecureSignature($postParams=array())
+function getCardXecureSignature($postParams=array(), $merchantInfo=array())
 {
 	if(!$postParams)
 	{
@@ -522,15 +509,69 @@ function getCardXecureSignature($postParams=array())
 		}
 	}
 	
-	$signature .= '56e940c625a281.36647928'; //secret key!
+	if(is_array($merchantInfo) && count($merchantInfo) > 0)
+	{
+		if(isset($merchantInfo['cx_secret_key']))
+		{
+			$signature .= $merchantInfo['cx_secret_key']; //secret key!
+		}
+	}
 
 	$signature = strtolower(sha1($signature));	
 	
 	return $signature;
 }
 
-function sendRequestToPaymentGateway($urlToRequest, $postParams=array(), $resultType='json')
+function sendRequestToPaymentGateway($callFor, $postParams=array(), $resultType='json')
 {
+	$urlToRequest 	= '';
+	$apiURL			= CONST_PAYMENT_TEST_URL; //It will change to "CONST_PAYMENT_LIVE_URL" - When we go to LIVE payments.
+	
+	if($callFor == 'signupMerchant')
+	{
+		$urlToRequest = $apiURL.'api/apiSignup';
+	}
+	else if($callFor == 'getPaymentMode')
+	{
+		$urlToRequest = $apiURL.'api/getPaymentMode';
+	}
+	else if($callFor == 'changePaymentMode')
+	{
+		$urlToRequest = $apiURL.'api/changePaymentMode';
+	}
+	else if($callFor == 'getBankAccountStatus')
+	{
+		$urlToRequest = $apiURL.'api/getBankAccStatus';
+	}
+	else if($callFor == 'paymentAuthorize')
+	{
+		/*
+			https://cardxecure.com/pay/authorize  TO DEV Interface URL: https://cardxecure.com/dev/authorize
+
+			If use pay.icannpay.com
+
+			https://pay.icannpay.com/pay/authorize  TO DEV Interface URL:https://pay.icannpay.com/dev/authorize
+		*/
+		
+		$urlToRequest = $apiURL.'authorize';
+	}
+	else if($callFor == 'paymentRefund')
+	{
+		/*
+			https://cardxecure.com/pay/refund  TO DEV Interface URL: https://cardxecure.com/dev/refund
+
+			If use pay.icannpay.com
+
+			https://pay.icannpay.com/pay/refund  TO DEV Interface URL:https://pay.icannpay.com/dev/refund
+		*/
+		
+		$urlToRequest = $apiURL.'refund';
+	}
+	else
+	{
+		$urlToRequest = $callFor;
+	}
+	
 	if(!$postParams)
 	{
 		$postParams = array();
@@ -631,22 +672,6 @@ function sendRequestToPaymentGateway($urlToRequest, $postParams=array(), $result
 		
 		return $apiResult;
 	}
-	
-	/* -- 
-	echo "urlToRequest: --".$urlToRequest."--<br />";
-	echo "Result: --";
-	my_debug($result);
-	
-	echo "--<br />";
-	
-	echo "postParams: --";
-	my_debug($postParams);
-	
-	echo "--<br />";
-	
-	echo "Info: --";
-	my_debug($info);
-	exit;*/
 	
 	return $result;
 }
