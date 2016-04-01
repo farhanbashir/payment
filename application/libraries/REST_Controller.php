@@ -2,6 +2,25 @@
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+define('CONST_API_LOGS',	   true);
+/*
+	Create below DB table, in-case CONST_API_LOGS is true
+	
+	CREATE TABLE IF NOT EXISTS `logs_apis` (
+	  `id` int(11) NOT NULL AUTO_INCREMENT,
+	  `user_id` int(11) DEFAULT '0',
+	  `service` varchar(200) DEFAULT NULL,
+	  `header_params` text,
+	  `post_params` text,
+	  `response` text,
+	  `request_time` datetime DEFAULT NULL,
+	  `response_time` datetime DEFAULT NULL,
+	  `total_seconds` varchar(100) DEFAULT NULL,
+	  `ip_address` varchar(200) DEFAULT NULL,
+	  PRIMARY KEY (`id`)
+	) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=8 ;
+*/
+
 /**
  * CodeIgniter Rest Controller
  * A fully RESTful server implementation for CodeIgniter using one library, one config file and one controller.
@@ -373,7 +392,14 @@ abstract class REST_Controller extends CI_Controller {
     public function __construct($config = 'rest')
     {
         parent::__construct();
-
+		
+		$this->log_id 		= 0;
+		$this->start_time 	= 0;
+		if(CONST_API_LOGS)
+		{
+			$this->_createLog();
+		}
+		
         // Disable XML Entity (security vulnerability)
         libxml_disable_entity_loader(TRUE);
 
@@ -726,6 +752,11 @@ abstract class REST_Controller extends CI_Controller {
 
         // Output the data
         $this->output->set_output($output);
+		
+		if(CONST_API_LOGS)
+		{
+			$this->_updateLogResponse($output);
+		}
 
         if ($continue === FALSE)
         {
@@ -2059,5 +2090,50 @@ abstract class REST_Controller extends CI_Controller {
                    ->get($this->config->item('rest_access_table'))
                    ->num_rows() > 0;
     }
-
+	
+	function _createLog()
+	{
+		$this->start_time = microtime(true);
+		
+		$CI =& get_instance();
+		$CI->load->model('logs');
+		
+		$logData = array();
+		
+		$headers = getallheaders();
+		
+		$user_id = 0;
+		if(isset($headers['Userid']))
+		{
+			$user_id = $headers['Userid'];
+		}
+		
+		$logData['user_id'] 		= $user_id; 
+		$logData['service'] 		= $CI->router->fetch_method();
+		$logData['header_params'] 	= json_encode($headers);
+		$logData['post_params'] 	= json_encode($_POST);
+		$logData['response'] 		= '';
+		$logData['request_time'] 	= date('Y-m-d H:i:s');
+		$logData['response_time'] 	= '';
+		$logData['ip_address'] 		= $CI->input->ip_address();
+		
+		$this->log_id = $CI->logs->add_api_log($logData);
+	}
+	
+	function _updateLogResponse($response='')
+	{
+		$start_time 	= $this->start_time;
+		$end_time 		= microtime(true);
+		
+		$CI =& get_instance();
+		$CI->load->model('logs');
+		
+		$logData = array();
+		
+		$logData['response'] 		= $response; 
+		$logData['response_time'] 	= date('Y-m-d H:i:s');
+		$logData['total_seconds'] 	= $end_time-$start_time; //in seconds
+		
+		$CI->logs->edit_api_log($this->log_id, $logData);
+	}
 }
