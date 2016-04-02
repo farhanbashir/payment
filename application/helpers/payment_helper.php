@@ -20,6 +20,12 @@ define('CONST_DEFAULT_CURRENCY',		'USD');
 define('CONST_TRANSACTION_TYPE_PAYMENT',	1);
 define('CONST_TRANSACTION_TYPE_REFUND',		2);
 
+//bank status
+define('CONST_BANK_STATUS_VERIFIED',		1);
+define('CONST_BANK_STATUS_NOT_VERIFIED',	2);
+
+global $merchan_service_start_time;
+
 function merchantSignup($_postParams=array())
 {
 	/*
@@ -63,36 +69,43 @@ function merchantSignup($_postParams=array())
 	
 	$postParams					= array();
 	
-	if(!$_postParams['phone'])
+	if(!@$_postParams['phone'])
 	{
-		$_postParams['phone'] = '111-222-333-4';
+		$_postParams['phone'] = '111-222-333-4'; //because its required field while SignUp!
 	}
 	
-	if(!$_postParams['store_name'])
+	if(!@$_postParams['store_name'])
 	{
-		$_postParams['store_name'] = $_postParams['first_name'].' Company';
+		$_postParams['store_name'] = @$_postParams['first_name'].' Company'; //because its required field while SignUp!
+	}
+	
+	if(!@$_postParams['website'])
+	{
+		$_postParams['website'] = 'iCannPay.com'; //because its required field while SignUp!
 	}
 	
 	$postParams['api_key']		= CONST_PAYMENT_API_KEY;
-	$postParams['email'] 		= $_postParams['email'];
-	$postParams['password'] 	= $_postParams['password'];
-	$postParams['rpassword'] 	= $_postParams['password'];
-	$postParams['fname'] 		= $_postParams['first_name'];
-	$postParams['lname'] 		= $_postParams['last_name'];
-	$postParams['cname'] 		= trim($_postParams['first_name'].' '.$_postParams['last_name']);
-	$postParams['phone'] 		= $_postParams['phone'];				//Required Field: The Phone field is required.
-	$postParams['ccompany'] 	= $_postParams['store_name'];			//Required Field: The Company Name field is required.
-	$postParams['cdomain'] 		= 'iCannPay.com';						//Required Field: The Domain Name field is required.
-	$postParams['accname'] 		= $_postParams['bank_account_title'];	//Required Field: The Your bank account name field is required.
-	$postParams['accno'] 		= $_postParams['bank_account_number'];	//Required Field: The Your bank account number field is required.
-	$postParams['bname'] 		= $_postParams['bank_name'];			//Required Field: The Name of bank field is required.
-	$postParams['baddress'] 	= $_postParams['bank_address'];			//Required Field: The Address of your bank field is required.
-	$postParams['swiftcode'] 	= $_postParams['bank_swift_code'];		//Required Field: The Swift code field is required
+	$postParams['email'] 		= @$_postParams['email'];
+	$postParams['password'] 	= @$_postParams['password'];
+	$postParams['rpassword'] 	= @$_postParams['password'];
+	$postParams['fname'] 		= @$_postParams['first_name'];
+	$postParams['lname'] 		= @$_postParams['last_name'];
+	$postParams['cname'] 		= trim(@$_postParams['first_name'].' '.@$_postParams['last_name']);
+	$postParams['phone'] 		= @$_postParams['phone'];
+	$postParams['ccompany'] 	= @$_postParams['store_name'];
+	$postParams['cdomain'] 		= @$_postParams['website'];
+	$postParams['accname'] 		= @$_postParams['bank_account_title'];
+	$postParams['accno'] 		= @$_postParams['bank_account_number'];
+	$postParams['bname'] 		= @$_postParams['bank_name'];
+	$postParams['baddress'] 	= @$_postParams['bank_address'];
+	$postParams['swiftcode'] 	= @$_postParams['bank_swift_code'];
 	
-	$apiResponse = sendRequestToPaymentGateway('signupMerchant', $postParams);
+	$userId = 0;
+	
+	$apiResponse = sendRequestToPaymentGateway($userId, 'signupMerchant', $postParams);
 	
 	$apiErrorMessage 	= '';
-	$apiSuccessMessage 	= '';
+	$apiSuccessMessage 	= 0;
 	$apiData 			= array();
 	if($apiResponse)
 	{
@@ -128,7 +141,142 @@ function merchantSignup($_postParams=array())
 	return $apiResult;
 }
 
-function getMerchantPaymentMode($postParams)
+function editMerchantDetails($userId=0, $_postParams=array())
+{
+	/*
+		Params:
+		
+			$postParams = array();
+
+				$postParams['api_key'] 		= '28966ac8a0af1447d6f5bfba0e1428fc';
+				$postParams['email'] 		= 'umair.jaffar+1@gmail.com';
+				$postParams['password'] 	= '123456';
+				$postParams['fname'] 		= 'Umair';
+				$postParams['lname'] 		= 'Jaffar';
+				$postParams['cname'] 		= 'Umair Jaffar';
+				$postParams['phone'] 		= '0987654321';
+				$postParams['ccompany'] 	= 'TechNyx';
+				$postParams['cdomain'] 		= 'TechNyx.com';
+				$postParams['accname'] 		= 'Umair Account Title';
+				$postParams['accno'] 		= '11112223334456';
+				$postParams['bname'] 		= 'SCB';
+				$postParams['baddress'] 	= 'Karachi';
+				$postParams['swiftcode'] 	= 'XXSCB-KHI12345';
+			
+			
+			Result - Success:
+			{
+				"response": {
+					"success": "success",
+					"hash": "64cff32a79174936d2d7c203f7cf0f50"
+				}
+			}
+			
+			Result - Fail:
+			{
+				"response": {
+					"error": "Nothing get updated!"
+				}
+			}
+	*/
+	
+	$CI =& get_instance();
+	$merchantInfo = $CI->profile->checkUserMerchantDetails($userId);
+	
+	$postParams					= array();
+	$postParams['api_key']		= CONST_PAYMENT_API_KEY;
+	$postParams['email'] 		= @$merchantInfo['email'];
+	$postParams['password'] 	= @$merchantInfo['password'];
+	
+	if(@$_postParams['first_name'])
+	{
+		$postParams['fname'] 	= @$_postParams['first_name'];
+	}
+	
+	if(@$_postParams['last_name'])
+	{
+		$postParams['lname'] 	= @$_postParams['last_name'];
+	}
+	
+	if(@$_postParams['first_name'] || @$_postParams['last_name'])
+	{
+		$postParams['cname'] 	= trim(@$_postParams['first_name'].' '.@$_postParams['last_name']);
+	}
+	
+	if(@$_postParams['phone'])
+	{
+		$postParams['phone'] 	= @$_postParams['phone'];
+	}
+	
+	if(@$_postParams['store_name'])
+	{
+		$postParams['ccompany'] = @$_postParams['store_name'];
+	}
+	
+	if(@$_postParams['website'])
+	{
+		$postParams['cdomain'] 	= @$_postParams['website'];
+	}
+	
+	if(@$_postParams['bank_account_title'])
+	{
+		$postParams['accname'] 	= @$_postParams['bank_account_title'];
+	}
+	
+	if(@$_postParams['bank_account_number'])
+	{
+		$postParams['accno'] 	= @$_postParams['bank_account_number'];
+	}
+	
+	if(@$_postParams['bank_name'])
+	{
+		$postParams['bname'] 	= @$_postParams['bank_name'];
+	}
+	
+	if(@$_postParams['bank_address'])
+	{
+		$postParams['baddress'] = @$_postParams['bank_address'];
+	}
+	
+	if(@$_postParams['bank_swift_code'])
+	{
+		$postParams['swiftcode'] = @$_postParams['bank_swift_code'];
+	}
+	
+	$apiResponse = sendRequestToPaymentGateway($userId, 'editMerchantDetails', $postParams);
+	
+	$apiErrorMessage 	= '';
+	$apiSuccessMessage 	= 0;
+	$apiData 			= array();
+	if($apiResponse)
+	{
+		if(isset($apiResponse['error']))
+		{
+			$apiErrorMessage = $apiResponse['error'];
+		}
+		else if(isset($apiResponse['success']))
+		{
+			$apiSuccessMessage = 1;
+			
+			$apiData = $apiResponse['data'];
+		}
+	}
+	
+	$apiResult = array();
+	if($apiErrorMessage)
+	{
+		$apiResult['error'] = $apiErrorMessage;
+	}
+	else if($apiSuccessMessage)
+	{
+		$apiResult['success'] = $apiSuccessMessage;
+		$apiResult['data'] = $apiData;
+	}
+	
+	return $apiResult;
+}
+
+function getMerchantPaymentMode($userId=0, $postParams)
 {
 	/*
 		Params:
@@ -152,10 +300,10 @@ function getMerchantPaymentMode($postParams)
 			}
 	*/
 	
-	return sendRequestToPaymentGateway('getPaymentMode', $postParams);
+	return sendRequestToPaymentGateway($userId, 'getPaymentMode', $postParams);
 }
 
-function changeMerchantPaymentMode($postParams)
+function changeMerchantPaymentMode($userId=0, $postParams)
 {
 	/*
 		Params:
@@ -180,10 +328,10 @@ function changeMerchantPaymentMode($postParams)
 			}
 	*/
 	
-	return sendRequestToPaymentGateway('changePaymentMode', $postParams);
+	return sendRequestToPaymentGateway($userId, 'changePaymentMode', $postParams);
 }
 
-function getMerchantBankAccountStatus($_postParams=array())
+function getMerchantBankAccountStatus($userId=0, $_postParams=array())
 {
 	/*
 		Params:
@@ -201,16 +349,20 @@ function getMerchantBankAccountStatus($_postParams=array())
 				}
 			}
 	*/
+	
+	$CI =& get_instance();
+	$merchantInfo = $CI->profile->checkUserMerchantDetails($userId);
+
 	$postParams					= array();
 	
 	$postParams['api_key']		= CONST_PAYMENT_API_KEY;
-	$postParams['email'] 		= $_postParams['email'];
-	$postParams['password'] 	= $_postParams['password'];
+	$postParams['email'] 		= @$merchantInfo['email'];
+	$postParams['password'] 	= @$merchantInfo['password'];
 	
-	$apiResponse = sendRequestToPaymentGateway('getBankAccountStatus', $postParams);
+	$apiResponse = sendRequestToPaymentGateway($userId, 'getBankAccountStatus', $postParams);
 	
 	$apiErrorMessage 	= '';
-	$apiSuccessMessage 	= '';
+	$apiSuccessMessage 	= 0;
 	$apiData 			= array();
 	if($apiResponse)
 	{
@@ -224,10 +376,10 @@ function getMerchantBankAccountStatus($_postParams=array())
 			
 			$_apiResponse_Status = @$apiResponse['data']['status'];
 			
-			$status = 0;// Not Verified 
+			$status = CONST_BANK_STATUS_NOT_VERIFIED;// Not Verified 
 			if($_apiResponse_Status == 'Verified')
 			{
-				$status = 1;// Verified
+				$status = CONST_BANK_STATUS_VERIFIED;// Verified
 			}
 			
 			$apiData = array(
@@ -379,10 +531,10 @@ function chargePaymentFromCreditCard($userId=0, $_postParams=array())
 
 	$postParams['signature'] = $signature;
 	
-	$apiResponse = sendRequestToPaymentGateway('paymentAuthorize', $postParams, 'query_string');
+	$apiResponse = sendRequestToPaymentGateway($userId, 'paymentAuthorize', $postParams, 'query_string');
 	
 	$apiErrorMessage 	= '';
-	$apiSuccessMessage 	= '';
+	$apiSuccessMessage 	= 0;
 	$apiData 			= array();
 	if($apiResponse)
 	{
@@ -455,10 +607,10 @@ function refundPayment($userId=0, $_postParams=array())
 
 	$postParams['signature'] = $signature;
 	
-	$apiResponse = sendRequestToPaymentGateway('paymentRefund', $postParams, 'query_string');
+	$apiResponse = sendRequestToPaymentGateway($userId, 'paymentRefund', $postParams, 'query_string');
 	
 	$apiErrorMessage 	= '';
-	$apiSuccessMessage 	= '';
+	$apiSuccessMessage 	= 0;
 	$apiData 			= array();
 	if($apiResponse)
 	{
@@ -522,7 +674,7 @@ function getCardXecureSignature($postParams=array(), $merchantInfo=array())
 	return $signature;
 }
 
-function sendRequestToPaymentGateway($callFor, $postParams=array(), $resultType='json')
+function sendRequestToPaymentGateway($userId=0, $callFor, $postParams=array(), $resultType='json')
 {
 	$urlToRequest 	= '';
 	$apiURL			= CONST_PAYMENT_TEST_URL; //It will change to "CONST_PAYMENT_LIVE_URL" - When we go to LIVE payments.
@@ -530,6 +682,10 @@ function sendRequestToPaymentGateway($callFor, $postParams=array(), $resultType=
 	if($callFor == 'signupMerchant')
 	{
 		$urlToRequest = $apiURL.'api/apiSignup';
+	}
+	else if($callFor == 'editMerchantDetails')
+	{
+		$urlToRequest = $apiURL.'api/apiEditMerchantDetails';
 	}
 	else if($callFor == 'getPaymentMode')
 	{
@@ -572,6 +728,8 @@ function sendRequestToPaymentGateway($callFor, $postParams=array(), $resultType=
 		$urlToRequest = $callFor;
 	}
 	
+	$logId = _createMerchantLog($userId, $callFor, $urlToRequest, $postParams);
+	
 	if(!$postParams)
 	{
 		$postParams = array();
@@ -592,11 +750,16 @@ function sendRequestToPaymentGateway($callFor, $postParams=array(), $resultType=
 	$result = curl_exec ($ch);
 	$info   = curl_getinfo($ch);
 	
+	if($logId)
+	{
+		_updateMerchantLogResponse($logId, $result);
+	}
+	
 	if($result)
 	{
 		$apiResponse 		= $result;
 		$apiErrorMessage 	= '';
-		$apiSuccessMessage 	= '';
+		$apiSuccessMessage 	= 0;
 		$apiData 			= array();
 	
 		if($resultType == 'json')
@@ -676,6 +839,46 @@ function sendRequestToPaymentGateway($callFor, $postParams=array(), $resultType=
 	return $result;
 }
 
+function _createMerchantLog($userId=0, $callFor, $urlToRequest, $params)
+{
+	global $merchan_service_start_time;
+	$merchan_service_start_time = microtime(true);
+	
+	$CI =& get_instance();
+	
+	$logData = array();
+	
+	$logData['user_id'] 		= $userId; 
+	$logData['service'] 		= $callFor;
+	$logData['url'] 			= $urlToRequest;
+	$logData['params'] 			= json_encode($params);
+	$logData['response'] 		= '';
+	$logData['request_time'] 	= date('Y-m-d H:i:s');
+	$logData['response_time'] 	= '';
+	$logData['ip_address'] 		= $CI->input->ip_address();
+	
+	$log_id = $CI->logs->add_merchant_log($logData);
+	
+	return $log_id;
+}
+
+function _updateMerchantLogResponse($log_id=0, $response='')
+{
+	global $merchan_service_start_time;
+	
+	$end_time 		= microtime(true);
+	
+	$CI =& get_instance();
+	
+	$logData = array();
+	
+	$logData['response'] 		= $response; 
+	$logData['response_time'] 	= date('Y-m-d H:i:s');
+	$logData['total_seconds'] 	= $end_time-$merchan_service_start_time; //in seconds
+	
+	$CI->logs->edit_merchant_log($log_id, $logData);
+}
+	
 function splitName($name)
 {
     $name = trim($name);
