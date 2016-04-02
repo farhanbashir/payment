@@ -160,3 +160,20 @@ CREATE TABLE IF NOT EXISTS `logs_apis` (
   `ip_address` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+*April 02, 2016:
+=================
+
+CREATE TABLE IF NOT EXISTS `logs_merchant` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT '0',
+  `service` varchar(200) DEFAULT NULL,
+  `url` varchar(250) DEFAULT NULL,
+  `params` text,
+  `response` text,
+  `request_time` datetime DEFAULT NULL,
+  `response_time` datetime DEFAULT NULL,
+  `total_seconds` varchar(100) DEFAULT NULL,
+  `ip_address` varchar(200) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
