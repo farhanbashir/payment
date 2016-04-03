@@ -16,8 +16,16 @@ Class Profile extends CI_Model
 				where u.user_id=$user_id" ;
         $query = $this->db->query($sql);
         $result = $query->result_array();
-        $query->free_result();
-        return $result[0];
+		
+		if($result)
+		{
+			$query->free_result();
+			return $result[0];
+		}
+		else			
+		{
+			return false;
+		}
     }
     /*
     function get_admin()
@@ -161,8 +169,16 @@ Class Profile extends CI_Model
         $sql = "select * from user_stores where store_id=$store_id" ;
         $query = $this->db->query($sql);
         $result = $query->result_array();
-        $query->free_result();
-        return $result[0];
+		
+		if($result)
+		{
+			$query->free_result();
+			return $result[0];
+		}
+		else			
+		{
+			return false;
+		}
     }
 
     function add_user_store($data)

@@ -162,18 +162,34 @@ Class User extends CI_Model
     {
         $sql = "select * from users where user_id=$user_id" ;
         $query = $this->db->query($sql);
-        $result = $query->result_array();
-        $query->free_result();
-        return $result[0];
+        $result = $query->result_array();        
+		
+		if($result)
+		{
+			$query->free_result();
+			return $result[0];
+		}
+		else			
+		{
+			return false;
+		}
     }
 
     function get_admin()
     {
         $sql = "select * from users where email='admin@woo.com'" ;
         $query = $this->db->query($sql);
-        $result = $query->result_array();
-        $query->free_result();
-        return $result[0];
+        $result = $query->result_array();        
+		
+		if($result)
+		{
+			$query->free_result();
+			return $result[0];
+		}
+		else
+		{
+			return false;
+		}
     }
 
     function get_users($page)
@@ -246,5 +262,22 @@ Class User extends CI_Model
     {
         $this->db->insert('users',$data);
         return $this->db->insert_id();
+    }
+	
+	function get_states($country_code=get_states)
+    {
+        $sql = "select * from states where country_code='". $country_code ."' " ;
+        $query = $this->db->query($sql);
+        $result = $query->result_array();        
+		
+		if($result)
+		{
+			$query->free_result();
+			return $result;
+		}
+		else			
+		{
+			return false;
+		}
     }
 }

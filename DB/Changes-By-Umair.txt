@@ -54,3 +54,126 @@ ALTER TABLE `transactions` CHANGE `auth_code` `cx_transaction_id` VARCHAR(250) C
 ALTER TABLE `transactions` CHANGE `cx_transaction_id` `cx_transaction_id` VARCHAR(250) CHARACTER SET utf16 COLLATE utf16_general_ci NULL DEFAULT NULL;
 
 ALTER TABLE `orders` ADD `custom_order_id` VARCHAR(250) NULL DEFAULT NULL AFTER `user_id`;
+
+*March 31, 2016:
+=================
+ALTER TABLE `orders` DROP `type`;
+
+ALTER TABLE `orders` ADD `customer_phone` VARCHAR(250) NULL DEFAULT NULL AFTER `customer_email`, ADD `customer_country` VARCHAR(250) NULL DEFAULT NULL AFTER `customer_phone`, ADD `customer_state` VARCHAR(250) NULL DEFAULT NULL AFTER `customer_country`, ADD `customer_city` VARCHAR(250) NULL DEFAULT NULL AFTER `customer_state`, ADD `customer_address1` VARCHAR(250) NULL DEFAULT NULL AFTER `customer_city`, ADD `customer_address2` VARCHAR(250) NULL DEFAULT NULL AFTER `customer_address1`;
+
+ALTER TABLE `orders` ADD `customer_zipcode` VARCHAR(250) NULL DEFAULT NULL AFTER `customer_address2`;
+
+
+CREATE TABLE IF NOT EXISTS `customers` (
+  `customer_id` int(11) NOT NULL AUTO_INCREMENT,
+  `email` varchar(250) DEFAULT NULL,
+  `created_order_id` int(11) DEFAULT '0',
+  `created_store_id` int(11) DEFAULT '0',
+  `created_user_id` int(11) DEFAULT '0',
+  `created` datetime DEFAULT NULL,
+  PRIMARY KEY (`customer_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
+
+ALTER TABLE `orders` ADD `customer_id` INT(11) NULL DEFAULT '0' AFTER `customer_signature`;
+
+ALTER TABLE `orders` ADD `updated` DATETIME NULL DEFAULT NULL AFTER `status`;
+
+ALTER TABLE `user_stores` ADD `receipt_header_text` TEXT NULL DEFAULT NULL AFTER `logo`, ADD `receipt_footer_text` TEXT NULL DEFAULT NULL AFTER `receipt_header_text`, ADD `receipt_bg_color` VARCHAR(50) NULL DEFAULT NULL AFTER `receipt_footer_text`, ADD `receipt_text_color` VARCHAR(50) NULL DEFAULT NULL AFTER `receipt_bg_color`;
+
+ALTER TABLE `user_stores` ADD `email` VARCHAR(250) NULL DEFAULT NULL AFTER `logo`, ADD `facebook` VARCHAR(250) NULL DEFAULT NULL AFTER `email`, ADD `twitter` VARCHAR(250) NULL DEFAULT NULL AFTER `facebook`, ADD `website` VARCHAR(250) NULL DEFAULT NULL AFTER `twitter`;
+
+CREATE TABLE IF NOT EXISTS `states` (
+  `state_id` int(11) NOT NULL AUTO_INCREMENT,
+  `country_code` varchar(10) DEFAULT NULL,
+  `name` varchar(250) DEFAULT NULL,
+  `code` varchar(20) DEFAULT NULL,
+  PRIMARY KEY (`state_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=52 ;
+
+INSERT INTO `states` (`state_id`, `country_code`, `name`, `code`) VALUES
+(1, 'USA', 'Alabama', 'AL'),
+(2, 'USA', 'Alaska', 'AK'),
+(3, 'USA', 'Arizona', 'AZ'),
+(4, 'USA', 'Arkansas', 'AR'),
+(5, 'USA', 'California', 'CA'),
+(6, 'USA', 'Colorado', 'CO'),
+(7, 'USA', 'Connecticut', 'CT'),
+(8, 'USA', 'Delaware', 'DE'),
+(9, 'USA', 'Dist. of Columbia', 'DC'),
+(10, 'USA', 'Florida', 'FL'),
+(11, 'USA', 'Georgia', 'GA'),
+(12, 'USA', 'Hawaii', 'HI'),
+(13, 'USA', 'Idaho', 'ID'),
+(14, 'USA', 'Illinois', 'IL'),
+(15, 'USA', 'Indiana', 'IN'),
+(16, 'USA', 'Iowa', 'IA'),
+(17, 'USA', 'Kansas', 'KS'),
+(18, 'USA', 'Kentucky', 'KY'),
+(19, 'USA', 'Louisiana', 'LA'),
+(20, 'USA', 'Maine', 'ME'),
+(21, 'USA', 'Maryland', 'MD'),
+(22, 'USA', 'Massachusetts', 'MA'),
+(23, 'USA', 'Michigan', 'MI'),
+(24, 'USA', 'Minnesota', 'MN'),
+(25, 'USA', 'Mississippi', 'MS'),
+(26, 'USA', 'Missouri', 'MO'),
+(27, 'USA', 'Montana', 'MT'),
+(28, 'USA', 'Nebraska', 'NE'),
+(29, 'USA', 'Nevada', 'NV'),
+(30, 'USA', 'New Hampshire', 'NH'),
+(31, 'USA', 'New Jersey', 'NJ'),
+(32, 'USA', 'New Mexico', 'NM'),
+(33, 'USA', 'New York', 'NY'),
+(34, 'USA', 'North Carolina', 'NC'),
+(35, 'USA', 'North Dakota', 'ND'),
+(36, 'USA', 'Ohio', 'OH'),
+(37, 'USA', 'Oklahoma', 'OK'),
+(38, 'USA', 'Oregon', 'OR'),
+(39, 'USA', 'Pennsylvania', 'PA'),
+(40, 'USA', 'Rhode Island', 'RI'),
+(41, 'USA', 'South Carolina', 'SC'),
+(42, 'USA', 'South Dakota', 'SD'),
+(43, 'USA', 'Tennessee', 'TN'),
+(44, 'USA', 'Texas', 'TX'),
+(45, 'USA', 'Utah', 'UT'),
+(46, 'USA', 'Vermont', 'VT'),
+(47, 'USA', 'Virginia', 'VA'),
+(48, 'USA', 'Washington', 'WA'),
+(49, 'USA', 'West Virginia', 'WV'),
+(50, 'USA', 'Wisconsin', 'WI'),
+(51, 'USA', 'Wyoming', 'WY');
+
+
+*April 01, 2016:
+=================
+
+CREATE TABLE IF NOT EXISTS `logs_apis` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT '0',
+  `service` varchar(200) DEFAULT NULL,
+  `header_params` text,
+  `post_params` text,
+  `response` text,
+  `request_time` datetime DEFAULT NULL,
+  `response_time` datetime DEFAULT NULL,
+  `total_seconds` varchar(100) DEFAULT NULL,
+  `ip_address` varchar(200) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+*April 02, 2016:
+=================
+
+CREATE TABLE IF NOT EXISTS `logs_merchant` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT '0',
+  `service` varchar(200) DEFAULT NULL,
+  `url` varchar(250) DEFAULT NULL,
+  `params` text,
+  `response` text,
+  `request_time` datetime DEFAULT NULL,
+  `response_time` datetime DEFAULT NULL,
+  `total_seconds` varchar(100) DEFAULT NULL,
+  `ip_address` varchar(200) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;

@@ -7,8 +7,16 @@ Class Order extends CI_Model
         $sql = "select * from orders where order_id=$order_id" ;
         $query = $this->db->query($sql);
         $result = $query->result_array();
-        $query->free_result();
-        return $result[0];
+		
+		if($result)
+		{
+			$query->free_result();
+			return $result[0];
+		}
+		else			
+		{
+			return false;
+		}
     }
 
     function get_all_orders_by_user($user_id)
@@ -63,7 +71,7 @@ Class Order extends CI_Model
 	
 	function get_order_transactions($order_id)
     {
-		 $sql = "select t.type, t.amount_cc, t.amount_cash, t.is_cc_swipe, t.cc_number, t.created from transactions t 
+		 $sql = "select t.type, t.amount_cc, t.amount_cash, t.is_cc_swipe, t.cc_number, cx_transaction_id, t.created from transactions t 
 inner join orders o on t.order_id=o.order_id
 where t.order_id=$order_id";
 
@@ -71,6 +79,30 @@ where t.order_id=$order_id";
         $result = $query->result_array();
         $query->free_result();
         return $result;
+    }
+	
+	function get_payment_transaction_by_order($order_id)
+    {
+		$sql = "SELECT 
+						t.amount_cc, t.amount_cash, t.is_cc_swipe, t.cc_number, 
+						cx_transaction_id, t.created 
+				FROM transactions t 
+				INNER JOIN orders o ON t.order_id=o.order_id
+				WHERE t.order_id='". $order_id ."' 
+				  AND t.type='". CONST_TRANSACTION_TYPE_PAYMENT ."'";
+
+        $query = $this->db->query($sql);
+        $result = $query->result_array();
+        
+		if($result)
+		{
+			$query->free_result();
+			return $result[0];
+		}
+		else			
+		{
+			return false;
+		}
     }
 	
     /*function get_user_detail($user_id)

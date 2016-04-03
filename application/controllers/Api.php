@@ -30,6 +30,8 @@ class Api extends REST_Controller {
         $this->load->model('profile','',TRUE);
         $this->load->model('product','',TRUE);
 		$this->load->model('order','',TRUE);
+		$this->load->model('customer','',TRUE);
+		$this->load->model('logs','',TRUE);
     	
         $this->user_id  = '';
         $this->token    = '';
@@ -99,6 +101,33 @@ class Api extends REST_Controller {
 	public function index()
 	{
 		$this->load->view('welcome_message');
+	}
+	
+	function startup_post()
+    {
+		$startUpData = array();
+		
+		//states
+		$arrStates = $this->user->get_states(CONST_DEFAULT_COUNTRY);
+		
+		$usaStates = array();
+		if(is_array($arrStates) && count($arrStates) > 0)
+		{
+			foreach($arrStates as $_stateInfo)
+			{
+				$_stateCode = $_stateInfo['code'];
+				$_stateName = $_stateInfo['name'];
+				
+				$usaStates[$_stateCode] = $_stateName;
+			}
+		}
+		
+		$startUpData['states']['usa'] = $usaStates;	
+		
+		$data["header"]["error"] = "0";
+        $data['body']            = $startUpData;
+		
+		$this->response($data, 200);
 	}
 
     function updateDevice_post()
@@ -258,51 +287,105 @@ class Api extends REST_Controller {
 		
 		if(true)
 		{
-			$user = array("first_name"=>$first_name,"last_name"=>$last_name,"parent_user_id"=>$parent_user_id,"email"=>$email,"password"=>md5($password),"plain_password"=>$password,"status"=>$status,"role_id"=>$role_id,"updated"=>$updated,"created"=>$created);
-        
-			// $temp_image_url = $this->__uploadFile($this->config->item('user_image_base'), asset_url('img/users'));
-
-			// if($temp_image_url !== "")
-			// {
-			//     $user['image'] = $temp_image_url;
-			// }
-			
-			// if($facebook_id !== '' && $temp_image_url === ""){
-
-			//     $user['image'] = getFacebookImage($facebook_id);
-				
-			// }
-
-			
-			$user_id = $this->user->add_user($user);
-			
-			if($user_id)
+			$apiStatus = true;
+			$apiData = array();
+			if($role_id == CONST_ROLE_ID_BUSINESS_ADMIN)
 			{
-				/* //UJ: Not needed at signup!
-				//insert device table
-				if(isset($device_type) && isset($device_id))
-				{
-					$device_data = array('user_id'=>$user_id,'uid'=>$device_id, 'type'=>$device_type);
-					$this->device->insert_device($device_data);
-				}
-				*/
+				$postParams = array();
+				$postParams['email'] 				= $email;
+				$postParams['password'] 			= $password;
+				$postParams['first_name'] 			= $first_name;
+				$postParams['last_name'] 			= $last_name;
 				
-				if($role_id == CONST_ROLE_ID_BUSINESS_ADMIN) //business admin
-				{
-					//if user role is business admin then create empty store
-					$store_id = $this->profile->add_user_store(array("user_id"=>$user_id));       
-				}
+				$apiStatus = false;
+				$apiData = array();
+				$apiResponse = merchantSignup($postParams);
 				
-				$data["header"]["error"]   = "0";
-				$data["header"]["message"] = "Signup successfull";
-				$this->response($data, 200);
+				if($apiResponse)
+				{
+					if(isset($apiResponse['error']))
+					{
+						$data["header"]["error"] = "1";
+						$data["header"]["message"] = $apiResponse['error'];
+						$this->response($data, 200);
+					}
+					else if(isset($apiResponse['success']))
+					{
+						$apiStatus = true;
+						
+						$apiData = $apiResponse['data'];
+					}
+				}
+			}
+			
+			if($apiStatus)
+			{
+				$user = array("first_name"=>$first_name,"last_name"=>$last_name,"parent_user_id"=>$parent_user_id,"email"=>$email,"password"=>md5($password),"plain_password"=>$password,"status"=>$status,"role_id"=>$role_id,"updated"=>$updated,"created"=>$created);
+        
+				// $temp_image_url = $this->__uploadFile($this->config->item('user_image_base'), asset_url('img/users'));
+
+				// if($temp_image_url !== "")
+				// {
+				//     $user['image'] = $temp_image_url;
+				// }
+				
+				// if($facebook_id !== '' && $temp_image_url === ""){
+
+				//     $user['image'] = getFacebookImage($facebook_id);
+					
+				// }
+				
+				$user_id = $this->user->add_user($user);
+				
+				if($user_id)
+				{
+					/* //UJ: Not needed at signup!
+					//insert device table
+					if(isset($device_type) && isset($device_id))
+					{
+						$device_data = array('user_id'=>$user_id,'uid'=>$device_id, 'type'=>$device_type);
+						$this->device->insert_device($device_data);
+					}
+					*/
+					
+					if($role_id == CONST_ROLE_ID_BUSINESS_ADMIN) //business admin
+					{
+						//if user role is business admin then create empty store
+						$store_id = $this->profile->add_user_store(array("user_id"=>$user_id));
+
+						//insert into merchant info
+						$merchant_info = array();
+						$merchant_info['user_id'] 					= $user_id;
+						$merchant_info['email'] 					= $email;
+						$merchant_info['password'] 					= $password;
+						$merchant_info['cx_authenticate_id'] 		= @$apiData['authenticate_id'];
+						$merchant_info['cx_authenticate_password'] 	= @$apiData['authenticate_password'];
+						$merchant_info['cx_secret_key'] 			= @$apiData['secret_key'];
+						$merchant_info['cx_hash'] 					= @$apiData['mode'];
+						$merchant_info['cx_mode'] 					= @$apiData['hash'];
+						$merchant_info['last_updated'] 				= $created;
+						
+						$this->profile->add_user_merchant_info($merchant_info);
+					}
+					
+					$data["header"]["error"] = "0";
+					$data["header"]["message"] = "Signup successfull";
+					$data['body'] = array("user_id"=>$user_id);
+					$this->response($data, 200);
+				}
+				else
+				{
+					$data["header"]["error"] = "1";
+					$data["header"]["message"] = "Something went wrong while creating user. Please try again!";
+					$this->response($data, 200);
+				}
 			}
 			else
 			{
 				$data["header"]["error"] = "1";
 				$data["header"]["message"] = "Something went wrong. Please try again!";
 				$this->response($data, 200);
-			}
+			}			
 		}
 		else
 		{
@@ -401,14 +484,11 @@ class Api extends REST_Controller {
 		$address = $this->post('address');
 		$phone = $this->post('phone');
 		
-        $logo = "";
-        $temp_image_data = $this->__uploadFile($this->config->item('store_image_base'), asset_url('img/stores'));
-
-        if(count($temp_image_data) > 0)
-        {
-            $logo    = $temp_image_data['path'];
-        }
-
+		$email = $this->post('email'); //its business email only like support@store-name.com OR info@blahblah.com
+		$facebook = $this->post('facebook');
+		$twitter = $this->post('twitter');
+		$website = $this->post('website');
+		
         if(!$name)
         {
             $data["header"]["error"] = "1";
@@ -425,19 +505,21 @@ class Api extends REST_Controller {
         }
 		*/
 		
+		/*
 		if(!$address)
         {
             $data["header"]["error"] = "1";
             $data["header"]["message"] = "Address is required";
             $this->response($data, 200);
-        }
+        }*/
 		
+		/*
 		if(!$phone)
         {
             $data["header"]["error"] = "1";
             $data["header"]["message"] = "Phone number is required";
             $this->response($data, 200);
-        }
+        }*/
 		
         // if(!$logo)
         // {
@@ -445,6 +527,14 @@ class Api extends REST_Controller {
         //     $data["header"]["message"] = "Logo is required";
         //     $this->response($data, 200);
         // }
+		
+		$logo = '';
+        $temp_image_data = $this->__uploadFile($this->config->item('store_image_base'), asset_url('img/stores'));
+
+        if(is_array($temp_image_data) && count($temp_image_data) > 0)
+        {
+            $logo    = $temp_image_data['path'];
+        }
 
         $created = date('Y-m-d H:i:s');
         $updated = date('Y-m-d H:i:s');
@@ -454,21 +544,48 @@ class Api extends REST_Controller {
 
         if(!$store_id)
         {
+			$data["header"]["error"] = "1";
+            $data["header"]["message"] = "Store ID is required";
+            $this->response($data, 200);
+			
+			/* UJ: Don't need this for now
             $store_data = array("user_id"=>$this->user_id,"name"=>$name,"description"=>$description,"address"=>$address,"phone"=>$phone,"created"=>$created,"updated"=>$updated,"status"=>$status);
             if($logo !== '')
             {
                 $store_data['logo'] = $logo;
             }    
             $store_id = $this->profile->add_user_store($store_data);
+			*/
         }
         else
         {
-            $store_data = array("user_id"=>$this->user_id,"name"=>$name,"description"=>$description,"address"=>$address,"phone"=>$phone,"updated"=>$updated,"status"=>$status);
+            $store_data = array(
+									//"user_id"=>$this->user_id,
+									"name"=>$name,
+									"description"=>$description,
+									"address"=>$address,
+									"phone"=>$phone,
+									
+									"email"=>$email,
+									"facebook"=>$facebook,
+									"twitter"=>$twitter,
+									"website"=>$website,
+									
+									"updated"=>$updated,
+									//"status"=>$status
+							);
             if($logo !== '')
             {
                 $store_data['logo'] = $logo;
             }
+			
             $this->profile->edit_user_store($store_id, $store_data);
+			
+			$postParams = array();
+			$postParams['phone'] 				= $phone;
+			$postParams['store_name'] 			= $name;
+			$postParams['website'] 				= $website;
+			$apiResponse = editMerchantDetails($this->user_id, $postParams);
         }    
         
         $data["header"]["error"] = "0";
@@ -476,6 +593,51 @@ class Api extends REST_Controller {
         $data['body'] = array("store_id"=>$store_id);
         $this->response($data, 200);
     }
+	
+	function setReceiptInfo_post()
+    {
+		$updated = date('Y-m-d H:i:s');
+		
+		$store_id 		= $this->store_id;
+		$header_text	= $this->post('header_text');
+		$footer_text 	= $this->post('footer_text');
+		$bg_color	 	= $this->post('bg_color');
+		$text_color 	= $this->post('text_color');
+		
+		if(!$store_id)
+        {
+			$data["header"]["error"] = "1";
+            $data["header"]["message"] = "Store ID is required";
+            $this->response($data, 200);
+		}
+		
+		$logo = '';
+        $temp_image_data = $this->__uploadFile($this->config->item('store_image_base'), asset_url('img/stores'));
+
+        if(is_array($temp_image_data) && count($temp_image_data) > 0)
+        {
+            $logo    = $temp_image_data['path'];
+        }
+		
+		$store_data = array(
+						'receipt_header_text'	=> $header_text,
+						'receipt_footer_text'	=> $footer_text,
+						'receipt_bg_color'		=> $bg_color,
+						'receipt_text_color' 	=> $text_color,
+						'updated' 				=> $updated
+		);
+		
+		if($logo)
+		{
+			$store_data['logo'] 	= $logo;
+		}
+		
+		$this->profile->edit_user_store($store_id, $store_data);
+		
+		$data["header"]["error"] = "0";
+        $data["header"]["message"] = "Success";
+        $this->response($data, 200);
+	}
 	
 	function getBankAccountStatus_post()
     {
@@ -485,15 +647,12 @@ class Api extends REST_Controller {
 		if($bankInfo)
 		{
 			$bank_id = $bankInfo['bank_id'];
-			$user = $this->user->get_user_detail($this->user_id);
-			
+				
 			$postParams = array();
-			$postParams['email'] 	= @$user['email'];
-			$postParams['password']	= @$user['plain_password'];
 			
 			$apiStatus = false;
 			$apiData = array();
-			$apiResponse = getMerchantBankAccountStatus($postParams);
+			$apiResponse = getMerchantBankAccountStatus($this->user_id, $postParams);
 			
 			if($apiResponse)
 			{
@@ -516,9 +675,9 @@ class Api extends REST_Controller {
 				$_apiData_Status = $apiData['status'];
 				$_apiData_Message = $apiData['message'];
 				
-				if($_apiData_Status) //verified!
+				if($_apiData_Status == CONST_BANK_STATUS_VERIFIED) //verified!
 				{
-					$this->profile->edit_user_bank($bank_id, array("updated"=>$updated,"status"=>2)); //2=verified, 1=Not Verified
+					$this->profile->edit_user_bank($bank_id, array("updated"=>$updated,"status"=>CONST_BANK_STATUS_VERIFIED));
 					
 					$data["header"]["error"] = "0";
 					$data["header"]["message"] = $_apiData_Message;
@@ -527,7 +686,7 @@ class Api extends REST_Controller {
 				}
 				else  //not-verified!
 				{
-					$this->profile->edit_user_bank($bank_id, array("updated"=>$updated,"status"=>1)); //2=verified, 1=Not Verified
+					$this->profile->edit_user_bank($bank_id, array("updated"=>$updated,"status"=>CONST_BANK_STATUS_NOT_VERIFIED));
 					
 					$data["header"]["error"] = "1";
 					$data["header"]["message"] = $_apiData_Message;
@@ -550,134 +709,136 @@ class Api extends REST_Controller {
 	}
 
     function setBankAccountInfo_post()
-    {	
+    {
+		$bank_id  = 0;
 		$bankInfo = $this->profile->checkUserBankDetails($this->user_id);
 		
+		$bank_status = -1;
 		if($bankInfo)
 		{
-			$this->getBankAccountStatus_post();
+			$bank_id		= @$bankInfo['bank_id'];
+			$bank_status	= @$bankInfo['status'];
 		}
-		else //user can save this, if bank is not previouly inserted by the user! - becauase user will have only 1 bank linked.
+		
+		if($bank_status == CONST_BANK_STATUS_VERIFIED)
 		{
-			$bank_name			= $this->post('bank_name');
-			$bank_address    	= $this->post('bank_address');
-			$swift_code      	= $this->post('swift_code');
-			$account_title      = $this->post('account_title');
-			$account_number 	= $this->post('account_number');
-			
-			$created        = date('Y-m-d H:i:s');
-			$updated        = date('Y-m-d H:i:s');
-			$status         = 1;
+			$data["header"]["error"] = "1";
+			$data["header"]["message"] = "No need to change your bank details as its already verified!";
+			$this->response($data, 200);
+		}
+		
+		$bank_name			= $this->post('bank_name');
+		$bank_address    	= $this->post('bank_address');
+		$swift_code      	= $this->post('swift_code');
+		$account_title      = $this->post('account_title');
+		$account_number 	= $this->post('account_number');
+		
+		$created        = date('Y-m-d H:i:s');
+		$updated        = date('Y-m-d H:i:s');
 
-			if(!$bank_name)
-			{
-				$data["header"]["error"] = "1";
-				$data["header"]["message"] = "Bank name is required";
-				$this->response($data, 200);
-			}
+		if(!$bank_name)
+		{
+			$data["header"]["error"] = "1";
+			$data["header"]["message"] = "Bank name is required";
+			$this->response($data, 200);
+		}
+		
+		if(!$bank_address)
+		{
+			$data["header"]["error"] = "1";
+			$data["header"]["message"] = "Bank address is required";
+			$this->response($data, 200);
+		}
+		
+		if(!$swift_code)
+		{
+			$data["header"]["error"] = "1";
+			$data["header"]["message"] = "Routing number / Swift code is required";
+			$this->response($data, 200);
+		}
+		
+		if(!$account_title)
+		{
+			$data["header"]["error"] = "1";
+			$data["header"]["message"] = "Account title is required";
+			$this->response($data, 200);
+		}
+		
+		if(!$account_number)
+		{
+			$data["header"]["error"] = "1";
+			$data["header"]["message"] = "Account Number is required";
+			$this->response($data, 200);
+		}
 			
-			if(!$bank_address)
+		$postParams = array();
+		$postParams['bank_name'] 			= $bank_name;
+		$postParams['bank_address'] 		= $bank_address;
+		$postParams['bank_swift_code'] 		= $swift_code;
+		$postParams['bank_account_title'] 	= $account_title;
+		$postParams['bank_account_number'] 	= $account_number;
+		
+		$apiStatus = false;
+		$apiData = array();
+		$apiResponse = editMerchantDetails($this->user_id, $postParams);
+		
+		if($apiResponse)
+		{
+			if(isset($apiResponse['error']))
 			{
 				$data["header"]["error"] = "1";
-				$data["header"]["message"] = "Bank address is required";
+				$data["header"]["message"] = $apiResponse['error'];
 				$this->response($data, 200);
 			}
-			
-			if(!$swift_code)
+			else if(isset($apiResponse['success']))
 			{
-				$data["header"]["error"] = "1";
-				$data["header"]["message"] = "Routing number / Swift code is required";
-				$this->response($data, 200);
+				$apiStatus = true;
+				
+				$apiData = $apiResponse['data'];
 			}
-			
-			if(!$account_title)
-			{
-				$data["header"]["error"] = "1";
-				$data["header"]["message"] = "Account title is required";
-				$this->response($data, 200);
-			}
-			
-			if(!$account_number)
-			{
-				$data["header"]["error"] = "1";
-				$data["header"]["message"] = "Account Number is required";
-				$this->response($data, 200);
-			}
-
-			$bank_id = $this->post('bank_id');
-
+		}
+		
+		if($apiStatus)
+		{
 			if(!$bank_id)
-			{
-				$user = $this->user->get_user_detail($this->user_id);
-				
-				$store_details = $this->profile->get_store_detail($this->store_id);
-				
-				$postParams = array();
-				$postParams['email'] 				= @$user['email'];
-				$postParams['password'] 			= @$user['plain_password'];
-				$postParams['first_name'] 			= @$user['first_name'];
-				$postParams['last_name'] 			= @$user['last_name'];
-				$postParams['phone'] 				= @$store_details['phone'];
-				$postParams['store_name'] 			= @$store_details['name'];
-				$postParams['bank_name'] 			= $bank_name;
-				$postParams['bank_address'] 		= $bank_address;
-				$postParams['bank_swift_code'] 		= $swift_code;
-				$postParams['bank_account_title'] 	= $account_title;
-				$postParams['bank_account_number'] 	= $account_number;
-				
-				$apiStatus = false;
-				$apiData = array();
-				$apiResponse = merchantSignup($postParams);
-				
-				if($apiResponse)
-				{
-					if(isset($apiResponse['error']))
-					{
-						$data["header"]["error"] = "1";
-						$data["header"]["message"] = $apiResponse['error'];
-						$this->response($data, 200);
-					}
-					else if(isset($apiResponse['success']))
-					{
-						$apiStatus = true;
-						
-						$apiData = $apiResponse['data'];
-					}
-				}
-				
-				if($apiStatus)
-				{
-					$bank_id = $this->profile->add_user_bank(array("user_id"=>$this->user_id,"bank_name"=>$bank_name,"bank_address"=>$bank_address,"swift_code"=>$swift_code,"account_title"=>$account_title,"account_number"=>$account_number,"created"=>$created,"updated"=>$updated,"status"=>$status));
-					
-					//insert into merchant info
-					$merchant_info = array();
-					$merchant_info['user_id'] 					= $this->user_id;
-					$merchant_info['email'] 					= @$user['email'];
-					$merchant_info['password'] 					= @$user['plain_password'];
-					$merchant_info['cx_authenticate_id'] 		= @$apiData['authenticate_id'];
-					$merchant_info['cx_authenticate_password'] 	= @$apiData['authenticate_password'];
-					$merchant_info['cx_secret_key'] 			= @$apiData['secret_key'];
-					$merchant_info['cx_hash'] 					= @$apiData['mode'];
-					$merchant_info['cx_mode'] 					= @$apiData['hash'];
-					$merchant_info['last_updated'] 				= $created;
-					
-					$this->profile->add_user_merchant_info($merchant_info);
-				}
-				else
-				{
-					$data["header"]["error"] = "1";
-					$data["header"]["message"] = "Something went wrong. Please try later!";
-					$this->response($data, 200);
-				}
-			}   
+			{	
+				$bank_id = $this->profile->add_user_bank(
+														array(
+																"user_id"			=> $this->user_id,
+																"bank_name"			=> $bank_name,
+																"bank_address"		=> $bank_address,
+																"swift_code"		=> $swift_code,
+																"account_title"		=> $account_title,
+																"account_number"	=> $account_number,
+																"created"			=> $created,
+																"updated"			=> $updated,
+																"status"			=> CONST_BANK_STATUS_NOT_VERIFIED
+															)
+													);
+			}
 			else
 			{
-				$this->profile->edit_user_bank($bank_id, array("user_id"=>$this->user_id,"bank_name"=>$bank_name,"bank_address"=>$bank_address,"swift_code"=>$swift_code,"account_title"=>$account_title,"account_number"=>$account_number,"updated"=>$updated,"status"=>$status));
-			} 
+				$this->profile->edit_user_bank( $bank_id, 
+														array(
+																"bank_name"			=> $bank_name,
+																"bank_address"		=> $bank_address,
+																"swift_code"		=> $swift_code,
+																"account_title"		=> $account_title,
+																"account_number"	=> $account_number,
+																"updated"			=> $updated
+															)
+													);
+			}
 			
 			$data["header"]["error"] = "0";
 			$data["header"]["message"] = "Success";
 			$data['body'] = array("bank_id"=>$bank_id);
+			$this->response($data, 200);
+		}
+		else
+		{
+			$data["header"]["error"] = "1";
+			$data["header"]["message"] = "Something went wrong. Please try later!";
 			$this->response($data, 200);
 		}
     }
@@ -867,6 +1028,37 @@ class Api extends REST_Controller {
             $data["header"]["message"] = "Password change successfully";
             $this->response($data, 200);
         }    
+    }
+	
+	function editUserInfo_post()
+    {
+        $first_name		= $this->post('first_name');
+		$last_name		= $this->post('last_name');	
+		
+		if(!$first_name)
+        {
+            $data["header"]["error"] = "1";
+            $data["header"]["message"] = "First name is required";
+            $this->response($data, 200);
+        }		
+		 if(!$last_name)
+        {
+            $data["header"]["error"] = "1";
+            $data["header"]["message"] = "Last name is required";
+            $this->response($data, 200);
+        }
+
+		$this->user->edit_user($this->user_id, array("first_name"=>$first_name,"last_name"=>$last_name));
+		
+		$postParams = array();
+		$postParams['first_name'] 			= $first_name;
+		$postParams['last_name'] 			= $last_name;
+		
+		$apiResponse = editMerchantDetails($this->user_id, $postParams);
+		
+		$data["header"]["error"] = "0";
+		$data["header"]["message"] = "Success";
+		$this->response($data, 200);
     }
 
     function forgetPassword_post()
@@ -1198,7 +1390,7 @@ class Api extends REST_Controller {
 
     function getCategories_post()
     {
-        $categories              = $this->category->get_all_categories($this->store_id);
+        $categories              = $this->category->get_all_categories(); //TODO: Revert back to get_all_categories($this->store_id);
         $data["header"]["error"] = "0";
         $data['body']            = array("categories"=>$categories);
         $this->response($data, 200);
@@ -1206,7 +1398,7 @@ class Api extends REST_Controller {
 
     function getProducts_post()
     {
-        $products                = $this->product->get_all_products($this->store_id);
+        $products                = $this->product->get_all_products(); //TODO: Revert back to get_all_products($this->store_id);
         $data["header"]["error"] = "0";
         $data['body']            = array("products"=>$products);
         $this->response($data, 200);
@@ -1263,6 +1455,7 @@ class Api extends REST_Controller {
 		//customer info!
 		$customer_info		= @$input_data['customer_info'];
 		
+		$customer_country 	= CONST_DEFAULT_COUNTRY;
 		$customer_email 	= @$customer_info['email'];
 		$customer_address1 	= @$customer_info['address1'];
 		$customer_address2 	= @$customer_info['address2'];
@@ -1298,19 +1491,23 @@ class Api extends REST_Controller {
 		}
 		
 		//validations start!
+		/*
 		if(!$customer_email)
 		{
 			$data["header"]["error"] = "1";
             $data["header"]["message"] = "Customer email address is required";
             $this->response($data, 200);
-		}
+		}*/
 		
-		if(!valid_email($customer_email))
-        {
-            $data["header"]["error"] = "1";
-            $data["header"]["message"] = "Please provide valid email address";
-            $this->response($data, 200);
-        }
+		if($customer_email)
+		{
+			if(!valid_email($customer_email))
+			{
+				$data["header"]["error"] = "1";
+				$data["header"]["message"] = "Please provide valid email address";
+				$this->response($data, 200);
+			}
+		}
 		
 		if(!$total_amount || $total_amount <= 0)
 		{
@@ -1377,7 +1574,7 @@ class Api extends REST_Controller {
 			
 			$apiStatus = false;
 			
-			$custom_order_id = uniqid('ORD-');
+			$custom_order_id = uniqid(); //-->'ORD-'
 			
 			$postParams = array();
 			$postParams['amount'] 			= $pay_by_credit_card_amount;
@@ -1390,7 +1587,7 @@ class Api extends REST_Controller {
 			$postParams['customer_lname'] 	= $arrNames['last_name'];
 			$postParams['customer_email']	= $customer_email;
 			$postParams['customer_phone'] 	= $customer_phone;
-			$postParams['customer_country']	= CONST_DEFAULT_COUNTRY;
+			$postParams['customer_country']	= $customer_country;
 			$postParams['customer_state'] 	= $customer_state;
 			$postParams['customer_city']	= $customer_city;
 			$postParams['customer_address'] = trim($customer_address1.' '.$customer_address2);
@@ -1421,108 +1618,176 @@ class Api extends REST_Controller {
 		
 		if($apiStatus)
 		{
+			$customer_id = 0;
+			$isNewCustomer = false;
+			if($customer_email)
+			{
+				$customerInfo = $this->customer->checkCustomerByEmail($customer_email);
+				
+				if($customerInfo)
+				{
+					$customer_id = $customerInfo['customer_id'];
+				}
+				else
+				{
+					$isNewCustomer = true;
+					
+					$customer_data = array(
+											'email' 			=> $customer_email,
+											'created_order_id'	=> 0,
+											'created_store_id'	=> $this->store_id,
+											'created_user_id'	=> $this->user_id,
+											'created'			=> $created
+					
+					);
+					
+					$customer_id = $this->customer->add_customer($customer_data);
+				}
+			}
+			
+			$signature = '';
+			$signature_image_data = $this->__uploadFile($this->config->item('order_signature_image_base'), asset_url('img/orders/signature'));
+
+			if(is_array($signature_image_data) && count($signature_image_data) > 0)
+			{
+				if(isset($signature_image_data['path']))
+				{
+					$signature    = $signature_image_data['path'];
+				}
+			}
+			
 			$order_data = array(
-									"store_id"			=> $store_id,
-									"user_id"			=> $this->user_id,
-									"total_amount"		=> $total_amount,
-									"created"			=> $created,
-									"customer_email"	=> $customer_email,
-									"description"		=> '',
-									"custom_order_id"	=> $custom_order_id
+									"store_id"				=> $store_id,
+									"user_id"				=> $this->user_id,
+									"total_amount"			=> $total_amount,
+									"created"				=> $created,									
+									"customer_id"			=> $customer_id,
+									"customer_email"		=> $customer_email,
+									"customer_phone"		=> $customer_phone,
+									"customer_country"		=> $customer_country,
+									"customer_state"		=> $customer_state,
+									"customer_city"			=> $customer_city,
+									"customer_address1"		=> $customer_address1,
+									"customer_address2"		=> $customer_address2,
+									"customer_zipcode"		=> $customer_zipcode,
+									"description"			=> '',
+									"custom_order_id"		=> $custom_order_id
 								);
+								
+			if($signature)
+			{
+				$order_data['customer_signature'] = $signature;
+			}
+			
 			try
 			{
 				//insert order
 				$order_id = $this->order->add_order($order_data);
 				
-				// cc number - save only last 4 numbers!
-				if($cc_number)
+				if($order_id)
 				{
-					$cc_number = 'XXXX-XXXX-XXXX-'.substr($cc_number, -4);
-				}
-				
-				//insert into transaction
-				$transaction_data = array(
-											"store_id"			=> $store_id,
-											"user_id"			=> $this->user_id,
-											"order_id"			=> $order_id,
-											"type"				=> 1, //1=payment, 2=refund
-											"created"			=> $created,
-											"amount_cc"			=> $pay_by_credit_card_amount,
-											"amount_cash"		=> $pay_by_cash_amount,  
-											"is_cc_swipe"		=> $is_cc_swipe, 
-											"cc_name"			=> $cc_name,
-											"cc_number"			=> $cc_number,
-											"cc_expiry_year"	=> $cc_expiry_year,
-											"cc_expiry_month"	=> $cc_expiry_month,
-											"cc_code"			=> $cc_code,
-											'cx_transaction_id' => $cx_transaction_id
-										);
-
-				$this->order->add_transaction($transaction_data);
-
-				//insert each product
-				if(is_array($products) && count($products) > 0)
-				{
-					foreach($products as $product)
+					if($isNewCustomer)
 					{
-						if(isset($product['product_id']))
+						if($customer_id)
 						{
-							$product_id = $product['product_id'];
-							
-							if($product_id)
-							{
-								$product_detail = $this->product->get_product_detail($product_id);
-						
-								if($product_detail)
-								{
-									$product_price = $product_detail['price'];
-									
-									$product_qty = 1;
-									if(isset($product['quantity']))
-									{
-										$_product_qty = $product['quantity'];
-										
-										if($_product_qty > 1)
-										{
-											$product_qty = $_product_qty;
-										}
-									}									
-									
-									//-->$items_amount = $product_qty * $product_price; //UJ: not needed!
-									
-									$order_line_item_data = array(
-																	"order_id"		=> $order_id,
-																	"product_id"	=> $product_id,
-																	"quantity"		=> $product_qty,
-																	"product_price"	=> $product_price,
-																	"created"		=> $created);
+							$customer_id = $this->customer->edit_customer($customer_id, array('created_order_id' => $order_id));
+						}
+					}
+					
+					// cc number - save only last 4 numbers!
+					if($cc_number)
+					{
+						$cc_number = 'XXXX-XXXX-XXXX-'.substr($cc_number, -4);
+					}
+					
+					//insert into transaction
+					$transaction_data = array(
+												"store_id"			=> $store_id,
+												"user_id"			=> $this->user_id,
+												"order_id"			=> $order_id,
+												"type"				=> CONST_TRANSACTION_TYPE_PAYMENT, //1=payment, 2=refund
+												"created"			=> $created,
+												"amount_cc"			=> $pay_by_credit_card_amount,
+												"amount_cash"		=> $pay_by_cash_amount,  
+												"is_cc_swipe"		=> $is_cc_swipe, 
+												"cc_name"			=> $cc_name,
+												"cc_number"			=> $cc_number,
+												"cc_expiry_year"	=> $cc_expiry_year,
+												"cc_expiry_month"	=> $cc_expiry_month,
+												"cc_code"			=> $cc_code,
+												'cx_transaction_id' => $cx_transaction_id
+											);
 
-									$this->order->add_order_line_item($order_line_item_data);
+					$this->order->add_transaction($transaction_data);
+
+					//insert each product
+					if(is_array($products) && count($products) > 0)
+					{
+						foreach($products as $product)
+						{
+							if(isset($product['product_id']))
+							{
+								$product_id = $product['product_id'];
+								
+								if($product_id)
+								{
+									$product_detail = $this->product->get_product_detail($product_id);
+							
+									if($product_detail)
+									{
+										$product_price = $product_detail['price'];
+										
+										$product_qty = 1;
+										if(isset($product['quantity']))
+										{
+											$_product_qty = $product['quantity'];
+											
+											if($_product_qty > 1)
+											{
+												$product_qty = $_product_qty;
+											}
+										}									
+										
+										//-->$items_amount = $product_qty * $product_price; //UJ: not needed!
+										
+										$order_line_item_data = array(
+																		"order_id"		=> $order_id,
+																		"product_id"	=> $product_id,
+																		"quantity"		=> $product_qty,
+																		"product_price"	=> $product_price,
+																		"created"		=> $created);
+
+										$this->order->add_order_line_item($order_line_item_data);
+									}
 								}
 							}
 						}
+					}					
+					
+					// for numeric pad product!
+					if($numeric_pad_amount > 0)
+					{
+						$order_line_item_data = array(
+														"order_id"		=> $order_id,
+														"product_id"	=> CONST_PRODUCT_ID_NUMPAD,
+														"quantity"		=> 1,
+														"product_price"	=> $numeric_pad_amount,
+														"created"		=> $created
+													);
+
+						$this->order->add_order_line_item($order_line_item_data);
 					}
+
+					$data["header"]["error"] = "0";
+					$data['body']            = array("order_id"=>$order_id);
+					$this->response($data, 200);
 				}
-				
-				
-				// for numeric pad product!
-				if($numeric_pad_amount > 0)
+				else
 				{
-					$order_line_item_data = array(
-													"order_id"		=> $order_id,
-													"product_id"	=> CONST_PRODUCT_ID_NUMPAD,
-													"quantity"		=> 1,
-													"product_price"	=> $numeric_pad_amount,
-													"created"		=> $created
-												);
-
-					$this->order->add_order_line_item($order_line_item_data);
+					$data["header"]["error"] = "1";
+					$data["header"]["message"] = "Something went wrong for order";
+					$this->response($data, 200);
 				}
-
-				$data["header"]["error"] = "0";
-				$data['body']            = array("order_id"=>$order_id);
-				$this->response($data, 200);
 			}
 			catch(Exception $ex)
 			{
@@ -1538,6 +1803,127 @@ class Api extends REST_Controller {
 			$this->response($data, 200);
 		}
     }
+	
+	function setCustomerInfoForOrder_post()
+	{
+		$created			= date('Y-m-d H:i:s');
+		$updated			= date('Y-m-d H:i:s');
+		 
+		$order_id 			= $this->post('order_id');
+		
+		$customer_country 	= CONST_DEFAULT_COUNTRY;
+		$customer_email 	= $this->post('email');
+		$customer_address1 	= $this->post('address1');
+		$customer_address2 	= $this->post('address2');
+		$customer_city 		= $this->post('city');
+		$customer_state 	= $this->post('state');
+		$customer_zipcode 	= $this->post('zipcode');
+		$customer_phone 	= $this->post('phone');
+		
+		if(!$order_id)
+		{
+			$data["header"]["error"] = "1";
+            $data["header"]["message"] = "Order ID is required";
+            $this->response($data, 200);
+		}
+		
+		$order_detail = $this->order->get_order_detail($order_id);
+		if($order_detail)
+		{
+			if($order_detail['user_id'] !== $this->user_id)
+			{
+				$data["header"]["error"] = "1";
+				$data["header"]["message"] = "Order do not belong to this user";
+				$this->response($data, 200);   
+			}
+		}
+		else
+		{	
+			$data["header"]["error"] = "1";
+			$data["header"]["message"] = "Order ID is not valid";
+			$this->response($data, 200);   
+		}
+		
+		if(!$customer_email)
+		{
+			$data["header"]["error"] = "1";
+            $data["header"]["message"] = "Customer email address is required";
+            $this->response($data, 200);
+		}
+		
+		if($customer_email)
+		{
+			if(!valid_email($customer_email))
+			{
+				$data["header"]["error"] = "1";
+				$data["header"]["message"] = "Please provide valid email address";
+				$this->response($data, 200);
+			}
+		}
+		
+		$customer_id = 0;
+		$isNewCustomer = false;
+		if($customer_email)
+		{
+			$customerInfo = $this->customer->checkCustomerByEmail($customer_email);
+			
+			if($customerInfo)
+			{
+				$customer_id = $customerInfo['customer_id'];
+			}
+			else
+			{
+				$isNewCustomer = true;
+				
+				$customer_data = array(
+										'email' 			=> $customer_email,
+										'created_order_id'	=> $order_id,
+										'created_store_id'	=> $this->store_id,
+										'created_user_id'	=> $this->user_id,
+										'created'			=> $created
+				
+				);
+				
+				$customer_id = $this->customer->add_customer($customer_data);
+			}
+		}
+		
+		$signature = '';
+		$signature_image_data = $this->__uploadFile($this->config->item('order_signature_image_base'), asset_url('img/orders/signature'));
+
+		if(is_array($signature_image_data) && count($signature_image_data) > 0)
+		{
+			if(isset($signature_image_data['path']))
+			{
+				$signature    = $signature_image_data['path'];
+			}
+		}
+		
+		$order_data = array(
+								"customer_id"			=> $customer_id,
+								"customer_email"		=> $customer_email,
+								"customer_phone"		=> $customer_phone,
+								"customer_country"		=> $customer_country,
+								"customer_state"		=> $customer_state,
+								"customer_city"			=> $customer_city,
+								"customer_address1"		=> $customer_address1,
+								"customer_address2"		=> $customer_address2,
+								"customer_zipcode"		=> $customer_zipcode,
+								"updated"				=> $updated,
+						);
+						
+		if($signature)
+		{
+			$order_data['customer_signature'] = $signature;
+		}
+		
+		// update order
+		$order_id = $this->order->edit_order($order_id, $order_data);
+		
+		$data["header"]["error"]   = "0";
+		$data["header"]["message"] = "Customer details has been successfully saved for the order";
+		$this->response($data, 200);				
+	}
 
     function getOrdersByUser_post()
     {
@@ -1586,12 +1972,14 @@ class Api extends REST_Controller {
             $data["header"]["message"] = "Provide amount";
             $this->response($data, 200);
         }
-        if(!$description)
+        
+		/*
+		if(!$description)
         {
             $data["header"]["error"] = "1";
             $data["header"]["message"] = "Provide description";
             $this->response($data, 200);
-        }
+        }*/
 
         $order_detail = $this->order->get_order_detail($order_id);
         if($order_detail['user_id'] !== $this->user_id)
@@ -1599,20 +1987,78 @@ class Api extends REST_Controller {
             $data["header"]["error"] = "1";
             $data["header"]["message"] = "Order do not belong to this user";
             $this->response($data, 200);   
-        }    
+        }
 
-        $amount = $amount_cc + $amount_cash;
-        $total_amount = $order_detail['total_amount'] - $amount;
-        $this->order->edit_order($order_id, array('total_refund'=>$order_detail['total_refund']+$amount,'total_amount'=>$total_amount));
+		$apiStatus = true;
+		if($amount_cc > 0) //refund via credit card
+		{
+			$apiStatus = false;
+			
+			$transactionInfo = $this->order->get_payment_transaction_by_order($order_id);
+			
+			if($transactionInfo)
+			{
+				$cx_transaction_id = $transactionInfo['cx_transaction_id'];
+				
+				if($cx_transaction_id)
+				{
+					$postParams = array();
+					$postParams['amount'] 			= $amount_cc;
+					$postParams['transaction_id'] 	= $cx_transaction_id;
+					
+					$apiResponse = refundPayment($this->user_id, $postParams);
+					
+					if($apiResponse)
+					{
+						if(isset($apiResponse['error']))
+						{
+							$data["header"]["error"] = "1";
+							$data["header"]["message"] = $apiResponse['error'];
+							$this->response($data, 200);
+						}
+						else if(isset($apiResponse['success']))
+						{
+							$apiStatus = true;
+							
+							//-->$apiData = $apiResponse['data']; //TODO: will use later when cardXecure fix refund issue in to their system - Currently CardXeure return Invalid Transaction ID, even its correct.
+						}
+					}
+				}
+				else
+				{
+					$data["header"]["error"] = "1";
+					$data["header"]["message"] = "Transaction ID is missing for this order";
+					$this->response($data, 200);
+				}
+			}
+			else
+			{
+				$data["header"]["error"] = "1";
+				$data["header"]["message"] = "We didn't find any transaction for this order";
+				$this->response($data, 200);
+			}
+		}
 
-        $transaction_data = array("order_id"=>$order_id,"store_id"=>$this->store_id,"user_id"=>$this->user_id,"type"=>2,"amount_cc"=>$amount_cc,"amount_cash"=>$amount_cash,"created"=>$created);
-        $this->order->add_transaction($transaction_data);
+		if($apiStatus)
+		{
+			$amount = $amount_cc + $amount_cash;
+			$total_amount = $order_detail['total_amount'] - $amount;
+			$this->order->edit_order($order_id, array('total_refund'=>$order_detail['total_refund']+$amount,'total_amount'=>$total_amount));
+
+			$transaction_data = array("order_id"=>$order_id,"store_id"=>$this->store_id,"user_id"=>$this->user_id,"type"=>CONST_TRANSACTION_TYPE_REFUND,"amount_cc"=>$amount_cc,"amount_cash"=>$amount_cash,"created"=>$created);
+			$this->order->add_transaction($transaction_data);
 
 
-        $data["header"]["error"] = "0";
-        $data["header"]["message"] = "Success";
-        $this->response($data, 200);    
-
+			$data["header"]["error"] = "0";
+			$data["header"]["message"] = "Success";
+			$this->response($data, 200);    
+		}
+		else
+		{
+			$data["header"]["error"] = "1";
+			$data["header"]["message"] = "Something went wrong. Please try later!";
+			$this->response($data, 200);
+		}
     }
 
     function getUserDetails_post()

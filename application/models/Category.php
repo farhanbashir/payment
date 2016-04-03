@@ -28,8 +28,16 @@ Class Category extends CI_Model
         $sql = "select * from categories where category_id=$category_id" ;
         $query = $this->db->query($sql);
         $result = $query->result_array();
-        $query->free_result();
-        return $result[0];
+		
+		if($result)
+		{
+			$query->free_result();
+			return $result[0];
+		}
+		else			
+		{
+			return false;
+		}
     }
 
     function delete_all_categories_for_product($product_id)
@@ -47,9 +55,17 @@ Class Category extends CI_Model
         return $result;   
     }
 
-    function get_all_categories($store_id)
+    function get_all_categories($store_id=0)
     {
-        $sql = "select * from categories where status=1 and store_id=$store_id" ;
+		if($store_id)
+		{
+			$sql = "select * from categories where status=1 and store_id=$store_id" ;
+		}
+		else
+		{
+			$sql = "select * from categories where status=1" ;
+		}
+        
         $query = $this->db->query($sql);
         $result = $query->result_array();
         $query->free_result();
