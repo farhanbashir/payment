@@ -22,22 +22,22 @@ class Dashboard extends CI_Controller {
      */
     function __construct() {
         parent::__construct();
-        //$this->load->model('user', '', TRUE);
-        //$this->load->model('store', '', TRUE);
-        /*if (!$this->session->userdata('logged_in')) {
+        $this->load->model('user', '', TRUE);
+        $this->load->model('store', '', TRUE);
+        if (!$this->session->userdata('logged_in')) {
             redirect(base_url());
-        }*/
+        }
     }
 
     public function index() {
-         $data = array();
-        // $data['total_users'] = $this->user->get_total_users();
-        // $data['total_stores'] = $this->store->get_total_stores();
-        // $data['latest_five_users'] = $this->user->get_latest_five_users();
-        // $data['latest_five_stores'] = $this->store->get_latest_five_stores();
+        $data = array();
+        $data['total_users'] = $this->user->get_total_users();
+        $data['total_stores'] = $this->store->get_total_stores();
+        $data['latest_five_users'] = $this->user->get_latest_five_users();
+        $data['latest_five_stores'] = $this->store->get_latest_five_stores();
 
-         $content = $this->load->view('content.php', $data, true);
-        $this->load->view('main', array('content' => $content));
+        $content = $this->load->view('content.php', $data, true);
+        $this->load->view('welcome_message', array('content' => $content));
     }
 
     public function change_password()

@@ -49,30 +49,6 @@ class Users extends CI_Controller {
         $this->load->view('welcome_message', array('content' => $content));
     }
 
-    public function verified()
-    {
-        $data = array();
-        // $data['total_users'] = $this->user->get_total_users();
-        // $data['total_stores'] = $this->store->get_total_stores();
-        // $data['latest_five_users'] = $this->user->get_latest_five_users();
-        // $data['latest_five_stores'] = $this->store->get_latest_five_stores();
-
-        $content = $this->load->view('users/tabular.php', $data, true);
-        $this->load->view('main', array('content' => $content));
-    }
-
-    public function nonverified()
-    {
-        $data = array();
-        // $data['total_users'] = $this->user->get_total_users();
-        // $data['total_stores'] = $this->store->get_total_stores();
-        // $data['latest_five_users'] = $this->user->get_latest_five_users();
-        // $data['latest_five_stores'] = $this->store->get_latest_five_stores();
-
-        $content = $this->load->view('users/tabular.php', $data, true);
-        $this->load->view('main', array('content' => $content));
-    }
-
     public function view($id) {
         $user = $this->user->get_user_detail($id);
         $data['user'] = $user;

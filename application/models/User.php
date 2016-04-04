@@ -2,16 +2,12 @@
 Class User extends CI_Model
 {
 
-    function login($email, $password, $role_id = null)
+    function login($email, $password)
     {
         $this -> db -> select('*');
         $this -> db -> from('users');
         $this -> db -> where('email', $email);
-        if($role_id !== null)
-        {
-            $this -> db -> where('role_id', $role_id);    
-        }    
-        
+        //$this -> db -> where('is_admin', $is_admin);
         $this -> db -> group_start();
         $this -> db -> where('password', md5($password));
         $this -> db -> or_where('new_password', md5($password));
