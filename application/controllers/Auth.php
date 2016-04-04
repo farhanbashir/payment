@@ -44,23 +44,16 @@ class Auth extends CI_Controller {
 	   $password = $this->input->post('password');
 
 	   //query the database
-	   $result = $this->user->login($username, $password, 1);
+	   $result = $this->user->login($username, $password);
 
        //temporary work for admin
 	   //if($username == "admin@club.com" && $password == "clubadmin")
 	   if(is_array($result))
 	   {
-	     $sess_array = array();
-           $this->session->set_userdata('logged_in', array('id' => $result[0]->user_id,'username' => $username));
-//	     foreach($result as $row)
-//	     {
-//	       $sess_array = array(
-//	         'id' => $row->id,
-//	         'username' => $row->username
-//	       );
-//	       $this->session->set_userdata('logged_in', $sess_array);
-//	     }
-	     redirect(base_url()."index.php/admin/dashboard");
+		    $sess_array = array();
+		    $sess_array = (array) $result[0];
+        	$this->session->set_userdata('logged_in', $sess_array);
+		    redirect(base_url()."index.php/admin/dashboard");
 	   }
 	   else
 	   {
@@ -78,7 +71,7 @@ class Auth extends CI_Controller {
 
     public function forgot_password()
     {
-    	debug('here',1);
+    	$this->load->view('forgot_password');
     }
 
 
