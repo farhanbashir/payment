@@ -1,14 +1,15 @@
 <?php
 //For payments processing - We are using CardXecure
-define('CONST_PAYMENT_MODE', 		'test'); //test | live
-define('CONST_PAYMENT_API_KEY',		'28966ac8a0af1447d6f5bfba0e1428fc');
-define('CONST_PAYMENT_TEST_URL',	'https://pay.icannpay.com/dev/index.php/');
-define('CONST_PAYMENT_LIVE_URL',	'https://pay.icannpay.com/index.php/'); //-->https://icannpay.com/index.php/
+define('CONST_PAYMENT_MODE', 				'test'); //test | live
+define('CONST_PAYMENT_API_KEY',				'28966ac8a0af1447d6f5bfba0e1428fc');
+define('CONST_PAYMENT_TEST_URL',			'https://pay.icannpay.com/dev/index.php/');
+define('CONST_PAYMENT_LIVE_URL',			'https://icannpay.com/index.php/'); //-->https://icannpay.com/index.php/
+define('CONST_CC_PAYMENT_SUCCESS_NOTICE',	'<strong>IMPORTANT:</strong> This purchase will appear as <strong>"descriptor"</strong> on your credit card statement or online transaction detail. As with any international transaction of this nature, the final posted transaction on your statement or transaction detail may vary depending on your credit card issuer. It is not uncommon for some credit card issuers to impose a small currency conversion fee.');
 
-//products!
+//Products!
 define('CONST_PRODUCT_ID_NUMPAD',	   -1);
 
-//roles!
+//Roles!
 define('CONST_ROLE_ID_SUPER_ADMIN',		1);
 define('CONST_ROLE_ID_BUSINESS_ADMIN',	2);
 define('CONST_ROLE_ID_BUSINESS_STAFF',	3);
@@ -16,13 +17,24 @@ define('CONST_ROLE_ID_BUSINESS_STAFF',	3);
 define('CONST_DEFAULT_COUNTRY',			'USA');
 define('CONST_DEFAULT_CURRENCY',		'USD');
 
-//transaction types
+//Transaction Types
 define('CONST_TRANSACTION_TYPE_PAYMENT',	1);
 define('CONST_TRANSACTION_TYPE_REFUND',		2);
 
-//bank status
+//Bank Status
 define('CONST_BANK_STATUS_VERIFIED',		1);
 define('CONST_BANK_STATUS_NOT_VERIFIED',	2);
+
+define('CONST_TXT_BANK_STATUS_VERIFIED',	'verified');
+define('CONST_TXT_BANK_STATUS_NOT_VERIFIED','not verified');
+
+//Merchant Mode Ids
+define('CONST_MERCHANT_MODE_LIVE',			1);
+define('CONST_MERCHANT_MODE_SANDBOX',		2);
+
+//Merchant Mode Text
+define('CONST_TXT_MERCHANT_MODE_LIVE',		'live');
+define('CONST_TXT_MERCHANT_MODE_SANDBOX',	'sandbox');
 
 global $merchan_service_start_time;
 
@@ -121,7 +133,7 @@ function merchantSignup($_postParams=array())
 								'authenticate_id' 			=> @$apiResponse['data']['Authenticate Id'],
 								'authenticate_password' 	=> @$apiResponse['data']['Authenticate Password'],
 								'secret_key' 				=> @$apiResponse['data']['Secret key'],
-								'mode' 						=> @$apiResponse['data']['mode'],
+								'mode' 						=> _getPaymentModeIdByText(@$apiResponse['data']['mode']),
 								'hash' 						=> @$apiResponse['data']['hash']
 				);
 		}
@@ -276,7 +288,7 @@ function editMerchantDetails($userId=0, $_postParams=array())
 	return $apiResult;
 }
 
-function getMerchantPaymentMode($userId=0, $postParams)
+function getMerchantPaymentMode($userId=0, $_postParams=array())
 {
 	/*
 		Params:
@@ -300,10 +312,55 @@ function getMerchantPaymentMode($userId=0, $postParams)
 			}
 	*/
 	
-	return sendRequestToPaymentGateway($userId, 'getPaymentMode', $postParams);
+	$CI =& get_instance();
+	$merchantInfo = $CI->profile->checkUserMerchantDetails($userId);
+
+	$postParams					= array();
+	
+	$postParams['api_key']		= CONST_PAYMENT_API_KEY;
+	$postParams['email'] 		= @$merchantInfo['email'];
+	$postParams['password'] 	= @$merchantInfo['password'];
+	
+	$apiResponse = sendRequestToPaymentGateway($userId, 'getPaymentMode', $postParams);
+	
+	$apiErrorMessage 	= '';
+	$apiSuccessMessage 	= 0;
+	$apiData 			= array();
+	if($apiResponse)
+	{
+		if(isset($apiResponse['error']))
+		{
+			$apiErrorMessage = $apiResponse['error'];
+		}
+		else if(isset($apiResponse['success']))
+		{
+			$apiSuccessMessage = 1;
+			
+			$_apiResponse_Mode	= @$apiResponse['data']['mode'];
+			$mode				= _getPaymentModeIdByText($_apiResponse_Mode);
+			
+			$apiData = array(
+								'mode'		=> $mode,
+								'message'	=> $_apiResponse_Mode
+				);
+		}
+	}
+	
+	$apiResult = array();
+	if($apiErrorMessage)
+	{
+		$apiResult['error'] = $apiErrorMessage;
+	}
+	else if($apiSuccessMessage)
+	{
+		$apiResult['success'] = $apiSuccessMessage;
+		$apiResult['data'] = $apiData;
+	}
+	
+	return $apiResult;
 }
 
-function changeMerchantPaymentMode($userId=0, $postParams)
+function changeMerchantPaymentMode($userId=0, $_postParams=array())
 {
 	/*
 		Params:
@@ -328,7 +385,53 @@ function changeMerchantPaymentMode($userId=0, $postParams)
 			}
 	*/
 	
-	return sendRequestToPaymentGateway($userId, 'changePaymentMode', $postParams);
+	$CI =& get_instance();
+	$merchantInfo = $CI->profile->checkUserMerchantDetails($userId);
+
+	$postParams					= array();
+	
+	$postParams['api_key']		= CONST_PAYMENT_API_KEY;
+	$postParams['email'] 		= @$merchantInfo['email'];
+	$postParams['password'] 	= @$merchantInfo['password'];
+	$postParams['payment_mode'] = @$_postParams['payment_mode'];
+	
+	$apiResponse = sendRequestToPaymentGateway($userId, 'changePaymentMode', $postParams);
+	
+	$apiErrorMessage 	= '';
+	$apiSuccessMessage 	= 0;
+	$apiData 			= array();
+	if($apiResponse)
+	{
+		if(isset($apiResponse['error']))
+		{
+			$apiErrorMessage = $apiResponse['error'];
+		}
+		else if(isset($apiResponse['success']))
+		{
+			$apiSuccessMessage = 1;
+			
+			$_apiResponse_Mode	= @$apiResponse['data']['mode'];
+			$mode				= _getPaymentModeIdByText($_apiResponse_Mode);
+			
+			$apiData = array(
+								'mode'		=> $mode,
+								'message'	=> $_apiResponse_Mode
+				);
+		}
+	}
+	
+	$apiResult = array();
+	if($apiErrorMessage)
+	{
+		$apiResult['error'] = $apiErrorMessage;
+	}
+	else if($apiSuccessMessage)
+	{
+		$apiResult['success'] = $apiSuccessMessage;
+		$apiResult['data'] = $apiData;
+	}
+	
+	return $apiResult;
 }
 
 function getMerchantBankAccountStatus($userId=0, $_postParams=array())
@@ -374,13 +477,8 @@ function getMerchantBankAccountStatus($userId=0, $_postParams=array())
 		{
 			$apiSuccessMessage = 1;
 			
-			$_apiResponse_Status = @$apiResponse['data']['status'];
-			
-			$status = CONST_BANK_STATUS_NOT_VERIFIED;// Not Verified 
-			if($_apiResponse_Status == 'Verified')
-			{
-				$status = CONST_BANK_STATUS_VERIFIED;// Verified
-			}
+			$_apiResponse_Status	= @$apiResponse['data']['status'];			
+			$status					= _getBankStatusIdByText($_apiResponse_Status);
 			
 			$apiData = array(
 								'status'	=> $status,
@@ -677,7 +775,22 @@ function getCardXecureSignature($postParams=array(), $merchantInfo=array())
 function sendRequestToPaymentGateway($userId=0, $callFor, $postParams=array(), $resultType='json')
 {
 	$urlToRequest 	= '';
-	$apiURL			= CONST_PAYMENT_TEST_URL; //It will change to "CONST_PAYMENT_LIVE_URL" - When we go to LIVE payments.
+	$apiURL			= CONST_PAYMENT_TEST_URL;
+	
+	/* //We will active this when we go to LIVE with CardXecure!
+	if($userId)
+	{
+		$CI =& get_instance();
+		$merchantInfo = $CI->profile->checkUserMerchantDetails($userId);
+		
+		$paymentMode = @$merchantInfo['cx_mode'];
+		
+		if($paymentMode == CONST_MERCHANT_MODE_LIVE)
+		{
+			$apiURL			= CONST_PAYMENT_LIVE_URL;
+		}
+	}
+	*/
 	
 	if($callFor == 'signupMerchant')
 	{
@@ -877,6 +990,38 @@ function _updateMerchantLogResponse($log_id=0, $response='')
 	$logData['total_seconds'] 	= $end_time-$merchan_service_start_time; //in seconds
 	
 	$CI->logs->edit_merchant_log($log_id, $logData);
+}
+
+function _getPaymentModeIdByText($modeText='') //-->Live (or) Sandbox 
+{
+	if($modeText)
+	{
+		$modeText = strtolower($modeText); //Live --> live
+	}
+	
+	$modeId = CONST_MERCHANT_MODE_SANDBOX;
+	if($modeText == CONST_TXT_MERCHANT_MODE_LIVE) 
+	{
+		$modeId = CONST_MERCHANT_MODE_LIVE;
+	}
+	
+	return $modeId;
+}
+
+function _getBankStatusIdByText($statusText='') //-->Not Verified (or) Verified
+{
+	if($statusText)
+	{
+		$statusText = strtolower($statusText); //Verified --> verified
+	}
+	
+	$statusId = CONST_BANK_STATUS_NOT_VERIFIED;
+	if($statusText == CONST_TXT_BANK_STATUS_VERIFIED) 
+	{
+		$statusId = CONST_BANK_STATUS_VERIFIED;
+	}
+	
+	return $statusId;
 }
 	
 function splitName($name)

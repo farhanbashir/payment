@@ -26,7 +26,7 @@ Class User extends CI_Model
         }
     }
 
-    function validStore($user_id, $store_id)
+    function validStore($user_id, $store_id=0)
     {
         $sql_user = "select * from users where user_id=$user_id limit 1";
         $query = $this->db->query($sql_user);
