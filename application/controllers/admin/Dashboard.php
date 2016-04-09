@@ -22,8 +22,8 @@ class Dashboard extends CI_Controller {
      */
     function __construct() {
         parent::__construct();
-        $this->load->model('user', '', TRUE);
-        $this->load->model('store', '', TRUE);
+        /*$this->load->model('user', '', TRUE);
+        $this->load->model('store', '', TRUE);*/
         if (!$this->session->userdata('logged_in')) {
             redirect(base_url());
         }
@@ -31,13 +31,23 @@ class Dashboard extends CI_Controller {
 
     public function index() {
         $data = array();
-        $data['total_users'] = $this->user->get_total_users();
-        $data['total_stores'] = $this->store->get_total_stores();
-        $data['latest_five_users'] = $this->user->get_latest_five_users();
-        $data['latest_five_stores'] = $this->store->get_latest_five_stores();
+        // $data['total_users'] = $this->user->get_total_users();
+        // $data['total_stores'] = $this->store->get_total_stores();
+        // $data['latest_five_users'] = $this->user->get_latest_five_users();
+        // $data['latest_five_stores'] = $this->store->get_latest_five_stores();
 
         $content = $this->load->view('content.php', $data, true);
-        $this->load->view('welcome_message', array('content' => $content));
+        $this->load->view('main', array('content' => $content));
+    }
+
+    public function test()
+    {
+      $this->load->library('google');
+      echo $this->google->getLibraryVersion();
+      $client = new Google_Client();
+      $client->setAuthConfigFile(APPPATH.'third_party\Google\client_secrets.json');
+$client->addScope(Google_Service_Drive::DRIVE_METADATA_READONLY);
+      debug('here',1);
     }
 
     public function change_password()
