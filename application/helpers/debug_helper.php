@@ -54,6 +54,12 @@ function asset_url($uri)
 	return $CI->config->base_url('assets/'.$uri);
 }
 
+function pages_url($uri)
+{
+  $CI =& get_instance();
+  return $CI->config->base_url('pages/'.$uri);
+}
+
 //to generate an image tag, set tag to true. you can also put a string in tag to generate the alt tag
 function asset_img($uri)
 {
