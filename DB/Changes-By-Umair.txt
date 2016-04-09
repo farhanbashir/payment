@@ -177,3 +177,9 @@ CREATE TABLE IF NOT EXISTS `logs_merchant` (
   `ip_address` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+
+*April 05, 2016:
+=================
+ALTER TABLE `user_merchant_info` CHANGE `cx_mode` `cx_mode` TINYINT(4) NULL DEFAULT '0' COMMENT '1=live,2=sandbox';
+UPDATE `user_merchant_info` SET cx_mode=2

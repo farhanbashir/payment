@@ -53,7 +53,7 @@ class Api extends REST_Controller {
                     }
                     else
                     {
-                        if(!$this->user->validStore($headers['Userid'],$headers['Storeid']))
+                        if(!$this->user->validStore($headers['Userid'],@$headers['Storeid']))
                         {
                             $data["header"]["error"] = "1";
                             $data["header"]["message"] = "Please provide valid store id";
@@ -63,7 +63,7 @@ class Api extends REST_Controller {
                         {
                             $this->user_id  = $headers['Userid'];
                             $this->token    = $headers['Token'];
-                            $this->store_id = $headers['Storeid'];
+                            $this->store_id = @$headers['Storeid'];
                         }    
                     }  
                 }   
@@ -107,6 +107,8 @@ class Api extends REST_Controller {
     {
 		$startUpData = array();
 		
+		$startUpData['cc_payment_notice']	= CONST_CC_PAYMENT_SUCCESS_NOTICE;
+		
 		//states
 		$arrStates = $this->user->get_states(CONST_DEFAULT_COUNTRY);
 		
@@ -122,7 +124,7 @@ class Api extends REST_Controller {
 			}
 		}
 		
-		$startUpData['states']['usa'] = $usaStates;	
+		$startUpData['states']['usa']		= $usaStates;		
 		
 		$data["header"]["error"] = "0";
         $data['body']            = $startUpData;
@@ -228,7 +230,8 @@ class Api extends REST_Controller {
             $data["header"]["message"] = "First name is required";
             $this->response($data, 200);
         }		
-		 if(!$last_name)
+		
+		if(!$last_name)
         {
             $data["header"]["error"] = "1";
             $data["header"]["message"] = "Last name is required";
@@ -361,8 +364,8 @@ class Api extends REST_Controller {
 						$merchant_info['cx_authenticate_id'] 		= @$apiData['authenticate_id'];
 						$merchant_info['cx_authenticate_password'] 	= @$apiData['authenticate_password'];
 						$merchant_info['cx_secret_key'] 			= @$apiData['secret_key'];
-						$merchant_info['cx_hash'] 					= @$apiData['mode'];
-						$merchant_info['cx_mode'] 					= @$apiData['hash'];
+						$merchant_info['cx_hash'] 					= @$apiData['hash'];
+						$merchant_info['cx_mode'] 					= @$apiData['mode'];
 						$merchant_info['last_updated'] 				= $created;
 						
 						$this->profile->add_user_merchant_info($merchant_info);
@@ -672,7 +675,7 @@ class Api extends REST_Controller {
 			
 			if($apiStatus)
 			{
-				$_apiData_Status = $apiData['status'];
+				$_apiData_Status  = $apiData['status'];
 				$_apiData_Message = $apiData['message'];
 				
 				if($_apiData_Status == CONST_BANK_STATUS_VERIFIED) //verified!
@@ -2068,6 +2071,136 @@ class Api extends REST_Controller {
         $data['body']            = array("user_detail"=>$user_detail);
         $this->response($data, 200);   
     }
-
-    
+	
+	function getPaymentMode_post()
+	{
+		$updated      = date('Y-m-d H:i:s');
+		
+		$merchantInfo = $this->profile->checkUserMerchantDetails($this->user_id);
+		
+		if(!$merchantInfo)
+		{
+			$data["header"]["error"] = "1";
+			$data["header"]["message"] = "No merchant details linked with this user!";
+			$this->response($data, 200);
+		}
+		else			
+		{
+			$merchant_id = $merchantInfo['id'];
+			
+			$apiStatus = false;
+			$apiData = array();
+			
+			$apiResponse = getMerchantPaymentMode($this->user_id);
+						
+			if($apiResponse)
+			{
+				if(isset($apiResponse['error']))
+				{
+					$data["header"]["error"] = "1";
+					$data["header"]["message"] = $apiResponse['error'];
+					$this->response($data, 200);
+				}
+				else if(isset($apiResponse['success']))
+				{
+					$apiStatus = true;
+					
+					$apiData = $apiResponse['data'];
+				}
+			}
+			
+			if($apiStatus)
+			{
+				$_apiData_Mode  	= $apiData['mode'];
+				$_apiData_Message	= $apiData['message'];
+				
+				$this->profile->edit_user_merchant_info($merchant_id, array("last_updated"=>$updated, "cx_mode"=>$_apiData_Mode));
+					
+				$data["header"]["error"] = "0";
+				$data["header"]["message"] = $_apiData_Message;
+				$this->response($data, 200);
+			}
+			else
+			{
+				$data["header"]["error"] = "1";
+				$data["header"]["message"] = "Something went wrong. Please try later!";
+				$this->response($data, 200);
+			}
+		}
+	}
+	
+	function setPaymentMode_post()
+	{
+		$updated		= date('Y-m-d H:i:s');
+		$payment_mode	= $this->post('payment_mode'); //live or sandbox
+		
+		if(!$payment_mode)
+        {
+            $data["header"]["error"] = "1";
+            $data["header"]["message"] = "Payment mode is required";
+            $this->response($data, 200);
+        }
+		
+		if($payment_mode != CONST_TXT_MERCHANT_MODE_LIVE && $payment_mode != CONST_TXT_MERCHANT_MODE_SANDBOX)
+        {
+            $data["header"]["error"] = "1";
+            $data["header"]["message"] = "Payment mode should be ".CONST_TXT_MERCHANT_MODE_SANDBOX." or ".CONST_TXT_MERCHANT_MODE_LIVE;
+            $this->response($data, 200);
+        }
+		
+		$merchantInfo = $this->profile->checkUserMerchantDetails($this->user_id);
+		
+		if(!$merchantInfo)
+		{
+			$data["header"]["error"] = "1";
+			$data["header"]["message"] = "No merchant details linked with this user!";
+			$this->response($data, 200);
+		}
+		else			
+		{
+			$merchant_id = $merchantInfo['id'];
+			
+			$apiStatus = false;
+			$apiData = array();
+			
+			$postParams = array();			
+			$postParams['payment_mode'] = $payment_mode;
+			
+			$apiResponse = changeMerchantPaymentMode($this->user_id, $postParams);
+						
+			if($apiResponse)
+			{
+				if(isset($apiResponse['error']))
+				{
+					$data["header"]["error"] = "1";
+					$data["header"]["message"] = $apiResponse['error'];
+					$this->response($data, 200);
+				}
+				else if(isset($apiResponse['success']))
+				{
+					$apiStatus = true;
+					
+					$apiData = $apiResponse['data'];
+				}
+			}
+			
+			if($apiStatus)
+			{
+				$_apiData_Mode  	= $apiData['mode'];
+				$_apiData_Message	= $apiData['message'];
+				
+				$this->profile->edit_user_merchant_info($merchant_id, array("last_updated"=>$updated, "cx_mode"=>$_apiData_Mode));
+					
+				$data["header"]["error"] = "0";
+				$data["header"]["message"] = 'Payment mode has been changed to '.$_apiData_Message;
+				$this->response($data, 200);
+			}
+			else
+			{
+				$data["header"]["error"] = "1";
+				$data["header"]["message"] = "Something went wrong. Please try later!";
+				$this->response($data, 200);
+			}
+		}
+	}
 }
