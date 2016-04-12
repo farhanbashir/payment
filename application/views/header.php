@@ -14,26 +14,17 @@
           <div class="pull-center hidden-md hidden-lg">
             <div class="header-inner">
               <div class="brand inline">
-                <img src="<?php echo asset_url('img/logo.png');?>" alt="logo" data-src="<?php echo asset_url('img/logo.png');?>" data-src-retina="<?php echo asset_url('img/logo_2x.png');?>" width="78" height="22">
+                <a href="<?php echo site_url('admin/dashboard') ?>"><img src="<?php echo asset_url('img/logo.png');?>" alt="logo" data-src="<?php echo asset_url('img/logo.png');?>" data-src-retina="<?php echo asset_url('img/logo_2x.png');?>" height="22" /></a>
               </div>
             </div>
           </div>
           <!-- RIGHT SIDE -->
-          <div class="pull-right full-height visible-sm visible-xs">
-            <!-- START ACTION BAR -->
-            <div class="header-inner">
-              <a href="#" class="btn-link visible-sm-inline-block visible-xs-inline-block" data-toggle="quickview" data-toggle-element="#quickview">
-                <span class="icon-set menu-hambuger-plus"></span>
-              </a>
-            </div>
-            <!-- END ACTION BAR -->
-          </div>
         </div>
         <!-- END MOBILE CONTROLS -->
         <div class=" pull-left sm-table hidden-xs hidden-sm">
           <div class="header-inner">
             <div class="brand inline">
-              <img src="<?php echo asset_url('img/logo.png');?>" alt="logo" data-src="<?php echo asset_url('img/logo.png');?>" data-src-retina="<?php echo asset_url('img/logo_2x.png');?>" width="78" height="22">
+              <a href="<?php echo site_url('admin/dashboard') ?>"><img src="<?php echo asset_url('img/logo.png');?>" alt="logo" data-src="<?php echo asset_url('img/logo.png');?>" data-src-retina="<?php echo asset_url('img/logo_2x.png');?>" height="22" /></a>
             </div>
             <!-- START NOTIFICATION LIST -->
             <?php //$this->load->view('notifications'); ?>

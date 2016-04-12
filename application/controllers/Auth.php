@@ -28,17 +28,16 @@ class Auth extends CI_Controller {
 	{
 		if($this->session->userdata('logged_in'))
 		{
-			redirect(base_url()."index.php/admin/dashboard", 'refresh');
+			redirect(site_url('admin/dashboard'), 'refresh');
 		}
 		else
 		{
-            $this->load->view('login');
+            $this->load->view('login', array("error" =>'', "username" => ''));
 		}
-
 	}
 
-	function check_database()
-	 {
+	function login()
+	{
 	   //Field validation succeeded.  Validate against database
 	   $username = $this->input->post('username');
 	   $password = $this->input->post('password');
@@ -48,20 +47,20 @@ class Auth extends CI_Controller {
 
        //temporary work for admin
 	   //if($username == "admin@club.com" && $password == "clubadmin")
-	   if(is_array($result))
-	   {
-		    $sess_array = array();
-		    $sess_array = (array) $result[0];
-        	$this->session->set_userdata('logged_in', $sess_array);
-		    redirect(base_url()."index.php/admin/dashboard");
-	   }
-	   else
-	   {
-			$this->load->view('login',array("error" =>"Invalid username or password"));
-			$this->form_validation->set_message('check_database', 'Invalid username or password');
+		if(is_array($result))
+		{
+			$sess_array = array();
+			$sess_array = (array) $result[0];
+			$this->session->set_userdata('logged_in', $sess_array);
+			redirect(site_url('admin/dashboard'));
+		}
+		else
+		{
+			$this->load->view('login',array("error" =>"Invalid Email or Password", "username" => $username));
+			$this->form_validation->set_message('login', "Invalid Email or Password");
 			return false;
-	   }
-	 }
+		}
+	}
 
     public function logout()
     {

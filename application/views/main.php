@@ -3,7 +3,7 @@
   <head>
     <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
     <meta charset="utf-8" />
-    <title>Pages - Admin Dashboard UI Kit - Dashboard</title>
+    <title>iCannPay</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no" />
     <link rel="apple-touch-icon" href="<?php echo pages_url('ico/60.png');?>">
     <link rel="apple-touch-icon" sizes="76x76" href="<?php echo pages_url('ico/76.png');?>">
@@ -28,6 +28,7 @@
     <link href="<?php echo asset_url('plugins/jquery-metrojs/MetroJs.css');?>" rel="stylesheet" type="text/css" media="screen" />
     <link href="<?php echo pages_url('css/pages-icons.css');?>" rel="stylesheet" type="text/css">
     <link class="main-stylesheet" href="<?php echo pages_url('css/pages.css');?>" rel="stylesheet" type="text/css" />
+	<link class="main-stylesheet" href="<?php echo pages_url('css/custom.css');?>" rel="stylesheet" type="text/css" />
     <!--[if lte IE 9]>
     <link href="assets/plugins/codrops-dialogFx/dialog.ie.css" rel="stylesheet" type="text/css" media="screen" />
     <![endif]-->
@@ -98,7 +99,9 @@
     <script src="<?php echo pages_url('js/pages.min.js');?>"></script>
     <!-- END CORE TEMPLATE JS -->
     <!-- BEGIN PAGE LEVEL JS -->
-    <script src="<?php echo asset_url('js/dashboard.js');?>" type="text/javascript"></script>
+	
+	<script src="<?php echo asset_url('js/form_elements.js');?>" type="text/javascript"></script>
+	<script src="<?php echo asset_url('js/dashboard.js');?>" type="text/javascript"></script>
     <script src="<?php echo asset_url('js/scripts.js');?>" type="text/javascript"></script>
     <script src="<?php echo asset_url('js/demo.js');?>" type="text/javascript"></script>
     <!-- END PAGE LEVEL JS -->
