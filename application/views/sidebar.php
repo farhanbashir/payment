@@ -44,6 +44,12 @@
             </a>
             <span class="<?php echo ($this->uri->segment(2) == 'dashboard') ? 'bg-success' : '';?> icon-thumbnail"><i class="pg-home"></i></span>
           </li>
+           <li class="">
+            <a href="<?php echo site_url('admin/users/index') ?>">
+              <span class="title">Merchants</span>
+            </a>
+            <span class="<?php echo ($this->uri->segment(2) == 'users')&&($this->uri->segment(3) == 'index') ? 'bg-success' : '';?> icon-thumbnail"><i class="fa fa-user"></i></span>
+          </li>
           <li>
             <a href="javascript:;"><span class="title">Sales</span>
             <span class=" arrow"></span></a>
@@ -60,13 +66,23 @@
             </ul>
           </li>
           <li class="">
-            <a href="<?php echo site_url('admin/products/index') ?>">
+            <a href="<?php echo site_url('admin/products/index');?>">
               <span class="title">Products</span>
             </a>
-            <span class="<?php echo ($this->uri->segment(2) == 'products') ? 'bg-success' : '';?> icon-thumbnail"><i class="pg-layouts"></i></span>
+            <span class="<?php echo ($this->uri->segment(2) == 'products')&&(($this->uri->segment(3) == 'index')||$this->uri->segment(3) == 'add_product')? 'bg-success' : '';?> icon-thumbnail">
+              <i class="fa fa-product-hunt"></i>
+            </span>
           </li>
           <li class="">
-            <a href="builder.html">
+            <a href="<?php echo site_url('admin/products/categories');?>">
+              <span class="title">Categories</span>
+            </a>
+            <span class="<?php echo ($this->uri->segment(2) == 'products')&&(($this->uri->segment(3) == 'categories')||$this->uri->segment(3) == 'add_category') ? 'bg-success' : '';?> icon-thumbnail">
+              <i class="fa fa-tags"></i>
+            </span>
+          </li>
+          <li class="">
+            <a href="#">
               <span class="title">Customers</span>
             </a>
             <span class="icon-thumbnail"><i class="fa fa-group"></i></span>
@@ -75,7 +91,7 @@
             <a href="<?php echo site_url('admin/users/accounts') ?>">
               <span class="title">Account & Setting</span>
             </a>
-            <span class="<?php echo ($this->uri->segment(2) == 'users') ? 'bg-success' : '';?> icon-thumbnail"><i class="fa fa-edit"></i></span>
+            <span class="<?php echo ($this->uri->segment(2) == 'users')&&($this->uri->segment(3) == 'accounts') ? 'bg-success' : '';?> icon-thumbnail"><i class="fa fa-edit"></i></span>
           </li>
         </ul>
         <div class="clearfix"></div>

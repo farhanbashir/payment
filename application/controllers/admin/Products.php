@@ -35,12 +35,29 @@ class Products extends CI_Controller {
         // $data['total_stores'] = $this->store->get_total_stores();
         // $data['latest_five_users'] = $this->user->get_latest_five_users();
         // $data['latest_five_stores'] = $this->store->get_latest_five_stores();
-
-        $content = $this->load->view('products/index.php', $data, true);
+        $data['categories']= '';
+        $content = $this->load->view('products/products', $data, true);
         $this->load->view('main', array('content' => $content));
     }
 
-   
+    function add_product()
+    {   
+        $data = array();
+        $content = $this->load->view('products/add_product', $data, true);
+        $this->load->view('main', array('content' => $content));
+    }
+    function categories()
+    {
+      $data = array();
+      $content = $this->load->view('products/categories', $data, true);
+      $this->load->view('main', array('content' => $content));
+    }
+    function add_category()
+    {   
+        $data = array();
+        $content = $this->load->view('products/add_category', $data, true);
+        $this->load->view('main', array('content' => $content));
+    }
 
     public function change_password()
     {

@@ -38,7 +38,7 @@ Class User extends CI_Model
             {
                 $sql = "select store_id from user_stores where user_id=".$result[0]['parent_user_id'];
             }
-            elseif($result[0]['role_id'] == 2)
+            elseif($result[0]['role_id'] == IS_ADMIN_FALSE)
             {
                 $sql = "select store_id from user_stores where user_id=$user_id";
             }
@@ -150,7 +150,7 @@ Class User extends CI_Model
 
     function get_total_users()
     {
-        $this -> db -> where('is_admin', 0);
+        $this -> db -> where('role_id', IS_ADMIN_FALSE);
         return $this->db->count_all_results('users');
     }
 
@@ -192,7 +192,7 @@ Class User extends CI_Model
     {
         $start =  $page;
         $limit = $this->config->item('pagination_limit');
-        $sql = "select * from users where is_admin=0 order by user_id desc limit $start,$limit" ;
+        $sql = "select * from users where role_id = ".IS_ADMIN_FALSE." order by user_id desc limit $start,$limit" ;
         $query = $this->db->query($sql);
         $result = $query->result_array();
         $query->free_result();
@@ -201,7 +201,7 @@ Class User extends CI_Model
 
     function get_all_users()
     {
-        $sql = "select * from users u where u.is_admin=0 order by u.user_id desc " ;
+        $sql = "select * from users u where u.role_id".IS_ADMIN_FALSE." order by u.user_id desc " ;
         $query = $this->db->query($sql);
         $result = $query->result_array();
         $query->free_result();
@@ -210,7 +210,7 @@ Class User extends CI_Model
 
     function get_complete_users()
     {
-        $sql = "select * from users u where u.is_admin=0 and user_id not in (select user_id from stores) order by u.user_id desc " ;
+        $sql = "select * from users u where u.role_id".IS_ADMIN_FALSE." and user_id not in (select user_id from stores) order by u.user_id desc " ;
         $query = $this->db->query($sql);
         $result = $query->result_array();
         $query->free_result();
@@ -219,7 +219,7 @@ Class User extends CI_Model
 
     function get_latest_five_users()
     {
-        $sql = "select * from users where is_admin=0 order by user_id desc limit 5";
+        $sql = "select * from users where role_id".IS_ADMIN_FALSE." order by user_id desc limit 5";
         $query = $this->db->query($sql);
         $result = $query->result_array();
         $query->free_result();

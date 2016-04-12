@@ -31,6 +31,7 @@ class Users extends CI_Controller {
     }
 
     public function index() {
+       
         $data = array();
         $this->load->library("pagination");
         $total_rows = $this->user->get_total_users();
@@ -41,12 +42,18 @@ class Users extends CI_Controller {
 
         $page = ($this->uri->segment(4)) ? $this->uri->segment(4) : 0;
 
+
         $data["links"] = $this->pagination->create_links();
 
         $users = $this->user->get_users($page);
+
         $data['users'] = $users;
+        //$this->load->view('header');
+        /* echo "<pre>";
+        print_r($data['users']);die;*/
         $content = $this->load->view('users/tabular.php', $data, true);
-        $this->load->view('welcome_message', array('content' => $content));
+
+        $this->load->view('main', array('content' => $content));
     }
 
     public function accounts() {
