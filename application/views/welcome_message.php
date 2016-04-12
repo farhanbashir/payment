@@ -4,6 +4,7 @@
         <script>
             var BASE_URL = "<?php echo base_url(); ?>";
         </script>
+      
         <meta charset="UTF-8">
         <title>Dashboard</title>
         <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>

@@ -58,7 +58,7 @@
             </span>
               </button>
               <ul class="dropdown-menu profile-dropdown" role="menu">
-                <li><a href="<?php echo site_url('admin/profile/setting') ?>"><i class="pg-settings_small"></i> Settings</a>
+                <li><a href="<?php echo site_url('admin/users/accounts') ?>"><i class="pg-settings_small"></i> Settings</a>
                 </li>
                 <!-- <li><a href="#"><i class="pg-outdent"></i> Feedback</a>
                 </li>

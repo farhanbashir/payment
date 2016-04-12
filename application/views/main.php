@@ -15,6 +15,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta content="" name="description" />
     <meta content="" name="author" />
+
+    <link href="<?php echo asset_url('jquery-datatable/extensions/FixedColumns/css/dataTables.fixedColumns.min.css');?>" rel="stylesheet" type="text/css" />
     <link href="<?php echo asset_url('plugins/pace/pace-theme-flash.css');?>" rel="stylesheet" type="text/css" />
     <link href="<?php echo asset_url('plugins/boostrapv3/css/bootstrap.min.css');?>" rel="stylesheet" type="text/css" />
     <link href="<?php echo asset_url('plugins/font-awesome/css/font-awesome.css');?>" rel="stylesheet" type="text/css" />
@@ -24,7 +26,10 @@
     <link href="<?php echo asset_url('plugins/nvd3/nv.d3.min.css');?>" rel="stylesheet" type="text/css" media="screen" />
     <link href="<?php echo asset_url('plugins/mapplic/css/mapplic.css');?>" rel="stylesheet" type="text/css" />
     <link href="<?php echo asset_url('plugins/rickshaw/rickshaw.min.css');?>" rel="stylesheet" type="text/css" />
+    <link href="<?php echo asset_url('plugins/datatables-responsive/css/datatables.responsive.css');?>" rel="stylesheet" type="text/css" />
+    
     <link href="<?php echo asset_url('plugins/bootstrap-datepicker/css/datepicker3.css');?>" rel="stylesheet" type="text/css" media="screen">
+    <link href="<?php echo asset_url('plugins/jquery-datatable/media/css/dataTables.bootstrap.min.css');?>" rel="stylesheet" type="text/css" media="screen">
     <link href="<?php echo asset_url('plugins/jquery-metrojs/MetroJs.css');?>" rel="stylesheet" type="text/css" media="screen" />
     <link href="<?php echo pages_url('css/pages-icons.css');?>" rel="stylesheet" type="text/css">
     <link class="main-stylesheet" href="<?php echo pages_url('css/pages.css');?>" rel="stylesheet" type="text/css" />
@@ -93,6 +98,12 @@
     <script src="<?php echo asset_url('plugins/jquery-sparkline/jquery.sparkline.min.js');?>" type="text/javascript"></script>
     <script src="<?php echo asset_url('plugins/skycons/skycons.js');?>" type="text/javascript"></script>
     <script src="<?php echo asset_url('plugins/bootstrap-datepicker/js/bootstrap-datepicker.js');?>" type="text/javascript"></script>
+    <script src="<?php echo asset_url('plugins/jquery-datatable/media/js/jquery.dataTables.min.js');?>" type="text/javascript"></script>
+    <script src="<?php echo asset_url('plugins/jquery-datatable/extensions/TableTools/js/dataTables.tableTools.min.js');?>" type="text/javascript"></script>
+    <script src="<?php echo asset_url('plugins/jquery-datatable/media/js/dataTables.bootstrap.js');?>" type="text/javascript"></script>
+    <script src="<?php echo asset_url('plugins/jquery-datatable/extensions/Bootstrap/jquery-datatable-bootstrap.js');?>" type="text/javascript"></script>
+    <script src="<?php echo asset_url('plugins/datatables-responsive/js/datatables.responsive.js');?>" type="text/javascript"></script>
+    <script src="<?php echo asset_url('plugins/datatables-responsive/js/lodash.min.js');?>" type="text/javascript"></script>
     <!-- END VENDOR JS -->
     <!-- BEGIN CORE TEMPLATE JS -->
     <script src="<?php echo pages_url('js/pages.min.js');?>"></script>
@@ -101,6 +112,7 @@
     <script src="<?php echo asset_url('js/dashboard.js');?>" type="text/javascript"></script>
     <script src="<?php echo asset_url('js/scripts.js');?>" type="text/javascript"></script>
     <script src="<?php echo asset_url('js/demo.js');?>" type="text/javascript"></script>
+    <script src="<?php echo asset_url('js/datatables.js');?>" type="text/javascript"></script>
     <!-- END PAGE LEVEL JS -->
   </body>
 </html>
