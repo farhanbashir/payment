@@ -7,21 +7,19 @@
         <div class="panel-title"><h1>Categories</h1>
         </div>
         <div class="btn-group pull-right m-b-10">
-          <a href="<?php echo site_url('admin/products/add_category');?>">
-            <button class="btn btn-primary btn-cons">New Category</button>
-          </a>
+          <a href="<?php echo site_url('admin/products/add_category');?>" class="btn btn-primary btn-cons">Add New Category</a>
         </div>
         <div class="clearfix"></div>
       </div>
       <div class="panel-body">
         <div id="tableWithSearch_wrapper" class="dataTables_wrapper form-inline no-footer">
-          <div class="table-responsive">
-            <table class="table table-hover demo-table-search dataTable no-footer" id="tableWithSearch" role="grid" aria-describedby="tableWithSearch_info">
+          <div class="table-responsive_UJ">
+            <table class="table table-hover demo-table-search_UJ dataTable no-footer" id="tableWithSearch" role="grid" aria-describedby="tableWithSearch_info">
               <thead>
                 <tr role="row">
-                  <th style="width:33.33%;" class="sorting" tabindex="0" aria-controls="basicTable" rowspan="1" colspan="1" aria-label="Status: activate to sort column ascending">Categories</th>
-                  <th style="width:33.33%;" class="sorting" tabindex="0" aria-controls="basicTable" rowspan="1" colspan="1" aria-label="Last Update: activate to sort column ascending">No. of products</th>
-                  <th class="sorting" tabindex="0" aria-controls="basicTable" rowspan="1" colspan="1" aria-label="Last Update: activate to sort column ascending">Actions</th>
+                  <th width="20%">Categories</th>
+                  <th width="20%">No. of Products</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>

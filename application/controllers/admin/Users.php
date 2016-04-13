@@ -150,7 +150,33 @@ class Users extends CI_Controller {
         $this->user->delete_user($user_id);
         redirect(site_url('admin/users/index'));
     }
-
-    
-
+	
+	public function login_merchant($user_id=0)
+    {
+		if($user_id)
+		{
+			$userInfo = $this->user->checkUserById($user_id);
+			
+			if($userInfo)
+			{
+				$userInfo = @$userInfo[0];
+				
+				if($userInfo)
+				{
+					$role_id = $userInfo->role_id;
+					
+					if($role_id == CONST_ROLE_ID_BUSINESS_ADMIN)
+					{
+						$userInfo = (array) $userInfo;
+						
+						$this->session->set_userdata('logged_in_merchant', $userInfo);
+						
+						redirect(site_url('admin/dashboard'));
+					}
+				}
+			}
+		}
+		
+		redirect(site_url('admin/users/index'));	
+	}
 }

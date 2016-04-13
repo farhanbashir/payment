@@ -1,3 +1,33 @@
+<?php
+	global $_logged_in_role_id, $_logged_in_name, $_logged_in_email;
+	global $_logged_in_merchant_user_id, $_logged_in_merchant_name, $_logged_in_merchant_email;
+	
+	$_logged_in_role_id = 0;
+	$_logged_in_name = '';
+	$_logged_in_email = '';
+	
+	$_logged_in_merchant_user_id = 0;
+	
+	$sess_logged_in = $this->session->userdata('logged_in');	
+	if($sess_logged_in)
+	{				
+		$_logged_in_role_id = @$sess_logged_in['role_id'];
+		
+		$_logged_in_name = trim(@$sess_logged_in['first_name'].' '.@$sess_logged_in['last_name']);
+		
+		$_logged_in_email = trim(@$sess_logged_in['email']);
+	}
+	
+	$sess_logged_in_merchant = $this->session->userdata('logged_in_merchant');
+	if($sess_logged_in_merchant)
+	{				
+		$_logged_in_merchant_user_id = @$sess_logged_in_merchant['user_id'];
+		
+		$_logged_in_merchant_name = trim(@$sess_logged_in_merchant['first_name'].' '.@$sess_logged_in_merchant['last_name']);
+		
+		$_logged_in_merchant_email = trim(@$sess_logged_in_merchant['email']);
+	}
+?>
 <!DOCTYPE html>
 <html>
   <head>
@@ -16,7 +46,7 @@
     <meta content="" name="description" />
     <meta content="" name="author" />
 
-    <link href="<?php echo asset_url('jquery-datatable/extensions/FixedColumns/css/dataTables.fixedColumns.min.css');?>" rel="stylesheet" type="text/css" />
+    <link href="<?php echo asset_url('plugins/jquery-datatable/extensions/FixedColumns/css/dataTables.fixedColumns.min.css');?>" rel="stylesheet" type="text/css" />
     <link href="<?php echo asset_url('plugins/pace/pace-theme-flash.css');?>" rel="stylesheet" type="text/css" />
     <link href="<?php echo asset_url('plugins/boostrapv3/css/bootstrap.min.css');?>" rel="stylesheet" type="text/css" />
     <link href="<?php echo asset_url('plugins/font-awesome/css/font-awesome.css');?>" rel="stylesheet" type="text/css" />
@@ -94,17 +124,28 @@
     <script src="<?php echo asset_url('plugins/mapplic/js/hammer.js');?>"></script>
     <script src="<?php echo asset_url('plugins/mapplic/js/jquery.mousewheel.js');?>"></script>
     <script src="<?php echo asset_url('plugins/mapplic/js/mapplic.js');?>"></script>
-    <script src="<?php echo asset_url('plugins/rickshaw/rickshaw.min.js');?>"></script>
+    <!-- <script src="<?php echo asset_url('plugins/rickshaw/rickshaw.min.js');?>"></script>-->
     <script src="<?php echo asset_url('plugins/jquery-metrojs/MetroJs.min.js');?>" type="text/javascript"></script>
     <script src="<?php echo asset_url('plugins/jquery-sparkline/jquery.sparkline.min.js');?>" type="text/javascript"></script>
     <script src="<?php echo asset_url('plugins/skycons/skycons.js');?>" type="text/javascript"></script>
-    <script src="<?php echo asset_url('plugins/bootstrap-datepicker/js/bootstrap-datepicker.js');?>" type="text/javascript"></script>
+    <script src="<?php echo asset_url('plugins/bootstrap-datepicker/js/bootstrap-datepicker.js');?>" type="text/javascript"></script>	
     <script src="<?php echo asset_url('plugins/jquery-datatable/media/js/jquery.dataTables.min.js');?>" type="text/javascript"></script>
     <script src="<?php echo asset_url('plugins/jquery-datatable/extensions/TableTools/js/dataTables.tableTools.min.js');?>" type="text/javascript"></script>
     <script src="<?php echo asset_url('plugins/jquery-datatable/media/js/dataTables.bootstrap.js');?>" type="text/javascript"></script>
     <script src="<?php echo asset_url('plugins/jquery-datatable/extensions/Bootstrap/jquery-datatable-bootstrap.js');?>" type="text/javascript"></script>
     <script src="<?php echo asset_url('plugins/datatables-responsive/js/datatables.responsive.js');?>" type="text/javascript"></script>
-    <script src="<?php echo asset_url('plugins/datatables-responsive/js/lodash.min.js');?>" type="text/javascript"></script>
+    <script src="<?php echo asset_url('plugins/datatables-responsive/js/lodash.min.js');?>" type="text/javascript"></script>	
+	
+	
+	<script src="<?php echo asset_url('plugins/bootstrap-daterangepicker/daterangepicker.js');?>" type="text/javascript"></script>
+	<script src="<?php echo asset_url('plugins/bootstrap-timepicker/bootstrap-timepicker.min.js');?>" type="text/javascript"></script>
+	<script src="<?php echo asset_url('plugins/jquery-autonumeric/autoNumeric.js');?>" type="text/javascript"></script>
+	<script src="<?php echo asset_url('plugins/dropzone/dropzone.min.js');?>" type="text/javascript"></script>
+	<script src="<?php echo asset_url('plugins/bootstrap-tag/bootstrap-tagsinput.min.js');?>" type="text/javascript"></script>
+	<script src="<?php echo asset_url('plugins/summernote/js/summernote.min.js');?>" type="text/javascript"></script>
+	<script src="<?php echo asset_url('plugins/bootstrap3-wysihtml5/bootstrap3-wysihtml5.all.min.js');?>" type="text/javascript"></script>
+	<script src="<?php echo asset_url('plugins/jquery-inputmask/jquery.inputmask.min.js');?>" type="text/javascript"></script>
+	
     <!-- END VENDOR JS -->
     <!-- BEGIN CORE TEMPLATE JS -->
     <script src="<?php echo pages_url('js/pages.min.js');?>"></script>
@@ -112,10 +153,48 @@
     <!-- BEGIN PAGE LEVEL JS -->
 	
 	<script src="<?php echo asset_url('js/form_elements.js');?>" type="text/javascript"></script>
-	<script src="<?php echo asset_url('js/dashboard.js');?>" type="text/javascript"></script>
+	<!--<script src="<?php echo asset_url('js/dashboard.js');?>" type="text/javascript"></script>-->
     <script src="<?php echo asset_url('js/scripts.js');?>" type="text/javascript"></script>
+	
+	<script type="text/javascript">
+		jQuery(document).ready(function(){
+			
+			var table = $('#custom-datatable');
+
+			var settings = {
+				"sDom": "<'table-responsive't><'row'<p i>>",
+				"destroy": true,
+				"scrollCollapse": true,
+				"oLanguage": {
+					"sLengthMenu": "_MENU_ ",
+					"sInfo": "Showing <b>_START_ to _END_</b> of _TOTAL_ entries"
+				},
+				"iDisplayLength": 5,
+				
+				 "aoColumns": [
+                                 { "bSortable": false, "bSearchable": false },
+                                 { "sType": "html" },
+                                 { "sType": "html" },
+                                 { "sType": "html" },
+                                 { "sType": "html", "bSortable": false, "bSearchable": false },
+                                 { "sType": "html", "bSortable": false, "bSearchable": false },                                
+                               ]
+				
+			};
+
+			table.dataTable(settings);
+
+			// search box for table
+			$('#search-table').keyup(function() {
+				table.fnFilter($(this).val());
+			});			
+		});
+	</script>
+	
     <script src="<?php echo asset_url('js/demo.js');?>" type="text/javascript"></script>
     <script src="<?php echo asset_url('js/datatables.js');?>" type="text/javascript"></script>
+	
+	
     <!-- END PAGE LEVEL JS -->
   </body>
 </html>

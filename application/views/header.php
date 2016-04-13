@@ -36,9 +36,29 @@
             <a href="#" class="btn-link icon-set menu-hambuger-plus m-l-20 sm-no-margin hidden-sm hidden-xs" data-toggle="quickview" data-toggle-element="#quickview"></a>
           </div> -->
         </div>
-        <div class=" pull-right">
+		
+		<?php 
+			global $_logged_in_role_id, $_logged_in_name, $_logged_in_email;
+			global $_logged_in_merchant_user_id, $_logged_in_merchant_name, $_logged_in_merchant_email;
+		?>
+		
+		<div class=" pull-right">
+			<div class="visible-lg visible-md m-t-10" >
+				<div class="pull-left p-r-10 p-t-10 fs-16 font-heading">
+					<small>You are Logged in as <strong><?php echo $_logged_in_name; ?></strong> (<?php echo $_logged_in_email; ?>)</small>
+					<?php
+						if($_logged_in_merchant_user_id)
+						{
+							?><small> &rarr; <strong>Merchant:</strong> <?php echo $_logged_in_merchant_name; ?> (<?php echo $_logged_in_merchant_email; ?>)</small><?php
+						}
+					?>
+				</div>
+			</div>
+		</div>
+		
+        <div class=" pull-right" style="display: none;">
           <!-- START User Info-->
-          <div class="visible-lg visible-md m-t-10">
+          <div class="visible-lg visible-md m-t-10" >
             <div class="pull-left p-r-10 p-t-10 fs-16 font-heading">
               <span class="semi-bold">David</span> <span class="text-master">Nest</span>
             </div>

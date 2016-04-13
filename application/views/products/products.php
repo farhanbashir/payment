@@ -7,14 +7,11 @@
         <div class="panel-title"><h1>Products</h1>
         </div>
         <div class="btn-group pull-right m-b-10">
-          <a href="<?php echo site_url('admin/products/add_product');?>">
-            <button class="btn btn-primary btn-cons">Add New</button>
-          </a>
+          <!--<a href="# class="btn btn-primary btn-cons">Import / Export</a>-->
+		  <a href="<?php echo site_url('admin/products/add_product');?>" class="btn btn-primary btn-cons">Add New Product</a>
         </div>
         <div class="btn-group pull-right m-b-10">
-          <a href="#">
-            <button class="btn btn-primary btn-cons">Import / Export</button>
-          </a>
+          
         </div>
         <div class="pull-right">
           <div class="col-xs-12">
@@ -25,14 +22,14 @@
       </div>
        <div class="panel-body">
             <div id="tableWithSearch_wrapper" class="dataTables_wrapper form-inline no-footer">
-                <div class="table-responsive">
-                    <table class="table table-hover demo-table-search dataTable no-footer" id="tableWithSearch" role="grid" aria-describedby="tableWithSearch_info">
+                <div class="table-responsive_UJ">
+                    <table class="table table-hover demo-table-search_UJ dataTable no-footer" id="tableWithSearch" role="grid" aria-describedby="tableWithSearch_info">
             <thead>
               <tr role="row">
-                <th style="width:25%;" class="sorting" tabindex="0" aria-controls="basicTable" rowspan="1" colspan="1" aria-label="Activities: activate to sort column ascending">Products</th>
-                <th style="width:25%;" class="sorting" tabindex="0" aria-controls="basicTable" rowspan="1" colspan="1" aria-label="Status: activate to sort column ascending">Categories</th>
-                <th style="width:25%;" class="sorting" tabindex="0" aria-controls="basicTable" rowspan="1" colspan="1" aria-label="Last Update: activate to sort column ascending">Price</th>
-                <th class="sorting" tabindex="0" aria-controls="basicTable" rowspan="1" colspan="1" aria-label="Last Update: activate to sort column ascending">Actions</th>
+                <th width="20%">Product</th>
+                <th width="20%">Categories</th>
+                <th width="10%">Price</th>
+                <th width="50%">Actions</th>
               </tr>
             </thead>
             <tbody>
