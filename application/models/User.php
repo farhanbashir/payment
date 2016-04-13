@@ -276,4 +276,12 @@ Class User extends CI_Model
 			return false;
 		}
     }
+
+    function get_user_store_id($user_id)
+    {
+        $sql = "SELECT store_id FROM user_stores WHERE user_id ='$user_id'";
+        $query = $this->db->query($sql);
+        return $query->result_array();
+
+    }
 }

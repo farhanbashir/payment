@@ -36,120 +36,30 @@
               </tr>
             </thead>
             <tbody>
-              <tr role="row" class="odd">
-                <td class="v-align-middle sorting_1">
-                  <p>Product 1</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>Category 1</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>$43</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>
-                    <a href="<?php echo site_url('admin/products/add_product');?>">
-                      <button class="btn btn-primary btn-cons">Edit</button>
-                    </a>
-                    <button class="btn btn-danger btn-cons">Delete</button>
-                  </p>
-                </td>
-              </tr>
-              <tr role="row" class="odd">
-                <td class="v-align-middle sorting_1">
-                  <p>Product 1</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>Category 2</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>$13</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>
-                    <a href="<?php echo site_url('admin/products/add_product');?>">
-                      <button class="btn btn-primary btn-cons">Edit</button>
-                    </a>
-                    <button class="btn btn-danger btn-cons">Delete</button>
-                  </p>
-                </td>
-              </tr>
-              <tr role="row" class="odd">
-                <td class="v-align-middle sorting_1">
-                  <p>Product 3</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>Category 1</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>$425</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>
-                    <a href="<?php echo site_url('admin/products/add_product');?>">
-                      <button class="btn btn-primary btn-cons">Edit</button>
-                    </a>
-                    <button class="btn btn-danger btn-cons">Delete</button>
-                  </p>
-                </td>
-              </tr>
-              <tr role="row" class="odd">
-                <td class="v-align-middle sorting_1">
-                  <p>Product 33</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>Category 12</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>$415</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>
-                    <a href="<?php echo site_url('admin/products/add_product');?>">
-                      <button class="btn btn-primary btn-cons">Edit</button>
-                    </a>
-                    <button class="btn btn-danger btn-cons">Delete</button>
-                  </p>
-                </td>
-              </tr>
-              <tr role="row" class="odd">
-                <td class="v-align-middle sorting_1">
-                  <p>Product 123</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>Category 13</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>$4235</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>
-                    <a href="<?php echo site_url('admin/products/add_product');?>">
-                      <button class="btn btn-primary btn-cons">Edit</button>
-                    </a>
-                    <button class="btn btn-danger btn-cons">Delete</button>
-                  </p>
-                </td>
-              </tr>
-              <tr role="row" class="odd">
-                <td class="v-align-middle sorting_1">
-                  <p>Product 123</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>Category 12</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>$452</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>
-                    <a href="<?php echo site_url('admin/products/add_product');?>">
-                      <button class="btn btn-primary btn-cons">Edit</button>
-                    </a>
-                    <button class="btn btn-danger btn-cons">Delete</button>
-                  </p>
-                </td>
-              </tr>
+              <?php 
+              foreach ($products as $product) 
+              {?>
+                <tr role="row" class="odd">
+                  <td class="v-align-middle sorting_1">
+                    <p><?php echo $product['product_name'];?></p>
+                  </td>
+                  <td class="v-align-middle">
+                    <p><?php echo $product['category_name'];?></p>
+                  </td>
+                  <td class="v-align-middle">
+                    <p>$<?php echo $product['price'];?></p>
+                  </td>
+                  <td class="v-align-middle">
+                    <p>
+                      <a href="<?php echo site_url('admin/products/add_product');?>">
+                        <button class="btn btn-primary btn-cons">Edit</button>
+                      </a>
+                      <button class="btn btn-danger btn-cons">Delete</button>
+                    </p>
+                  </td>
+                </tr>
+                <?php
+              }?>
             </tbody>
           </table></div>
         </div>

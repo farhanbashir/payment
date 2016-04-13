@@ -74,10 +74,10 @@
             </span>
           </li>
           <li class="">
-            <a href="<?php echo site_url('admin/products/categories');?>">
+            <a href="<?php echo site_url('admin/categories');?>">
               <span class="title">Categories</span>
             </a>
-            <span class="<?php echo ($this->uri->segment(2) == 'products')&&(($this->uri->segment(3) == 'categories')||$this->uri->segment(3) == 'add_category') ? 'bg-success' : '';?> icon-thumbnail">
+            <span class="<?php echo ($this->uri->segment(2) == 'categories')||($this->uri->segment(3) == 'add_category') ? 'bg-success' : '';?> icon-thumbnail">
               <i class="fa fa-tags"></i>
             </span>
           </li>

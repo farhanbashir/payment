@@ -10,7 +10,7 @@
 
     <div class="panel panel-transparent">
         <div class="panel-heading">
-            <div class="panel-title">Merchunds List
+            <div class="panel-title">Merchants List
             </div>
             <div class="pull-right">
                 <div class="col-xs-12">

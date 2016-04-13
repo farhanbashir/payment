@@ -1,7 +1,6 @@
 <?php
 Class Product extends CI_Model
 {
-
     function get_product_detail($product_id)
     {
         $sql = "select * from products where product_id=$product_id" ;
@@ -20,16 +19,33 @@ Class Product extends CI_Model
     }
 
     function get_all_products($store_id=0)
-    {
+    {   
+        $user_id = $this->session->userdata['logged_in']['user_id'];
 		if($store_id)
 		{
 			$sql = "select * from products where status=1 and store_id=$store_id" ;
 		}
 		else
 		{
-			$sql = "select * from products where status=1 AND product_id!='". CONST_PRODUCT_ID_NUMPAD ."'" ;
+			$sql = "SELECT pc.product_id,pc.category_id,p.price,p.name AS product_name, c.name AS category_name FROM 
+                    product_categories AS pc
+                    LEFT JOIN products AS p
+                    ON pc.product_id = p.product_id
+                    LEFT JOIN categories AS c
+                    ON pc.category_id = c.category_id
+                    WHERE p.user_id ='$user_id'" ;
 		}
-        
+        $query = $this->db->query($sql);
+        $result = $query->result_array();
+        $query->free_result();
+        return $result;
+    }
+
+    function get_all_categories()
+    {   
+        $user_id = $this->session->userdata['logged_in']['user_id'];
+        $sql = "SELECT name,category_id,(SELECT COUNT(product_id) FROM product_categories WHERE user_id='$user_id' AND category_id=category_id) AS total_products
+                FROM categories WHERE user_id='$user_id'";
         $query = $this->db->query($sql);
         $result = $query->result_array();
         $query->free_result();
@@ -37,10 +53,11 @@ Class Product extends CI_Model
     }
 
     function get_order_products($order_id)
-    {
+    {   
+
         $sql = "select ol.product_id,p.name,ol.quantity, ol.product_price from order_line_items ol 
-inner join products p on ol.product_id=p.product_id
-where ol.order_id=$order_id";
+                inner join products p on ol.product_id=p.product_id
+                where ol.order_id=$order_id";
         $query = $this->db->query($sql);
         $result = $query->result_array();
         $query->free_result();

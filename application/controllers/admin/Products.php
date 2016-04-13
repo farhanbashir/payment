@@ -24,18 +24,19 @@ class Products extends CI_Controller {
         parent::__construct();
         /*$this->load->model('user', '', TRUE);
         $this->load->model('store', '', TRUE);*/
+        $this->load->model('Product');
         if (!$this->session->userdata('logged_in')) {
             redirect(base_url());
         }
     }
-
-    public function index() {
+    public function index() 
+    {
         $data = array();
         // $data['total_users'] = $this->user->get_total_users();
         // $data['total_stores'] = $this->store->get_total_stores();
         // $data['latest_five_users'] = $this->user->get_latest_five_users();
         // $data['latest_five_stores'] = $this->store->get_latest_five_stores();
-        $data['categories']= '';
+        $data['products'] = $this->Product->get_all_products();
         $content = $this->load->view('products/products', $data, true);
         $this->load->view('main', array('content' => $content));
     }
@@ -44,18 +45,6 @@ class Products extends CI_Controller {
     {   
         $data = array();
         $content = $this->load->view('products/add_product', $data, true);
-        $this->load->view('main', array('content' => $content));
-    }
-    function categories()
-    {
-      $data = array();
-      $content = $this->load->view('products/categories', $data, true);
-      $this->load->view('main', array('content' => $content));
-    }
-    function add_category()
-    {   
-        $data = array();
-        $content = $this->load->view('products/add_category', $data, true);
         $this->load->view('main', array('content' => $content));
     }
 

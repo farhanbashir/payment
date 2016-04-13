@@ -40,6 +40,12 @@ Class Category extends CI_Model
 		}
     }
 
+    function update_category($data,$id)
+    {
+        $this->db->where('category_id', $id);
+        $this->db->update('categories', $data); 
+    }
+
     function delete_all_categories_for_product($product_id)
     {
         $sql = "delete from product_categories where product_id=$product_id";
@@ -55,17 +61,21 @@ Class Category extends CI_Model
         return $result;   
     }
 
-    function get_all_categories($store_id=0)
+    function get_all_categories($param = '')
     {
-		if($store_id)
-		{
-			$sql = "select * from categories where status=1 and store_id=$store_id" ;
-		}
-		else
-		{
-			$sql = "select * from categories where status=1" ;
-		}
         
+        $user_id = $this->session->userdata['logged_in']['user_id'];
+
+        if($param == VIEW)
+        {   
+            $sql = "SELECT name,category_id,(SELECT COUNT(category_id) FROM product_categories WHERE category_id=categories.category_id) AS total_products
+                    FROM categories WHERE user_id='$user_id'";
+        }
+
+        if($param == INSERT)
+        {
+             $sql = "SELECT name,category_id FROM categories WHERE user_id='$user_id'";
+        }
         $query = $this->db->query($sql);
         $result = $query->result_array();
         $query->free_result();
@@ -78,11 +88,16 @@ Class Category extends CI_Model
         return $this->db->insert_id();
     }
 
-    function edit_category($category_id, $data)
-    {
-        $this->db->where('category_id', $category_id);
-        $this->db->update('categories',$data);
-        return ($this->db->affected_rows() != 1) ? false : true;
+    
+
+    function edit_category($category_id)
+    {   
+        $sql = "SELECT t1.name AS category, t2.name AS parent_category,t1.parent_id AS parent_category_id 
+                FROM categories AS t1 LEFT JOIN categories AS t2 ON t2.category_id = t1.parent_id WHERE t1.category_id ='$category_id'";
+        $query = $this->db->query($sql);
+        $result = $query->result_array();
+        $query->free_result();
+        return $result;
     }
 
     function add_product_category($data)
@@ -97,72 +112,5 @@ Class Category extends CI_Model
         $this->db->update('product_categories',$data);
         return ($this->db->affected_rows() != 1) ? false : true;
     }
-
-    /*function get_admin()
-    {
-        $sql = "select * from users where email='admin@woo.com'" ;
-        $query = $this->db->query($sql);
-        $result = $query->result_array();
-        $query->free_result();
-        return $result[0];
-    }
-
-    function get_users($page)
-    {
-        $start =  $page;
-        $limit = $this->config->item('pagination_limit');
-        $sql = "select * from users where is_admin=0 order by user_id desc limit $start,$limit" ;
-        $query = $this->db->query($sql);
-        $result = $query->result_array();
-        $query->free_result();
-        return $result;
-    }
-
-    function get_complete_users()
-    {
-        $sql = "select * from users u where u.is_admin=0 and user_id not in (select user_id from stores) order by u.user_id desc " ;
-        $query = $this->db->query($sql);
-        $result = $query->result_array();
-        $query->free_result();
-        return $result;
-    }
-
-    function get_latest_five_users()
-    {
-        $sql = "select * from users where is_admin=0 order by user_id desc limit 5";
-        $query = $this->db->query($sql);
-        $result = $query->result_array();
-        $query->free_result();
-        return $result;
-    }
-
-    function deactivate_user($user_id)
-        {
-        $sql = "update users set is_active=0 where user_id=$user_id";
-        $query = $this->db->query($sql);
-
-    }
-
-    function delete_user($user_id)
-        {
-        $sql = "delete from users where user_id=$user_id";
-        $query = $this->db->query($sql);
-
-    }
-
-    function activate_user($user_id)
-    {
-        $sql = "update users set is_active=1 where user_id=$user_id";
-        $query = $this->db->query($sql);
-
-    }
-
-    function edit_user($user_id,$data)
-    {
-        $this->db->where('user_id', $user_id);
-        $this->db->update('users',$data);
-        return ($this->db->affected_rows() != 1) ? false : true;
-    }
-
-    */
 }
+?>

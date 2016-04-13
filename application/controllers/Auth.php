@@ -52,6 +52,8 @@ class Auth extends CI_Controller {
 	   {
 		    $sess_array = array();
 		    $sess_array = (array) $result[0];
+		   	$store_id = $this->user->get_user_store_id($sess_array['user_id']);
+		   	$sess_array['store_id'] = $store_id[0]['store_id'];
         	$this->session->set_userdata('logged_in', $sess_array);
 		    redirect(base_url()."index.php/admin/dashboard");
 	   }
