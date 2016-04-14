@@ -9,6 +9,18 @@ function userdata( $key, $val = null ){
   }
 }
 
+function getLoggedInUserId()
+{ 
+  $ci = &get_instance();
+  return $ci->session->userdata['logged_in']['user_id'];
+}
+
+function getLoggedInStoreId()
+{ 
+  $ci = &get_instance();
+  return $ci->session->userdata['logged_in']['store_id'];
+}
+
 function object2array($object)
 {
     return json_decode(json_encode($object), TRUE);

@@ -28,17 +28,16 @@ class Auth extends CI_Controller {
 	{
 		if($this->session->userdata('logged_in'))
 		{
-			redirect(base_url()."index.php/admin/dashboard", 'refresh');
+			redirect(site_url('admin/dashboard'), 'refresh');
 		}
 		else
 		{
-            $this->load->view('login');
+            $this->load->view('login', array("error" =>'', "username" => ''));
 		}
-
 	}
 
-	function check_database()
-	 {
+	function login()
+	{
 	   //Field validation succeeded.  Validate against database
 	   $username = $this->input->post('username');
 	   $password = $this->input->post('password');
@@ -59,11 +58,11 @@ class Auth extends CI_Controller {
 	   }
 	   else
 	   {
-			$this->load->view('login',array("error" =>"Invalid username or password"));
+			$this->load->view('login',array("error" =>"Invalid username or password", "username" => $username));
 			$this->form_validation->set_message('check_database', 'Invalid username or password');
 			return false;
-	   }
-	 }
+		}
+	}
 
     public function logout()
     {

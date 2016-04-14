@@ -46,6 +46,12 @@ Class Category extends CI_Model
         $this->db->update('categories', $data); 
     }
 
+    function delete_category($id)
+    {
+        $this->db->where('category_id', $id);
+        $this->db->delete('categories');
+    }
+
     function delete_all_categories_for_product($product_id)
     {
         $sql = "delete from product_categories where product_id=$product_id";
@@ -61,21 +67,12 @@ Class Category extends CI_Model
         return $result;   
     }
 
-    function get_all_categories($param = '')
+    function get_all_categories()
     {
         
-        $user_id = $this->session->userdata['logged_in']['user_id'];
-
-        if($param == VIEW)
-        {   
-            $sql = "SELECT name,category_id,(SELECT COUNT(category_id) FROM product_categories WHERE category_id=categories.category_id) AS total_products
-                    FROM categories WHERE user_id='$user_id'";
-        }
-
-        if($param == INSERT)
-        {
-             $sql = "SELECT name,category_id FROM categories WHERE user_id='$user_id'";
-        }
+        $user_id = getLoggedInUserId();
+        $sql = "SELECT name,category_id,(SELECT COUNT(category_id) FROM product_categories WHERE category_id=categories.category_id) AS total_products
+                FROM categories WHERE user_id='$user_id'";
         $query = $this->db->query($sql);
         $result = $query->result_array();
         $query->free_result();

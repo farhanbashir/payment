@@ -1,32 +1,31 @@
-
- 
     <div class="panel-body">
-      <h2>Bank Information</h2>
+      <h2>Receipt Designer</h2>
 	  <div class="col-md-6" style="padding-left: 0px;">
-		  <form role="form">
+		<form role="form">
+			
 			<div class="form-group">
-			  <label>Bank Name</label>
+			  <label>Header Text</label>
 			  <input type="text" class="form-control" required="">
 			</div>
+			
 			<div class="form-group">
-			  <label>Bank Address</label>
+			  <label>Footer Text</label>
 			  <input type="text" class="form-control" required="">
 			</div>
+			
 			<div class="form-group">
-			  <label>Routing No / SWIFT Code</label>
+			  <label>Background Color</label>
 			  <input type="text" class="form-control" required="">
 			</div>
+			
 			<div class="form-group">
-			  <label>Account Title</label>
+			  <label>Text Color</label>
 			  <input type="text" class="form-control" required="">
 			</div>
-			 <div class="form-group">
-			  <label>Account Number / IBAN</label>
-			  <input type="text" class="form-control" required="">
-			</div>
+			
 			<br /><br />
 			<button type="button" class="btn btn-primary btn-cons">Save</button>
 		  </form>
 	  </div>
+      
     </div>
-

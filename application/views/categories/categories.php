@@ -8,8 +8,8 @@
         <div class="panel-title"><h1>Categories</h1>
         </div>
         <div class="btn-group pull-right m-b-10">
-          <a href="<?php echo site_url('admin/categories/new_category');?>">
-            <button class="btn btn-primary btn-cons">New Category</button>
+          <a class="btn btn-primary btn-cons" href="<?php echo site_url('admin/categories/create_category');?>">
+            Add New Category
           </a>
         </div>
         <div class="clearfix"></div>
@@ -48,7 +48,7 @@
                       <a href="<?php echo site_url('admin/categories/edit_category/'.$category['category_id']);?>">
                         <button class="btn btn-primary btn-cons">Edit</button>
                       </a>
-                      <a href="<?php echo site_url('admin/categories/delete_category/'.$category['category_id']);?>">
+                      <a onclick="return confirm('Are you sure want to delete','<?php echo site_url('admin/categories/delete_category/'.$category['category_id']);?>')"href="<?php echo site_url('admin/categories/delete_category/'.$category['category_id']);?>">
                         <button class="btn btn-danger btn-cons">Delete</button>
                       </a>
                     </p>

@@ -1,0 +1,9 @@
+.nav-tabs-linetriangle > li.active > a:after
+{
+	border-top-color: #fff;
+}
+
+.no-resize
+{
+	resize: none;
+}

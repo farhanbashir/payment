@@ -15,7 +15,8 @@
     $(document).ready(function() {
 
         //Multiselect - Select2 plug-in
-        $("#multi").val(["Jim", "Lucy"]).select2();
+        // $("#multi").val(["Jim", "Lucy"]).select2();
+        //$("#multi").val([]).select2();
 
         //Date Pickers
         $('#datepicker-range, #datepicker-component, #datepicker-component2').datepicker();

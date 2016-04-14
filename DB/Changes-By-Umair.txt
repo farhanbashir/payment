@@ -182,4 +182,4 @@ CREATE TABLE IF NOT EXISTS `logs_merchant` (
 *April 05, 2016:
 =================
 ALTER TABLE `user_merchant_info` CHANGE `cx_mode` `cx_mode` TINYINT(4) NULL DEFAULT '0' COMMENT '1=live,2=sandbox';
-UPDATE `user_merchant_info` SET cx_mode=2
+UPDATE `user_merchant_info` SET cx_mode=2;

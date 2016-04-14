@@ -10,8 +10,7 @@
 
     <div class="panel panel-transparent">
         <div class="panel-heading">
-            <div class="panel-title">Merchants List
-            </div>
+            <div class="panel-title"><h1>Merchants</h1></div>
             <div class="pull-right">
                 <div class="col-xs-12">
                     <input type="text" id="search-table" class="form-control pull-right" placeholder="Search">
@@ -21,16 +20,16 @@
         </div>
         <div class="panel-body">
             <div id="tableWithSearch_wrapper" class="dataTables_wrapper form-inline no-footer">
-                <div class="table-responsive">
-                    <table class="table table-hover demo-table-search dataTable no-footer" id="tableWithSearch" role="grid" aria-describedby="tableWithSearch_info">
+                <div class="table-responsive_UJ">
+                    <table class="table table-hover demo-table-search_UJ dataTable no-footer" id="custom-datatable" role="grid" aria-describedby="tableWithSearch_info">
                         <thead>
                             <tr role="row">
-                                <th >#</th>
-                                <th class="sorting" tabindex="0" aria-controls="tableWithSearch" rowspan="1" colspan="1" aria-label="Places: activate to sort column ascending" style="width: 221px;">Email</th>
-                                <th class="sorting" tabindex="0" aria-controls="tableWithSearch" rowspan="1" colspan="1" aria-label="Activities: activate to sort column ascending" style="width: 245px;">Fisrt Name</th>
-                                <th class="sorting" tabindex="0" aria-controls="tableWithSearch" rowspan="1" colspan="1" aria-label="Status: activate to sort column ascending" style="width: 138px;">Last Name</th>
-                                <th tabindex="0" aria-controls="tableWithSearch" rowspan="1" colspan="1" aria-label="Last Update: activate to sort column ascending" style="width: 185px;">Status</th>
-                                <th aria-controls="tableWithSearch" rowspan="1" colspan="1" aria-label="Last Update: activate to sort column ascending" style="width: 185px;">Actions</th>
+                                <th width="5%">#</th>
+                                <th width="15%">Email</th>
+                                <th width="15%">Fisrt Name</th>
+                                <th width="15%">Last Name</th>
+                                <th width="10%">Status</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -61,17 +60,11 @@
                                     </td>
                                     <td class="v-align-middle semi-bold sorting_1">
                                         <p>
-                                            <a href="<?php echo base_url(); ?>index.php/admin/users/view/<?php echo $user['user_id']; ?>">View</a>
-                                            &nbsp;&nbsp;&nbsp;
-                                            <a href="<?php echo base_url(); ?>index.php/admin/users/edit/<?php echo $user['user_id']; ?>">Edit</a>
-                                            &nbsp;&nbsp;&nbsp;
-                                            <a href="<?php echo base_url(); ?>index.php/admin/users/deactive/<?php echo $user['user_id']; ?>/<?php echo ($user['status'] == 1) ? '0' : '1'; ?>" class="status_confirm">
-                                                <?php
-                                                echo ($user['status'] == 1) ? "Deactivate" : "Activate";
-                                                ?>
-                                            </a> 
-                                            &nbsp;&nbsp;&nbsp;
-                                            <a class="delete_anything" href="#">Delete</a>
+                                            <a href="Javascript: void();" class="btn btn-primary ">Edit</a>
+											
+                                            <a href="Javascript: void();" class="btn btn-danger">Delete</a>
+											
+											<a href="<?php echo site_url('admin/users/login_merchant/'.$user['user_id']);?>" class="btn btn-warning">Log-In as this Merchant</a>
                                         </p>
                                     </td>
                                 </tr>

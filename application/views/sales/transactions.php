@@ -4,172 +4,170 @@
     <!-- START PANEL -->
     <div class="panel panel-transparent">
       <div class="panel-heading">
-        <div class="panel-title">Pages Default Tables Style
-        </div>
-        <div class="btn-group pull-right m-b-10">
-          <button type="button" class="btn btn-default">Add new</button>
-          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-            <span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu" role="menu">
-            <li><a href="#">Settings</a>
-            </li>
-            <li><a href="#">Help</a>
-            </li>
-          </ul>
-        </div>
+        <div class="panel-title"><h1>Transactions</h1></div>		
+		
+		<div class="row">		
+			<div class="col-md-4">
+				<div id="datepicker-component" class="input-group date col-sm-8">
+					<input type="text" class="form-control"><span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+				</div>
+			</div>
+			<div class="btn-group pull-right m-b-10">
+				<button type="button" class="btn btn-primary">Export</button>
+			</div>
+		</div>
+       
         <div class="clearfix"></div>
       </div>
       <div class="panel-body">
         <div class="table-responsive">
-          <div id="basicTable_wrapper" class="dataTables_wrapper form-inline no-footer"><table class="table table-hover dataTable no-footer" id="basicTable" role="grid">
+          <div id="basicTable_wrapper" class="dataTables_wrapper form-inline no-footer">
+		  <table class="table table-hover dataTable no-footer" id="basicTable" role="grid">
             <thead>
-              <tr role="row"><th style="width:1%" class="sorting_disabled" rowspan="1" colspan="1" aria-label="
-                  
-                  
-                ">
-                  <button class="btn"><i class="pg-trash"></i>
-                  </button>
-                </th><th style="width: 182px;" class="sorting_desc" tabindex="0" aria-controls="basicTable" rowspan="1" colspan="1" aria-sort="descending" aria-label="Title: activate to sort column ascending">Title</th><th style="width: 184px;" class="sorting" tabindex="0" aria-controls="basicTable" rowspan="1" colspan="1" aria-label="Places: activate to sort column ascending">Places</th><th style="width: 282px;" class="sorting" tabindex="0" aria-controls="basicTable" rowspan="1" colspan="1" aria-label="Activities: activate to sort column ascending">Activities</th><th style="width: 129px;" class="sorting" tabindex="0" aria-controls="basicTable" rowspan="1" colspan="1" aria-label="Status: activate to sort column ascending">Status</th><th style="width: 130px;" class="sorting" tabindex="0" aria-controls="basicTable" rowspan="1" colspan="1" aria-label="Last Update: activate to sort column ascending">Last Update</th></tr>
+              <tr role="row">
+				<th style="width: 182px;" class="sorting_desc" tabindex="0" aria-controls="basicTable" rowspan="1" colspan="1" aria-sort="descending">Transaction ID</th>
+				
+				<th style="width: 184px;" class="sorting" tabindex="0" aria-controls="basicTable" rowspan="1" colspan="1">Amount Charged</th>
+				
+				<th style="width: 282px;" class="sorting" tabindex="0" aria-controls="basicTable" rowspan="1" colspan="1">Payment Method</th>
+				
+				<th style="width: 129px;" class="sorting" tabindex="0" aria-controls="basicTable" rowspan="1" colspan="1">API Response</th>
+				
+				<th style="width: 130px;" class="sorting" tabindex="0" aria-controls="basicTable" rowspan="1" colspan="1">Status</th>
+				
+				<th style="width: 130px;" class="sorting" tabindex="0" aria-controls="basicTable" rowspan="1" colspan="1">Details</th>
+				</tr>
             </thead>
             <tbody>
-              
-              
-              
-              
-              
-              
             <tr role="row" class="odd">
-                <td class="v-align-middle">
-                  <div class="checkbox ">
-                    <input type="checkbox" value="3" id="checkbox4">
-                    <label for="checkbox4"></label>
-                  </div>
-                </td>
+               
                 <td class="v-align-middle sorting_1">
-                  <p>Life’s sadness shared</p>
+                  <p>500000034</p>
                 </td>
                 <td class="v-align-middle">
-                  <p>United States, India, China,Africa</p>
+                  <p>$1,549</p>
                 </td>
                 <td class="v-align-middle">
-                  <p>he world speaks English. Common law, Magna Carta and the Bill of Rights are its wonderful legacy</p>
+                  <p><strong>Credit Card:</strong> XXXX-XXXX-XXXX-1111</p>
                 </td>
                 <td class="v-align-middle">
-                  <p>Public</p>
+                  <p>...</p>
                 </td>
                 <td class="v-align-middle">
-                  <p>April 13,2014 10:13</p>
+                  <span class="label label-info">SUCCESS</span>
+                </td>
+				
+				<td class="v-align-middle">
+                  <p>lorem ipsum</p>
+                </td>
+              </tr>
+			  
+			  <tr role="row" class="even">
+                
+                <td class="v-align-middle sorting_1">
+                  <p>500000033</p>
+                </td>
+                <td class="v-align-middle">
+                  <p>$300</p>
+                </td>
+               <td class="v-align-middle">
+                  <p><strong>Credit Card:</strong> XXXX-XXXX-XXXX-1112</p>
+                </td>
+                <td class="v-align-middle">
+                  <p>...</p>
+                </td>
+                <td class="v-align-middle">
+                  <span class="label label-info">SUCCESS</span>
+                </td>
+				<td class="v-align-middle">
+                  <p>lorem ipsum</p>
+                </td>
+              </tr>
+			  
+			  <tr role="row" class="odd">
+               
+                <td class="v-align-middle sorting_1">
+                  <p>500000032</p>
+                </td>
+                <td class="v-align-middle">
+                  <p>$473</p>
+                </td>
+                <td class="v-align-middle">
+                  <p><strong>Credit Card:</strong> <small>XXXX-XXXX-XXXX-1113</small></p>
+				  <p><strong>Cash:</strong> $200</p>
+                </td>
+                <td class="v-align-middle">
+                  <p>...</p>
+                </td>
+                <td class="v-align-middle">
+                  <span class="label label-info">SUCCESS</span>
+                </td>
+				<td class="v-align-middle">
+                  <p>lorem ipsum</p>
                 </td>
               </tr><tr role="row" class="even">
-                <td class="v-align-middle">
-                  <div class="checkbox ">
-                    <input type="checkbox" value="3" id="checkbox1">
-                    <label for="checkbox1"></label>
-                  </div>
-                </td>
+               
                 <td class="v-align-middle sorting_1">
-                  <p>First Tour</p>
+                  <p>500000031</p>
                 </td>
                 <td class="v-align-middle">
-                  <p>United States, India, China,Africa</p>
+                  <p>$270</p>
                 </td>
                 <td class="v-align-middle">
-                  <p>it is more then ONE nation/nationality as its fall name is The United Kingdom of Great Britain and North Ireland..</p>
+                  <p><strong>Credit Card:</strong> XXXX-XXXX-XXXX-1114</p>
                 </td>
                 <td class="v-align-middle">
-                  <p>Public</p>
+                  <p>...</p>
                 </td>
                 <td class="v-align-middle">
-                  <p>April 13,2014 10:13</p>
+                  <span class="label label-info">SUCCESS</span>
                 </td>
-              </tr><tr role="row" class="odd">
-                <td class="v-align-middle">
-                  <div class="checkbox ">
-                    <input type="checkbox" value="3" id="checkbox5">
-                    <label for="checkbox5"></label>
-                  </div>
+				<td class="v-align-middle">
+                  <p>lorem ipsum</p>
                 </td>
+              </tr>
+			  
+			  <tr role="row" class="odd">
+                
                 <td class="v-align-middle sorting_1">
-                  <p>First Tour</p>
+                  <p>500000030</p>
                 </td>
                 <td class="v-align-middle">
-                  <p>United States, India, China,Africa</p>
+                  <p>$197</p>
                 </td>
                 <td class="v-align-middle">
-                  <p>it is more then ONE nation/nationality as its fall name is The United Kingdom of Great Britain and North Ireland..</p>
+                  <p><strong>Credit Card:</strong> XXXX-XXXX-XXXX-1115</p>
                 </td>
                 <td class="v-align-middle">
-                  <p>Public</p>
+                  <p>...</p>
                 </td>
                 <td class="v-align-middle">
-                  <p>April 13,2014 10:13</p>
+                  <span class="label label-info">SUCCESS</span>
                 </td>
-              </tr><tr role="row" class="even">
-                <td class="v-align-middle">
-                  <div class="checkbox ">
-                    <input type="checkbox" value="3" id="checkbox6">
-                    <label for="checkbox6"></label>
-                  </div>
+				<td class="v-align-middle">
+                  <p>lorem ipsum</p>
                 </td>
+              </tr>
+			  
+			  <tr role="row" class="even">
+                
                 <td class="v-align-middle sorting_1">
-                  <p>First Tour</p>
+                  <p>500000029</p>
                 </td>
                 <td class="v-align-middle">
-                  <p>United States, India, China,Africa</p>
+                  <p>$864</p>
                 </td>
                 <td class="v-align-middle">
-                  <p>it is more then ONE nation/nationality as its fall name is The United Kingdom of Great Britain and North Ireland..</p>
+                  <p><strong>Credit Card:</strong> XXXX-XXXX-XXXX-1116</p>
                 </td>
                 <td class="v-align-middle">
-                  <p>Public</p>
+                  <p>...</p>
                 </td>
                 <td class="v-align-middle">
-                  <p>April 13,2014 10:13</p>
+                  <span class="label label-info">SUCCESS</span>
                 </td>
-              </tr><tr role="row" class="odd">
-                <td class="v-align-middle">
-                  <div class="checkbox ">
-                    <input type="checkbox" value="3" id="checkbox2">
-                    <label for="checkbox2"></label>
-                  </div>
-                </td>
-                <td class="v-align-middle sorting_1">
-                  <p>Among the children</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>United States, India, China,Africa</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>you want English, Scottish, Welsh, Irish, British, European or UK even a British (name other original country you came form or have roots to E.G. A British Japanese or a 5th generation</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>Public</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>April 13,2014 10:13</p>
-                </td>
-              </tr><tr role="row" class="even">
-                <td class="v-align-middle">
-                  <div class="checkbox ">
-                    <input type="checkbox" value="3" id="checkbox3">
-                    <label for="checkbox3"></label>
-                  </div>
-                </td>
-                <td class="v-align-middle sorting_1">
-                  <p>A day to remember</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>United States, India, China,Africa</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>UK was on top of the art world 18-19 century had the best food, best cloths and best entertainment back then) it was a hyper nation</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>Public</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>April 13,2014 10:13</p>
+				<td class="v-align-middle">
+                  <p>lorem ipsum</p>
                 </td>
               </tr></tbody>
           </table></div>

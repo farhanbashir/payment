@@ -1,3 +1,4 @@
+<?php global $_logged_in_role_id, $_logged_in_merchant_user_id; ?>
 <nav class="page-sidebar" data-pages="sidebar">
       <!-- BEGIN SIDEBAR MENU TOP TRAY CONTENT-->
       <div class="sidebar-overlay-slide from-top" id="appMenu">
@@ -37,61 +38,79 @@
       <!-- START SIDEBAR MENU -->
       <div class="sidebar-menu">
         <!-- BEGIN SIDEBAR MENU ITEMS-->
+		
         <ul class="menu-items">
-          <li class="m-t-30 ">
-            <a href="<?php echo site_url('admin/dashboard') ?>" class="detailed">
-              <span class="title">Home</span>
+		
+			<?php
+				if($_logged_in_role_id == CONST_ROLE_ID_SUPER_ADMIN)
+				{
+					?>
+						<li class="m-t-30 ">
+							<a href="<?php echo site_url('admin/users/index') ?>">
+							  <span class="title">Merchants</span>
+							</a>
+							<span class="<?php echo ($this->uri->segment(2) == 'users')&&($this->uri->segment(3) == 'index') ? 'bg-success' : '';?> icon-thumbnail"><i class="fa fa-user"></i></span>
+						</li>
+					<?php
+				}
+			?>
+		  
+		  <?php
+			 if( ($_logged_in_role_id == CONST_ROLE_ID_BUSINESS_ADMIN) || $_logged_in_merchant_user_id)
+			 {
+				?>
+					<li class="m-t-30 ">
+						<a href="<?php echo site_url('admin/dashboard') ?>" class="detailed">
+						  <span class="title">Home</span>
+						</a>
+						<span class="<?php echo ($this->uri->segment(2) == 'dashboard') ? 'bg-success' : '';?> icon-thumbnail"><i class="pg-home"></i></span>
+					  </li>
+					  <li>
+						<a href="javascript:;"><span class="title">Sales</span>
+						<span class=" arrow"></span></a>
+						<span class="<?php echo ($this->uri->segment(2) == 'sales') ? 'bg-success' : '';?> icon-thumbnail"><i class="fa fa-dollar"></i></span>
+						<ul class="sub-menu">
+						  <li class="">
+							<a href="<?php echo site_url('admin/sales/reports') ?>">Reports</a>
+							<span class="icon-thumbnail">R</span>
+						  </li>
+						  <li class="">
+							<a href="<?php echo site_url('admin/sales/transactions') ?>">Transactions</a>
+							<span class="icon-thumbnail">T</span>
+						  </li>
+						</ul>
+					  </li>
+					  <li class="">
+						<a href="<?php echo site_url('admin/products/index');?>">
+						  <span class="title">Products</span>
+						</a>
+						<span class="<?php echo ($this->uri->segment(2) == 'products')&&(($this->uri->segment(3) == 'index')||$this->uri->segment(3) == 'add_product')? 'bg-success' : '';?> icon-thumbnail">
+						  <i class="fa fa-product-hunt"></i>
+						</span>
+					  </li>
+					  <li class="">
+						<a href="<?php echo site_url('admin/categories');?>">
+						  <span class="title">Categories</span>
+						</a>
+						<span class="<?php echo ($this->uri->segment(2) == 'categories')||($this->uri->segment(3) == 'add_category') ? 'bg-success' : '';?> icon-thumbnail">
+						  <i class="fa fa-tags"></i>
+						</span>
+					  </li>  
+					  <li class="">
+						<a href="<?php echo site_url('admin/users/accounts') ?>">
+						  <span class="title">Settings</span>
+						</a>
+						<span class="<?php echo ($this->uri->segment(2) == 'users')&&($this->uri->segment(3) == 'accounts') ? 'bg-success' : '';?> icon-thumbnail"><i class="fa fa-edit"></i></span>
+					  </li>
+				<?php
+			 }
+		  ?>
+		  
+		  <li class="">
+            <a href="<?php echo site_url('auth/logout') ?>">
+              <span class="title">Logout</span>
             </a>
-            <span class="<?php echo ($this->uri->segment(2) == 'dashboard') ? 'bg-success' : '';?> icon-thumbnail"><i class="pg-home"></i></span>
-          </li>
-           <li class="">
-            <a href="<?php echo site_url('admin/users/index') ?>">
-              <span class="title">Merchants</span>
-            </a>
-            <span class="<?php echo ($this->uri->segment(2) == 'users')&&($this->uri->segment(3) == 'index') ? 'bg-success' : '';?> icon-thumbnail"><i class="fa fa-user"></i></span>
-          </li>
-          <li>
-            <a href="javascript:;"><span class="title">Sales</span>
-            <span class=" arrow"></span></a>
-            <span class="<?php echo ($this->uri->segment(2) == 'sales') ? 'bg-success' : '';?> icon-thumbnail"><i class="fa fa-dollar"></i></span>
-            <ul class="sub-menu">
-              <li class="">
-                <a href="<?php echo site_url('admin/sales/reports') ?>">Reports</a>
-                <span class="icon-thumbnail">R</span>
-              </li>
-              <li class="">
-                <a href="<?php echo site_url('admin/sales/transactions') ?>">Transactions</a>
-                <span class="icon-thumbnail">T</span>
-              </li>
-            </ul>
-          </li>
-          <li class="">
-            <a href="<?php echo site_url('admin/products/index');?>">
-              <span class="title">Products</span>
-            </a>
-            <span class="<?php echo ($this->uri->segment(2) == 'products')&&(($this->uri->segment(3) == 'index')||$this->uri->segment(3) == 'add_product')? 'bg-success' : '';?> icon-thumbnail">
-              <i class="fa fa-product-hunt"></i>
-            </span>
-          </li>
-          <li class="">
-            <a href="<?php echo site_url('admin/categories');?>">
-              <span class="title">Categories</span>
-            </a>
-            <span class="<?php echo ($this->uri->segment(2) == 'categories')||($this->uri->segment(3) == 'add_category') ? 'bg-success' : '';?> icon-thumbnail">
-              <i class="fa fa-tags"></i>
-            </span>
-          </li>
-          <li class="">
-            <a href="#">
-              <span class="title">Customers</span>
-            </a>
-            <span class="icon-thumbnail"><i class="fa fa-group"></i></span>
-          </li>
-          <li class="">
-            <a href="<?php echo site_url('admin/users/accounts') ?>">
-              <span class="title">Account & Setting</span>
-            </a>
-            <span class="<?php echo ($this->uri->segment(2) == 'users')&&($this->uri->segment(3) == 'accounts') ? 'bg-success' : '';?> icon-thumbnail"><i class="fa fa-edit"></i></span>
+            <span class="icon-thumbnail"><i class="fa pg-power"></i></span>
           </li>
         </ul>
         <div class="clearfix"></div>
