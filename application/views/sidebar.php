@@ -97,10 +97,10 @@
 						</span>
 					  </li>  
 					  <li class="">
-						<a href="<?php echo site_url('admin/users/accounts') ?>">
+						<a href="<?php echo site_url('admin/settings') ?>">
 						  <span class="title">Settings</span>
 						</a>
-						<span class="<?php echo ($this->uri->segment(2) == 'users')&&($this->uri->segment(3) == 'accounts') ? 'bg-success' : '';?> icon-thumbnail"><i class="fa fa-edit"></i></span>
+						<span class="<?php echo ($this->uri->segment(2) == 'settings') ? 'bg-success' : '';?> icon-thumbnail"><i class="fa fa-edit"></i></span>
 					  </li>
 				<?php
 			 }

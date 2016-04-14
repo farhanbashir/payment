@@ -82,7 +82,8 @@ class Users extends CI_Controller {
         $this->load->view('welcome_message', array('content' => $content));
     }
 
-    public function update() {
+    public function update() 
+    {
         $username = $this->input->post('username');
         $new_password = $this->input->post('password');
         $email = $username;

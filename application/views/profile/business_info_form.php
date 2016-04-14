@@ -1,51 +1,63 @@
+<?php
+$business_name = $business_info[0]['name'];
+$description = $business_info[0]['description'];
+$email = $business_info[0]['email'];
+$phone = $business_info[0]['phone'];
+$logo = $business_info[0]['logo'];
+$address = $business_info[0]['address'];
+$facebook = $business_info[0]['facebook'];
+$twitter = $business_info[0]['twitter'];
+$website = $business_info[0]['website'];
 
- 
-    <div class="panel-body">
-      <h2>Business Information</h2>
-	  <div class="col-md-6" style="padding-left: 0px;">
-		<form role="form">
+?>
+
+<div class="panel-body">
+	<h2>Business Information</h2>
+	<div class="col-md-6" style="padding-left: 0px;">
+		<form role="form" method ="post"action="<?php echo $business_info_form_url;?>" enctype="multipart/form-data" accept-charset="utf-8">
 			<div class="form-group">
-			  <label>Logo</label>
-			  <input type="file" class="form-control" required="">
-			  <br /><br />
-			  <img src="<?php echo asset_url('img/company-logo.jpg');?>" width="150" />
+				<label>Logo</label>
+				<input type="file" name="image" class="form-control">
+				<input type="hidden" name="old-image" value="<?php echo $logo;?>">
+				<br /><br />
+				<img src="<?php echo $logo;?>" width="150" />
 			</div>
 			<div class="form-group">
-			  <label>Business Name</label>
-			  <input type="text" class="form-control" required="">
+				<label>Business Name</label>
+				<input name="business" value="<?php echo $business_name;?>" type="text" class="form-control" required="">
 			</div>
 			<div class="form-group">
-			  <label>Description</label>
-			  <textarea type="text" class="form-control no-resize" rows="8"></textarea>
+				<label>Description</label>
+				<textarea name="description" type="text" class="form-control no-resize" rows="8"><?php echo $description;?></textarea>
 			</div>
 			<div class="form-group">
-			  <label>Email</label>
-			  <span class="help">e.g. "abcd@hotmail.com"</span>
-			  <input type="email" class="form-control" required="">
+				<label>Email</label>
+				<span class="help">e.g. "abcd@hotmail.com"</span>
+				<input name="email" value="<?php echo $email;?>"type="email" class="form-control" required="">
 			</div>
 			<div class="form-group">
-			  <label>Phone</label>
-			  <input type="text" class="form-control" required="">
+				<label>Phone</label>
+				<input name="phone" value="<?php echo $phone;?>" type="text" class="form-control" required="">
 			</div>
 			<div class="form-group">
-			  <label>Address</label>
-			  <input type="text" class="form-control">
+				<label>Address</label>
+				<input name="address" value="<?php echo $address;?>" type="text" class="form-control">
 			</div>
 			<div class="form-group">
-			  <label>Facebook</label>
-			  <input type="text" class="form-control">
+				<label>Facebook</label>
+				<input name="facebook" value="<?php echo $facebook;?>" type="text" class="form-control">
 			</div>
 			<div class="form-group">
-			  <label>Twitter</label>
-			  <input type="text" class="form-control">
+				<label>Twitter</label>
+				<input  name="twitter" value="<?php echo $twitter;?>" type="text" class="form-control">
 			</div>
 			<div class="form-group">
-			  <label>Website</label>
-			  <input type="text" class="form-control">
+				<label>Website</label>
+				<input name="website" value="<?php echo $website;?>" type="text" class="form-control">
 			</div>
 			<br /><br />
-			<button type="button" class="btn btn-primary btn-cons">Save</button>
-		  </form>
-	  </div>
-      
-    </div>
+			<button type="submit" class="btn btn-primary btn-cons">Save</button>
+		</form>
+	</div>
+
+</div>
