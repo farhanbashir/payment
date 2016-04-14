@@ -9,6 +9,13 @@ $account_title = $bank_info[0]['account_title'];
 <div class="panel-body">
 	<h2>Bank Information</h2>
 	<div class="col-md-6" style="padding-left: 0px;">
+		<?php if($this->session->flashdata('MessageTab3')!='')
+	    {?>   
+	        <div class="alert alert-success">
+	          <strong>Success!</strong>&nbsp;&nbsp;<?php echo $this->session->flashdata('MessageTab3');?>
+	        </div>
+	        <?php 
+	    }?>
 		<form role="form" action="<?php echo $bank_info_form_url;?>" method="post">
 			<div class="form-group">
 				<label>Bank Name</label>

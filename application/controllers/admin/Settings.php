@@ -13,6 +13,7 @@ Class Settings extends CI_Controller
 
    	function index()
    	{	
+   		
    		$data = array();
    		$data['basic_info'] = $this->Setting->get_user_basic_info();
    		$data['security_questions'] = $this->Setting->get_security_questions();
@@ -76,7 +77,7 @@ Class Settings extends CI_Controller
 		}
 		if(isset($ErrorMessage) && $ErrorMessage!='')
 		{
-			$this->session->set_flashdata('ErrorMessage','Passwords does not match');
+			$this->session->set_flashdata('ErrorMessageTab1','Passwords does not match');
 				$data['basic_info'] = $ArrFormValues;
 				$data['security_questions'] = $this->Setting->get_security_questions();
 	   			$data['basic_info_form_url'] = site_url('admin/settings/update_basic_info');
@@ -92,7 +93,7 @@ Class Settings extends CI_Controller
 		{
 			$this->Setting->update_basic_info($data);
 			$this->Setting->update_security_info($ArrSeurityInfo);
-			$this->session->set_flashdata('Message','Basic Information updated successfully');
+			$this->session->set_flashdata('MessageTab1','Basic Information updated successfully');
 			redirect('admin/settings','refresh');
    		}
    	}
@@ -120,7 +121,7 @@ Class Settings extends CI_Controller
 			$load =$this->upload->initialize($config);
 			if ( ! $this->upload->do_upload("image"))
 			{
-				$this->session->set_flashdata('ErrorMessage','Image Uploading Faild');
+				$this->session->set_flashdata('ErrorMessageTab2','Image Uploading Faild');
 				$data['basic_info'] = $this->Setting->get_user_basic_info();
 		   		$data['security_questions'] = $this->Setting->get_security_questions();
 		   		$data['basic_info_form_url'] = site_url('admin/settings/update_basic_info');
@@ -152,7 +153,7 @@ Class Settings extends CI_Controller
 			$data['logo']=base_url().CONST_IMAGE_UPLOAD_DIR.$file_name['file_name'];
 		}
 		$this->Setting->update_business_info($data);
-		$this->session->set_flashdata('Message','Business Information updated successfully');
+		$this->session->set_flashdata('MessageTab2','Business Information updated successfully');
 		redirect('admin/settings','refresh');
 
    	}
@@ -169,7 +170,7 @@ Class Settings extends CI_Controller
 			'updated'				=> date("Y-m-d H:i:s"),
 		);
 		$this->Setting->update_bank_info($data);
-		$this->session->set_flashdata('Message','Bank Information updated successfully');
+		$this->session->set_flashdata('MessageTab3','Bank Information updated successfully');
 		redirect('admin/settings','refresh');
 
    	}
@@ -185,7 +186,7 @@ Class Settings extends CI_Controller
 			'updated'				=> date("Y-m-d H:i:s"),
 		);
 		$this->Setting->update_business_info($data);
-		$this->session->set_flashdata('Message','Receipt Designing updated successfully');
+		$this->session->set_flashdata('MessageTab4','Receipt Designing updated successfully');
 		redirect('admin/settings','refresh');
    	}
 }

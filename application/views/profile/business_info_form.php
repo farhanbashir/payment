@@ -14,6 +14,20 @@ $website = $business_info[0]['website'];
 <div class="panel-body">
 	<h2>Business Information</h2>
 	<div class="col-md-6" style="padding-left: 0px;">
+		<?php if($this->session->flashdata('ErrorMessageTab2')!='')
+	    {?>   
+	        <div class="alert alert-danger">
+	          <strong>Alert!</strong>&nbsp;&nbsp;<?php echo $this->session->flashdata('ErrorMessageTab2');?>
+	        </div>
+	        <?php 
+	    }?>
+	    <?php if($this->session->flashdata('MessageTab2')!='')
+	    {?>   
+	        <div class="alert alert-success">
+	          <strong>Success!</strong>&nbsp;&nbsp;<?php echo $this->session->flashdata('MessageTab2');?>
+	        </div>
+	        <?php 
+	    }?>
 		<form role="form" method ="post"action="<?php echo $business_info_form_url;?>" enctype="multipart/form-data" accept-charset="utf-8">
 			<div class="form-group">
 				<label>Logo</label>

@@ -8,6 +8,13 @@ $receipt_text_color  = $business_info[0]['receipt_text_color'];
 <div class="panel-body">
 	<h2>Receipt Designer</h2>
 	<div class="col-md-6" style="padding-left: 0px;">
+		<?php if($this->session->flashdata('MessageTab4')!='')
+	    {?>   
+	        <div class="alert alert-success">
+	          <strong>Success!</strong>&nbsp;&nbsp;<?php echo $this->session->flashdata('MessageTab4');?>
+	        </div>
+	        <?php 
+	    }?>
 		<form role="form" method="post" action="<?php echo $receipt_designer_form_url;?>">
 			
 			<div class="form-group">
