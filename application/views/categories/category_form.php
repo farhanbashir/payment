@@ -18,7 +18,7 @@ if(isset($edit_data) && is_array($edit_data))
       <h1>
        <?php echo $form_title;?>
       </h1>
-      <form role="form" method="post" action='<?php echo $url;?>'>
+      <form role="form" method="post" action='<?php echo $form_url;?>'>
         <div class="form-group">
           <label>Category Name</label>
           <span class="help">e.g. "T-Shirt"</span>
@@ -36,9 +36,11 @@ if(isset($edit_data) && is_array($edit_data))
                 <option selected value="<?php echo $child_category_id?>"><?php echo $parent_category;?></option>
                 <?php
               }
-              ?>
-              <option value="<?php echo $category['category_id'];?>"><?php echo $category['name'];?></option>
-              <?php
+              if($category['name']!=$category_name)
+              {?>
+                <option value="<?php echo $category['category_id'];?>"><?php echo $category['name'];?></option>
+                <?php
+              }
             }?>
           </select>
         </div>

@@ -25,7 +25,7 @@ class Categories extends CI_Controller
         $data['form_title'] = "Add Category";
         $data['button_title'] = "Create a new Category";
         $data['categories'] = $this->Category->get_all_categories();
-        $data['url'] = site_url('admin/categories/category_form');
+        $data['form_url'] = site_url('admin/categories/add_category');
         $content = $this->load->view('categories/category_form', $data, true);
         $this->load->view('main', array('content' => $content));
     }
@@ -64,7 +64,7 @@ class Categories extends CI_Controller
         $data['button_title'] = "Edit Category";
 		$data['id']= $category_id;
 		$data['edit_data'] = $this->Category->edit_category($category_id);
-        $data['url'] = site_url('admin/categories/update_category/'.$category_id);
+        $data['form_url'] = site_url('admin/categories/update_category/'.$category_id);
         $data['categories'] = $this->Category->get_all_categories();
         $content = $this->load->view('categories/category_form', $data, true);
         $this->load->view('main', array('content' => $content));
