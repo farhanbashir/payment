@@ -46,7 +46,7 @@ class Dashboard extends CI_Controller {
       echo $this->google->getLibraryVersion();
       $client = new Google_Client();
       $client->setAuthConfigFile(APPPATH.'third_party\Google\client_secrets.json');
-$client->addScope(Google_Service_Drive::DRIVE_METADATA_READONLY);
+      $client->addScope(Google_Service_Drive::DRIVE_METADATA_READONLY);
       debug('here',1);
     }
 

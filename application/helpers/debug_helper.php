@@ -12,12 +12,32 @@ function userdata( $key, $val = null ){
 function getLoggedInUserId()
 { 
   $ci = &get_instance();
+
+  $sess_logged_in_merchant = $ci->session->userdata('logged_in_merchant');
+  if($sess_logged_in_merchant)
+  {       
+    $_logged_in_merchant_user_id = @$sess_logged_in_merchant['user_id'];
+    
+    return $_logged_in_merchant_user_id;
+  }
+  
   return $ci->session->userdata['logged_in']['user_id'];
 }
 
 function getLoggedInStoreId()
-{ 
+{
   $ci = &get_instance();
+  
+  $sess_logged_in_merchant = $ci->session->userdata('logged_in_merchant');
+
+
+  if($sess_logged_in_merchant)
+  {       
+    $_logged_in_merchant_user_id = @$sess_logged_in_merchant['store_id'];
+    
+    return $_logged_in_merchant_user_id;
+  }
+  
   return $ci->session->userdata['logged_in']['store_id'];
 }
 

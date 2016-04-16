@@ -12,7 +12,9 @@ class Categories extends CI_Controller
     }
 
     function index()
-    {
+    {   
+
+       
     	$data = array();
 	    $data['categories'] = $this->Category->get_all_categories();
 	    $content = $this->load->view('categories/categories', $data, true);

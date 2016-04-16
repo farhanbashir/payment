@@ -71,7 +71,7 @@ Class Category extends CI_Model
     {
         
         $user_id = getLoggedInUserId();
-        $sql = "SELECT name,category_id,(SELECT COUNT(category_id) FROM product_categories WHERE category_id=categories.category_id) AS total_products
+        $sql = "SELECT name,category_id,parent_id,(SELECT COUNT(category_id) FROM product_categories WHERE category_id=categories.category_id) AS total_products
                 FROM categories WHERE user_id='$user_id'";
         $query = $this->db->query($sql);
         $result = $query->result_array();

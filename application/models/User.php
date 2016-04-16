@@ -129,14 +129,22 @@ Class User extends CI_Model
 
     function checkUserById($user_id)
     {
-        $this -> db -> select('user_id, password, first_name, last_name, email, role_id, status');
+        /*$this -> db -> select('user_id, password, first_name, last_name, email, role_id, status');
         $this -> db -> from('users');
         $this -> db -> where('user_id', $user_id);
+        $this -> db ->join('user_stores', 'user_stores.user_id = users.user_id',left);*/
         //$this -> db -> where('is_admin', $is_admin);
         //$this -> db -> where('password', $password);
-        $this -> db -> limit(1);
+        //$this -> db -> limit(1);
 
-        $query = $this -> db -> get();
+        //$query = $this -> db -> get();
+
+        $SQL = "SELECT t1.user_id,t1.password,t1.first_name,t1.last_name,t1.email,t1.role_id,t1.status,t2.store_id
+                FROM users AS t1
+                LEFT JOIN user_stores AS t2 ON t2.user_id = t1.user_id
+                WHERE t1.user_id ='$user_id'";
+
+        $query = $this -> db -> query($SQL);
 
         if($query -> num_rows() == 1)
         {
