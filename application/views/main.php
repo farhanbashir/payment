@@ -190,12 +190,29 @@
 				table.fnFilter($(this).val());
 			});			
 		});
-                //$("#multi").val([<?php echo implode(', ', $ArrEditCategoriesId);?>]).select2();
-                //$("#multi").val(["1", "5"]).select2();
 	</script>
 	
     <script src="<?php echo asset_url('js/demo.js');?>" type="text/javascript"></script>
     <script src="<?php echo asset_url('js/datatables.js');?>" type="text/javascript"></script>
+	
+	<script type="text/javascript">
+		function openPopupForOrderDetails(order_id)
+		{
+			jQuery.ajax({
+				url: '<?php echo site_url('admin/sales/popup_order/') ?>/'+order_id,
+				success: function(data)
+				{
+					if(data)
+					{
+						$("#modal-wrapper").html(data);
+						$('#modal').modal('show');
+					}
+				}
+			});
+			
+			return false;
+		}
+	</script>
 	
 	
     <!-- END PAGE LEVEL JS -->

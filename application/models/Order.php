@@ -27,6 +27,20 @@ Class Order extends CI_Model
         $query->free_result();
         return $result;
     }
+	
+	 function get_all_order_transactions_by_user($user_id)
+    {
+        $sql = "SELECT o.*, t.*
+				FROM orders o, transactions t 
+				WHERE o.order_id=t.order_id 
+				  AND t.type='". CONST_TRANSACTION_TYPE_PAYMENT ."' 
+				  AND o.user_id='". $user_id ."'  
+				ORDER BY o.order_id DESC " ;
+        $query = $this->db->query($sql);
+        $result = $query->result_array();
+        $query->free_result();
+        return $result;
+    }
 
     function get_products_by_category($category_id)
     {
@@ -84,7 +98,8 @@ where t.order_id=$order_id";
 	function get_payment_transaction_by_order($order_id)
     {
 		$sql = "SELECT 
-						t.amount_cc, t.amount_cash, t.is_cc_swipe, t.cc_number, 
+						t.amount_cc, t.amount_cash, t.is_cc_swipe, 
+						t.cc_name, t.cc_number, t.cc_expiry_year, t.cc_expiry_month, t.cc_code, 
 						cx_transaction_id, t.created 
 				FROM transactions t 
 				INNER JOIN orders o ON t.order_id=o.order_id
@@ -98,6 +113,29 @@ where t.order_id=$order_id";
 		{
 			$query->free_result();
 			return $result[0];
+		}
+		else			
+		{
+			return false;
+		}
+    }
+	
+	function get_refund_transactions_by_order($order_id)
+    {
+		$sql = "SELECT 
+						t.amount_cc, t.amount_cash, cx_transaction_id, t.created 
+				FROM transactions t 
+				INNER JOIN orders o ON t.order_id=o.order_id
+				WHERE t.order_id='". $order_id ."' 
+				  AND t.type='". CONST_TRANSACTION_TYPE_REFUND ."'";
+
+        $query = $this->db->query($sql);
+        $result = $query->result_array();
+        
+		if($result)
+		{
+			$query->free_result();
+			return $result;
 		}
 		else			
 		{

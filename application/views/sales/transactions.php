@@ -24,152 +24,95 @@
           <div id="basicTable_wrapper" class="dataTables_wrapper form-inline no-footer">
 		  <table class="table table-hover dataTable no-footer" id="basicTable" role="grid">
             <thead>
-              <tr role="row">
-				<th style="width: 182px;" class="sorting_desc" tabindex="0" aria-controls="basicTable" rowspan="1" colspan="1" aria-sort="descending">Transaction ID</th>
-				
-				<th style="width: 184px;" class="sorting" tabindex="0" aria-controls="basicTable" rowspan="1" colspan="1">Amount Charged</th>
-				
-				<th style="width: 282px;" class="sorting" tabindex="0" aria-controls="basicTable" rowspan="1" colspan="1">Payment Method</th>
-				
-				<th style="width: 129px;" class="sorting" tabindex="0" aria-controls="basicTable" rowspan="1" colspan="1">API Response</th>
-				
-				<th style="width: 130px;" class="sorting" tabindex="0" aria-controls="basicTable" rowspan="1" colspan="1">Status</th>
-				
-				<th style="width: 130px;" class="sorting" tabindex="0" aria-controls="basicTable" rowspan="1" colspan="1">Details</th>
+				<tr role="row">
+					<th >Order ID</th>
+					
+					<th>Amount Charged</th>
+					
+					<th>Payment Method</th>
+					
+					<th>Custom Info</th>
+					
+					<th>Date</th>
+					
+					<th>Actions</th>
 				</tr>
             </thead>
             <tbody>
-            <tr role="row" class="odd">
-               
-                <td class="v-align-middle sorting_1">
-                  <p>500000034</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>$1,549</p>
-                </td>
-                <td class="v-align-middle">
-                  <p><strong>Credit Card:</strong> XXXX-XXXX-XXXX-1111</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>...</p>
-                </td>
-                <td class="v-align-middle">
-                  <span class="label label-info">SUCCESS</span>
-                </td>
-				
-				<td class="v-align-middle">
-                  <p>lorem ipsum</p>
-                </td>
-              </tr>
-			  
-			  <tr role="row" class="even">
-                
-                <td class="v-align-middle sorting_1">
-                  <p>500000033</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>$300</p>
-                </td>
-               <td class="v-align-middle">
-                  <p><strong>Credit Card:</strong> XXXX-XXXX-XXXX-1112</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>...</p>
-                </td>
-                <td class="v-align-middle">
-                  <span class="label label-info">SUCCESS</span>
-                </td>
-				<td class="v-align-middle">
-                  <p>lorem ipsum</p>
-                </td>
-              </tr>
-			  
-			  <tr role="row" class="odd">
-               
-                <td class="v-align-middle sorting_1">
-                  <p>500000032</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>$473</p>
-                </td>
-                <td class="v-align-middle">
-                  <p><strong>Credit Card:</strong> <small>XXXX-XXXX-XXXX-1113</small></p>
-				  <p><strong>Cash:</strong> $200</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>...</p>
-                </td>
-                <td class="v-align-middle">
-                  <span class="label label-info">SUCCESS</span>
-                </td>
-				<td class="v-align-middle">
-                  <p>lorem ipsum</p>
-                </td>
-              </tr><tr role="row" class="even">
-               
-                <td class="v-align-middle sorting_1">
-                  <p>500000031</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>$270</p>
-                </td>
-                <td class="v-align-middle">
-                  <p><strong>Credit Card:</strong> XXXX-XXXX-XXXX-1114</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>...</p>
-                </td>
-                <td class="v-align-middle">
-                  <span class="label label-info">SUCCESS</span>
-                </td>
-				<td class="v-align-middle">
-                  <p>lorem ipsum</p>
-                </td>
-              </tr>
-			  
-			  <tr role="row" class="odd">
-                
-                <td class="v-align-middle sorting_1">
-                  <p>500000030</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>$197</p>
-                </td>
-                <td class="v-align-middle">
-                  <p><strong>Credit Card:</strong> XXXX-XXXX-XXXX-1115</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>...</p>
-                </td>
-                <td class="v-align-middle">
-                  <span class="label label-info">SUCCESS</span>
-                </td>
-				<td class="v-align-middle">
-                  <p>lorem ipsum</p>
-                </td>
-              </tr>
-			  
-			  <tr role="row" class="even">
-                
-                <td class="v-align-middle sorting_1">
-                  <p>500000029</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>$864</p>
-                </td>
-                <td class="v-align-middle">
-                  <p><strong>Credit Card:</strong> XXXX-XXXX-XXXX-1116</p>
-                </td>
-                <td class="v-align-middle">
-                  <p>...</p>
-                </td>
-                <td class="v-align-middle">
-                  <span class="label label-info">SUCCESS</span>
-                </td>
-				<td class="v-align-middle">
-                  <p>lorem ipsum</p>
-                </td>
-              </tr></tbody>
+			
+			<?php
+			
+				if(isset($orders))
+				{
+					if(is_array($orders) && count($orders) > 0)
+					{
+						foreach($orders as $orderInfo)
+						{
+							$order_id = $orderInfo['order_id']; 
+							
+							?>
+								<tr role="row" class="odd">
+
+									<td class="v-align-middle sorting_1">
+										<p><?php echo $order_id; ?></p>
+									</td>
+									<td class="v-align-middle">
+										<p>$ <?php echo $orderInfo['total_amount']; ?></p>
+									</td>
+									<td class="v-align-middle">
+										<?php
+											$amount_cash = $orderInfo['amount_cash'];
+											
+											if($amount_cash > 0)
+											{
+												?><p><strong>Cash:</strong> $<?php echo $amount_cash; ?></p><?php
+											}
+											
+											$amount_cc = $orderInfo['amount_cc'];
+											
+											if($amount_cc > 0)
+											{
+												?>
+													<p>
+														<strong>Credit Card:</strong> $<?php echo $amount_cc; ?> 
+														<br /> 
+														<span class="small" style="font-size: 10px;"><?php echo $orderInfo['cc_number']; ?></span>
+													</p>
+												<?php
+											}
+										?>
+									</td>
+									<td class="v-align-middle">
+										<p>
+											<strong>Email:</strong> <?php echo $orderInfo['customer_email']; ?><br />
+											<strong>Phone:</strong> <?php echo $orderInfo['customer_phone']; ?><br />
+											<strong>State:</strong> <?php echo $orderInfo['customer_state']; ?><br />
+											<strong>City:</strong> <?php echo $orderInfo['customer_city']; ?><br />
+											<strong>Address:</strong> <?php echo trim($orderInfo['customer_address1'].' '.$orderInfo['customer_address2']); ?><br />
+											<strong>Zipcode:</strong> <?php echo trim($orderInfo['customer_zipcode']); ?><br />
+										</p>
+									</td>
+									<td class="v-align-middle">
+										<p><?php echo $orderInfo['created']; ?></p>
+									</td>
+									<!--<td class="v-align-middle">
+										<span class="label label-info">SUCCESS</span>
+									</td>-->
+									<td class="v-align-middle">
+										<p>
+											<a href="#<?php echo $order_id; ?>" class="btn btn-primary" onclick="Javascript: return openPopupForOrderDetails('<?php echo $order_id; ?>');">View Details</a>
+											
+											<a href="Javascript: void();" class="btn btn-info">View Receipt</a>
+										</p>
+									</td>
+								</tr>
+								
+							<?php
+						}						
+					}
+				}
+			?>
+			</tr></tbody>
           </table></div>
         </div>
       </div>
@@ -178,3 +121,5 @@
   </div>
   <!-- END CONTAINER FLUID -->
 </div>
+
+<div id="modal-wrapper"></div>

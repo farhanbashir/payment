@@ -27,6 +27,10 @@ class Sales extends CI_Controller {
         if (!$this->session->userdata('logged_in')) {
             redirect(base_url());
         }
+		
+		$this->load->model('user','',TRUE);
+        $this->load->model('product','',TRUE);
+		$this->load->model('order','',TRUE);
     }
 
     public function index() {
@@ -57,10 +61,34 @@ class Sales extends CI_Controller {
         // $data['total_stores'] = $this->store->get_total_stores();
         // $data['latest_five_users'] = $this->user->get_latest_five_users();
         // $data['latest_five_stores'] = $this->store->get_latest_five_stores();
+		
+		$user_id = 59;
+		
+		$orders = $this->order->get_all_order_transactions_by_user($user_id);
+		
+		$data['orders'] = $orders;
 
         $content = $this->load->view('sales/transactions.php', $data, true);
         $this->load->view('main', array('content' => $content));
     }
+	
+	public function popup_order($order_id=0)
+	{
+		$orderInfo				= $this->order->get_order_detail($order_id);
+		$paymentTransaction 	= $this->order->get_payment_transaction_by_order($order_id);
+		$products 				= $this->product->get_order_products($order_id);
+		$refundTransaction		= $this->order->get_refund_transactions_by_order($order_id);
+		
+		$data = array();
+		
+		$data['order_id'] 			= $order_id;
+		$data['products'] 			= $products;
+		$data['orderInfo'] 			= $orderInfo;
+		$data['paymentTransaction'] = $paymentTransaction;		
+		$data['refundTransaction'] 	= $refundTransaction;
+		
+        $this->load->view('sales/popup_order.php', $data);
+	}
 
     public function change_password()
     {

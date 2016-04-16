@@ -16,14 +16,14 @@
             </li>
           </ul><div class="panel-group visible-xs" id="WzDfD-accordion"></div>
           <div class="tab-content">
-            <div class="tab-pane active" id="basic-info">
+            <div class="tab-pane " id="basic-info">
               <div class="row column-seperation">
                 <div class="col-md-12">
                   <?php $this->load->view('profile/basic_info_form');?>
                 </div>
               </div>
               </div>
-              <div class="tab-pane" id="business-info">
+              <div class="tab-pane active" id="business-info">
                 <div class="row">
                    <div class="col-md-12">
                       <?php $this->load->view('profile/business_info_form');?>
