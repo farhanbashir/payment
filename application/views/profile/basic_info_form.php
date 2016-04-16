@@ -8,17 +8,17 @@ $security_answer = $basic_info[0]['security_answer'];
 <div class="panel-body">
 	<h2>Personal Information</h2>
 	<div class="col-md-6" style="padding-left: 0px;">
-		<?php if($this->session->flashdata('ErrorMessage')!='')
+		<?php if($this->session->flashdata('ErrorMessageTab1')!='')
 	    {?>   
 	        <div class="alert alert-danger">
-	          <strong>Alert!</strong>&nbsp;&nbsp;<?php echo $this->session->flashdata('ErrorMessage');?>
+	          <strong>Alert!</strong>&nbsp;&nbsp;<?php echo $this->session->flashdata('ErrorMessageTab1');?>
 	        </div>
 	        <?php 
 	    }?>
-	    <?php if($this->session->flashdata('Message')!='')
+	    <?php if($this->session->flashdata('MessageTab1')!='')
 	    {?>   
 	        <div class="alert alert-success">
-	          <strong>Success!</strong>&nbsp;&nbsp;<?php echo $this->session->flashdata('Message');?>
+	          <strong>Success!</strong>&nbsp;&nbsp;<?php echo $this->session->flashdata('MessageTab1');?>
 	        </div>
 	        <?php 
 	    }?>
