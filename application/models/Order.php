@@ -19,9 +19,68 @@ Class Order extends CI_Model
 		}
     }
 
-    function get_all_orders_by_user($user_id)
+    function get_all_orders_by_user($user_id, $filters=array())
     {
-        $sql = "select * from orders where user_id=$user_id" ;
+		$from_date = '';
+		$to_date = '';
+		
+		if(is_array($filters) && count($filters) > 0)
+		{
+			if(isset($filters['from_date']))
+			{
+				$from_date = $filters['from_date'];
+				
+				if($from_date)
+				{
+					$from_date = date('Y-m-d', strtotime($from_date));
+				}
+			}
+			
+			if(isset($filters['to_date']))
+			{
+				$to_date = $filters['to_date'];
+				
+				if($to_date)
+				{
+					$to_date = date('Y-m-d', strtotime($to_date));
+				}
+			}
+		}
+		
+		$arrWhere = array();
+		
+		if($from_date)
+		{
+			//-->$arrWhere[] = " ( created >= '". $from_date ."' ) ";
+			
+			$arrWhere[] = " ( DATE_FORMAT(created, '%Y-%m-%d') >= DATE_FORMAT('". $from_date ."', '%Y-%m-%d') ) ";
+		}
+		
+		if($to_date)
+		{
+			//-->$arrWhere[] = " ( created <= '". $to_date ."' ) ";
+			
+			$arrWhere[] = " ( DATE_FORMAT(created, '%Y-%m-%d') <= DATE_FORMAT('". $to_date ."', '%Y-%m-%d') ) ";
+		}
+		
+		$where = '';
+		if(is_array($arrWhere) && count($arrWhere) > 0)
+		{
+			$where = implode(' AND ', $arrWhere);
+			
+			if($where)
+			{
+				//-->$where = ' WHERE '.$where;
+				$where = ' AND  '.$where;
+			}
+		}
+		
+		
+        $sql = "SELECT * 
+				FROM orders 
+				WHERE user_id='". $user_id ."' ". $where. " 
+				ORDER BY order_id DESC ";
+		
         $query = $this->db->query($sql);
         $result = $query->result_array();
         $query->free_result();

@@ -1459,6 +1459,7 @@ class Api extends REST_Controller {
 		$customer_info		= @$input_data['customer_info'];
 		
 		$customer_country 	= CONST_DEFAULT_COUNTRY;
+		$customer_name 		= @$customer_info['name'];
 		$customer_email 	= @$customer_info['email'];
 		$customer_address1 	= @$customer_info['address1'];
 		$customer_address2 	= @$customer_info['address2'];
@@ -1621,6 +1622,11 @@ class Api extends REST_Controller {
 		
 		if($apiStatus)
 		{
+			if(!$customer_name)
+			{
+				$customer_name = $cc_name;
+			}
+			
 			$customer_id = 0;
 			$isNewCustomer = false;
 			if($customer_email)
@@ -1636,6 +1642,7 @@ class Api extends REST_Controller {
 					$isNewCustomer = true;
 					
 					$customer_data = array(
+											'name' 				=> $customer_name,
 											'email' 			=> $customer_email,
 											'created_order_id'	=> 0,
 											'created_store_id'	=> $this->store_id,
@@ -1665,6 +1672,7 @@ class Api extends REST_Controller {
 									"total_amount"			=> $total_amount,
 									"created"				=> $created,									
 									"customer_id"			=> $customer_id,
+									"customer_name"			=> $customer_name,
 									"customer_email"		=> $customer_email,
 									"customer_phone"		=> $customer_phone,
 									"customer_country"		=> $customer_country,
@@ -1815,6 +1823,7 @@ class Api extends REST_Controller {
 		$order_id 			= $this->post('order_id');
 		
 		$customer_country 	= CONST_DEFAULT_COUNTRY;
+		$customer_name 		= $this->post('name');
 		$customer_email 	= $this->post('email');
 		$customer_address1 	= $this->post('address1');
 		$customer_address2 	= $this->post('address2');
@@ -1847,12 +1856,23 @@ class Api extends REST_Controller {
 			$this->response($data, 200);   
 		}
 		
+		/*
+		if(!$customer_name)
+		{
+			$data["header"]["error"] = "1";
+            $data["header"]["message"] = "Customer name is required";
+            $this->response($data, 200);
+		}
+		*/
+		
+		/*
 		if(!$customer_email)
 		{
 			$data["header"]["error"] = "1";
             $data["header"]["message"] = "Customer email address is required";
             $this->response($data, 200);
 		}
+		*/
 		
 		if($customer_email)
 		{
@@ -1879,6 +1899,7 @@ class Api extends REST_Controller {
 				$isNewCustomer = true;
 				
 				$customer_data = array(
+										'name' 				=> $customer_name,
 										'email' 			=> $customer_email,
 										'created_order_id'	=> $order_id,
 										'created_store_id'	=> $this->store_id,
@@ -1904,6 +1925,7 @@ class Api extends REST_Controller {
 		
 		$order_data = array(
 								"customer_id"			=> $customer_id,
+								"customer_name"			=> $customer_name,
 								"customer_email"		=> $customer_email,
 								"customer_phone"		=> $customer_phone,
 								"customer_country"		=> $customer_country,
@@ -1930,7 +1952,14 @@ class Api extends REST_Controller {
 
     function getOrdersByUser_post()
     {
-        $orders = $this->order->get_all_orders_by_user($this->user_id);
+		$from_date 	= $this->post('from_date');
+		$to_date 	= $this->post('to_date');
+		
+		$filters = array();
+		$filters['from_date'] 	= $from_date;
+		$filters['to_date'] 	= $to_date;
+		
+        $orders = $this->order->get_all_orders_by_user($this->user_id, $filters);
         $data["header"]["error"] = "0";
         $data['body']            = array("orders"=>$orders);
         $this->response($data, 200);   
@@ -1948,7 +1977,8 @@ class Api extends REST_Controller {
 
         $order_detail         = $this->order->get_order_detail($order_id);
         $order_detail["products"] = $this->product->get_order_products($order_id);
-		$order_detail["transactions"] = $this->order->get_order_transactions($order_id);
+		$order_detail["payment_transaction"] = $this->order->get_payment_transaction_by_order($order_id);
+		$order_detail["refund_transactions"] = $this->order->get_refund_transactions_by_order($order_id);
 		
         $data["header"]["error"] = "0";
         $data['body']            = array("order_detail"=>$order_detail);

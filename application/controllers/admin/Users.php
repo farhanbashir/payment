@@ -33,7 +33,9 @@ class Users extends CI_Controller {
     public function index() {
        
         $data = array();
-        $this->load->library("pagination");
+        
+		/*
+		$this->load->library("pagination");
         $total_rows = $this->user->get_total_users();
 
         $pagination_config = get_pagination_config('users/index', $total_rows, $this->config->item('pagination_limit'), 4);
@@ -44,8 +46,9 @@ class Users extends CI_Controller {
 
 
         $data["links"] = $this->pagination->create_links();
+		*/
 
-        $users = $this->user->get_users($page);
+        $users = $this->user->get_all_users(); //-->$this->user->get_users($page);
 
         $data['users'] = $users;
         //$this->load->view('header');

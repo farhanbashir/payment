@@ -183,3 +183,9 @@ CREATE TABLE IF NOT EXISTS `logs_merchant` (
 =================
 ALTER TABLE `user_merchant_info` CHANGE `cx_mode` `cx_mode` TINYINT(4) NULL DEFAULT '0' COMMENT '1=live,2=sandbox';
 UPDATE `user_merchant_info` SET cx_mode=2;
+
+*April 18, 2016:
+=================
+ALTER TABLE `orders` ADD `customer_name` VARCHAR(250) NULL DEFAULT NULL AFTER `customer_id`;
+
+ALTER TABLE `customers` ADD `name` VARCHAR(250) NULL DEFAULT NULL ;

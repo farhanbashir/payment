@@ -209,7 +209,7 @@ Class User extends CI_Model
 
     function get_all_users()
     {
-        $sql = "select * from users u where u.role_id".CONST_ROLE_ID_BUSINESS_ADMIN." order by u.user_id desc " ;
+        $sql = "select * from users u where u.role_id=".CONST_ROLE_ID_BUSINESS_ADMIN." order by u.user_id desc " ;
         $query = $this->db->query($sql);
         $result = $query->result_array();
         $query->free_result();
