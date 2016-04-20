@@ -50,8 +50,9 @@ class Sales extends CI_Controller {
         // $data['total_stores'] = $this->store->get_total_stores();
         // $data['latest_five_users'] = $this->user->get_latest_five_users();
         // $data['latest_five_stores'] = $this->store->get_latest_five_stores();
-
-        $content = $this->load->view('sales/reports.php', $data, true);
+        $data['sales_summary'] = $this->order->get_sales_summary();
+        $data['order_summary'] = $this->order->get_order_summary();
+        $content = $this->load->view('sales/reports/index', $data, true);
         $this->load->view('main', array('content' => $content));
     }
 
@@ -144,8 +145,11 @@ class Sales extends CI_Controller {
         $this->load->view('welcome_message', array('content' => $content));
     }
 
-
-
+    function sales_summary()
+    {
+      $string = file_get_contents(base_url()."/data.json");
+      echo $string;
+    }
     /* public function parents()
       {
       $data = array();

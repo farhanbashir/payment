@@ -68,10 +68,10 @@
 					  <li>
 						<a href="javascript:;"><span class="title">Sales</span>
 						<span class=" arrow"></span></a>
-						<span class="<?php echo ($this->uri->segment(2) == 'sales') ? 'bg-success' : '';?> icon-thumbnail"><i class="fa fa-dollar"></i></span>
+						<span class="<?php echo ($this->uri->segment(2) == 'reports') ? 'bg-success' : '';?> icon-thumbnail"><i class="fa fa-dollar"></i></span>
 						<ul class="sub-menu">
 						  <li class="">
-							<a href="<?php echo site_url('admin/sales/reports') ?>">Reports</a>
+							<a href="<?php echo site_url('admin/reports') ?>">Reports</a>
 							<span class="icon-thumbnail">R</span>
 						  </li>
 						  <li class="">

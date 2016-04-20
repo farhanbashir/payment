@@ -7,21 +7,16 @@
       {
           $tab1 = "";
           $tab2 = "active";
-          $tab3 = "";
-          $tab4 = "";
+          
       }
       if($this->session->flashdata('ErrorMessageTab3')!='' || $this->session->flashdata('MessageTab3')!='' )
       {
           $tab1 = "";
-          $tab2 = "";
           $tab3 = "active";
-          $tab4 = "";
       }
       if($this->session->flashdata('ErrorMessageTab4')!='' || $this->session->flashdata('MessageTab4')!='' )
       {
           $tab1 = "";
-          $tab2 = "";
-          $tab3 = "";
           $tab4 = "active";
       }
 ?>
