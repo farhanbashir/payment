@@ -29,7 +29,7 @@
                                 <th width="15%">Fisrt Name</th>
                                 <th width="15%">Last Name</th>
                                 <th width="10%">Status</th>
-                                <th>Actions</th>
+                                <th width="10%">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -64,6 +64,7 @@
 											
                                             <a href="Javascript: void();" class="btn btn-danger">Delete</a>
 											
+											<br /><br />
 											<a href="<?php echo site_url('admin/users/login_merchant/'.$user['user_id']);?>" class="btn btn-warning">Log-In as this Merchant</a>
                                         </p>
                                     </td>

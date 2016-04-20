@@ -62,7 +62,7 @@ class Sales extends CI_Controller {
         // $data['latest_five_users'] = $this->user->get_latest_five_users();
         // $data['latest_five_stores'] = $this->store->get_latest_five_stores();
 		
-		$user_id = 59;
+		$user_id = getLoggedInUserId();
 		
 		$orders = $this->order->get_all_order_transactions_by_user($user_id);
 		
