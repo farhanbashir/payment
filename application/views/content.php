@@ -1,15 +1,20 @@
-<div class="content sm-gutter">
-	
+<script type="text/javascript" src="<?php echo asset_url('js/loader.js');?>"></script>
+   <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<div class="content ">
 	<!-- START CONTAINER FLUID -->
-	<div class="container-fluid padding-25 sm-padding-10">
-		
-		<!-- START ROW -->
-		<div class="row">
-			Dashboard will show here!
+	<div class="container-fluid container-fixed-lg">
+
+		<!-- START PANEL -->
+		<div class="panel">
+			
+			<div class="panel-body">              
+				<div class="row">
+						<?php $this->load->view('graph.php');?>
+				</div>	
+				
+				<!-- END ROW -->
+			</div>
 		</div>
-		<!-- END ROW -->
-		
 	</div>
 	<!-- END CONTAINER FLUID -->
-	
 </div>

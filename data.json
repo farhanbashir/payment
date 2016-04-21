@@ -1,0 +1,21 @@
+{
+  "cols": [
+        {"id":"","label":"","pattern":"","type":"string"},
+        {"id":"","label":"Sales Summary","pattern":"","type":"number"}
+      ],
+  "rows": [
+        {"c":[{"v":"Jan","f":null},{"v":3112,"f":null}]},
+        {"c":[{"v":"Feb","f":null},{"v":1005,"f":null}]},
+        {"c":[{"v":"Mar","f":null},{"v":703,"f":null}]},
+        {"c":[{"v":"Apr","f":null},{"v":620,"f":null}]},
+        {"c":[{"v":"May","f":null},{"v":482,"f":null}]},
+        {"c":[{"v":"Jun","f":null},{"v":420,"f":null}]},
+        {"c":[{"v":"Jul","f":null},{"v":346,"f":null}]},
+        {"c":[{"v":"Aug","f":null},{"v":306,"f":null}]},
+        {"c":[{"v":"Sep","f":null},{"v":293,"f":null}]},
+        {"c":[{"v":"Oct","f":null},{"v":250,"f":null}]},
+        {"c":[{"v":"Nov","f":null},{"v":250,"f":null}]},
+        {"c":[{"v":"Dec","f":null},{"v":450,"f":null}]},
+
+      ]
+} 

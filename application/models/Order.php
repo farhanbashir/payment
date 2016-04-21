@@ -86,8 +86,10 @@ Class Order extends CI_Model
         $query->free_result();
         return $result;
     }
+
 	
-	 function get_all_order_transactions_by_user($user_id)
+
+	function get_all_order_transactions_by_user($user_id)
     {
         $sql = "SELECT o.*, t.*
 				FROM orders o, transactions t 
