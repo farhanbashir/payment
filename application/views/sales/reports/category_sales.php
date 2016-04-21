@@ -1,6 +1,36 @@
 <?php 
+$ArrColumns = array();
 
+foreach ($category_sales as $row)
+{
+  $ArrColumns[] = $row['category_name']; 
+}
 
+$ArrCategories = array_unique($ArrColumns);
+
+$ArrCategories = array_values($ArrCategories);
+
+foreach ($category_sales as $row) 
+{ 
+  
+  
+  $ArrData['Day'] = $row['order_date'];
+  
+  for ($i=0; $i <count($ArrCategories) ; $i++) 
+  { 
+    if($row['category_name']==$ArrCategories[$i])
+    {
+      $ArrData[$ArrCategories[$i]] = $row['total_sale'];
+
+    }
+    else
+    {
+      $ArrData[$ArrCategories[$i]] = 0;
+    }
+  }
+
+  $GraphData[]= $ArrData;
+}
 ?>
 <script type="text/javascript">
       google.charts.load('current', {'packages':['line']});
@@ -9,32 +39,34 @@
     function drawChart() {
 
       var data = new google.visualization.DataTable();
-      data.addColumn('string', 'Day');
-      data.addColumn('number', 'Guardians of the Galaxy');
-      data.addColumn('number', 'The Avengers');
-      data.addColumn('number', 'Transformers: Age of Extinction');
+     data.addColumn('string', 'Date');
 
-      data.addRows([
-        ['1',  37.8, 80.8, 41.8],
-        ['2',  30.9, 69.5, 32.4],
-        ['3',  25.4,   57, 25.7],
-        /*[4,  11.7, 18.8, 10.5],
-        [5,  11.9, 17.6, 10.4],
-        [6,   8.8, 13.6,  7.7],
-        [7,   7.6, 12.3,  9.6],
-        [8,  12.3, 29.2, 10.6],
-        [9,  16.9, 42.9, 14.8],
-        [10, 12.8, 30.9, 11.6],
-        [11,  5.3,  7.9,  4.7],
-        [12,  6.6,  8.4,  5.2],
-        [13,  4.8,  6.3,  3.6],
-        [14,  4.2,  6.2,  3.4]*/
+      <?php 
+      for ($i=0; $i <count($ArrCategories) ; $i++) 
+        {?>
+          data.addColumn('number', '<?php echo $ArrCategories[$i];?>');
+           
+          <?php
+        }?>
+        data.addRows
+        ([
+          <?php
+          foreach ($GraphData as $row) 
+          {   
+            echo "['".date("m-d",strtotime($row['Day']))."',";
+            for ($i=0; $i <count($ArrCategories) ; $i++)
+            { 
+              echo $row[$ArrCategories[$i]].",";
+            }
+            echo "],";
+          }
+          ?>
       ]);
 
       var options = {
         chart: {
-          title: 'Box Office Earnings in First Two Weeks of Opening',
-          subtitle: 'in millions of dollars (USD)'
+          /*title: 'Box Office Earnings in First Two Weeks of Opening',
+          subtitle: 'in millions of dollars (USD)'*/
         },
         vAxis: {title: "# Price"},
         width: 900,
@@ -49,4 +81,41 @@
 </script>
 
 <div id="curve_chart" style="width: 1200px; height: 800px"></div>
+<div id="tableWithSearch_wrapper" class="dataTables_wrapper form-inline no-footer">
+  <div class="table-responsive">
+    <table class="table table-hover demo-table-search dataTable no-footer" id="" role="grid" aria-describedby="tableWithSearch_info">
+      <thead>
+        <tr role="row">
+          <th width="20%" class="sorting_asc" tabindex="0" aria-controls="tableWithSearch" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Product: activate to sort column descending">Date</th>
+          <th width="20%" class="sorting" tabindex="0" aria-controls="tableWithSearch" rowspan="1" colspan="1" aria-label="Categories: activate to sort column ascending" style="width: 198px;">Category</th>
+          <th width="10%" class="sorting" tabindex="0" aria-controls="tableWithSearch" rowspan="1" colspan="1" aria-label="Price: activate to sort column ascending" style="width: 79px;">Quantity</th>
+          <th width="10%" class="sorting" tabindex="0" aria-controls="tableWithSearch" rowspan="1" colspan="1" aria-label="Price: activate to sort column ascending" style="width: 79px;">Gross Sale</th>
 
+        </tr>
+      </thead>
+      <tbody>
+        <?php
+        foreach ($category_sales as $row) 
+        {?>
+          <tr role="row" class="odd">
+            <td class="v-align-middle sorting_1">
+              <p><?php echo date('F , m, Y',strtotime($row['order_date']));?></p>
+            </td>
+            <td class="v-align-middle">
+              <p><?php echo $row['category_name'];?></p>
+            </td>
+            <td class="v-align-middle">
+              <p><?php echo $row['total_quantity'];?></p>
+            </td>
+            <td class="v-align-middle">
+              <p><?php echo $row['total_sale'];?></p>
+            </td>
+          </tr>
+          <?php
+        }
+        ?>
+        
+      </tbody>
+    </table>
+  </div>
+</div>

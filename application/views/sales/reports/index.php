@@ -67,6 +67,26 @@ if($this->uri->segment(3) == 'category_sales')
 							<!-- Tab panes -->
 								  
 						</div>
+						<div class="form-group">
+							<form role="form" method="post" action="<?php echo $form_url;?>">
+								<div class="input-daterange input-group" id="datepicker-range">
+									<input name="date1" type="text" class="input-sm form-control" name="start">
+									<span class="input-group-addon">to</span>
+									<input name="date2" type="text" class="input-sm form-control" name="end">
+								
+								</div>
+								<div class="form-group"style="width: 200px;margin-top: -34px;margin-left: 410px;">
+						          <select name="select" class="full-width select2-offscreen" data-init-plugin="select2" tabindex="-1" title="">
+						            <option value="0">Please Select Type</option>
+						            <option value="Daily">Daily</option>
+						            <option value="Weekly">Weekly</option>
+						            <option value="Monthly">Monthly</option>
+						          </select>
+	       						</div>
+	       						<button style="margin-top: -76px;margin-left: 622px;" class="btn btn-primary" type="submit">Submit</button>
+							</form>
+						</div>
+						<br>
 						<?php $this->load->view($load_page); ?>	
 					</div>
 				</div>
