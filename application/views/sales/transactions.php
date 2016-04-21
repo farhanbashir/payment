@@ -48,7 +48,8 @@
 					{
 						foreach($orders as $orderInfo)
 						{
-							$order_id = $orderInfo['order_id']; 
+							$order_id = $orderInfo['order_id'];
+							$receipt  = $orderInfo['receipt'];
 							
 							?>
 								<tr role="row" class="odd">
@@ -102,7 +103,18 @@
 										<p>
 											<a href="#<?php echo $order_id; ?>" class="btn btn-primary" onclick="Javascript: return openPopupForOrderDetails('<?php echo $order_id; ?>');">View Details</a>
 											
-											<a href="Javascript: void();" class="btn btn-info">View Receipt</a>
+											<br /><br />
+											<?php
+												if($receipt)
+												{
+													?><a target="_blank" href="<?php echo $receipt; ?>" class="btn btn-info">View Receipt</a><?php
+												}
+												else
+												{
+													?><a target="_blank" href="<?php echo site_url('admin/sales/generate_receipt/'.$order_id) ?>" class="btn btn-info">Generate Receipt</a><?php
+												}
+											?>
+											
 										</p>
 									</td>
 								</tr>

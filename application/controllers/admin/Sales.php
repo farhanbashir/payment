@@ -31,6 +31,7 @@ class Sales extends CI_Controller {
 		$this->load->model('user','',TRUE);
         $this->load->model('product','',TRUE);
 		$this->load->model('order','',TRUE);
+		$this->load->model('profile','',TRUE);
     }
 
     public function index() {
@@ -89,7 +90,43 @@ class Sales extends CI_Controller {
 		
         $this->load->view('sales/popup_order.php', $data);
 	}
-
+	
+	public function receipt($order_id=0)
+	{
+		$data = array();
+		
+		$this->load->view('sales/receipt.php', $data);
+	}
+	
+	public function generate_receipt($order_id=0)
+	{
+		$user_id = getLoggedInUserId();
+		
+		$receiptCreated = generateReceiptByOrderId($order_id, $user_id);
+		
+		if($receiptCreated)
+		{
+			redirect($receiptCreated);
+			exit;
+		}
+		else
+		{
+			$orderInfo			= $this->order->get_order_detail($order_id);
+			$orderReceipt		= @$orderInfo['receipt'];
+			
+			if($orderReceipt)
+			{
+				redirect($orderReceipt);
+				exit;
+			}
+			else
+			{
+				echo 'Not able to generate receipt for Order # '.$order_id;
+				exit;
+			}
+		}
+	}
+	
     public function change_password()
     {
         $data = array("error"=>"");

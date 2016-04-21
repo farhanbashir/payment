@@ -16,6 +16,8 @@ define('CONST_ROLE_ID_BUSINESS_STAFF',	3);
 
 define('CONST_DEFAULT_COUNTRY',			'USA');
 define('CONST_DEFAULT_CURRENCY',		'USD');
+define('CONST_DATE_FORMAT',				'm/d/Y');
+define('CONST_TIME_FORMAT',				'H:i:s'); //H -> 24-hour format of an hour with leading zeros
 
 //Transaction Types
 define('CONST_TRANSACTION_TYPE_PAYMENT',	1);
@@ -35,6 +37,9 @@ define('CONST_MERCHANT_MODE_SANDBOX',		2);
 //Merchant Mode Text
 define('CONST_TXT_MERCHANT_MODE_LIVE',		'live');
 define('CONST_TXT_MERCHANT_MODE_SANDBOX',	'sandbox');
+
+
+
 
 global $merchan_service_start_time;
 
@@ -1030,4 +1035,386 @@ function splitName($name)
     $last_name = (strpos($name, ' ') === false) ? '' : preg_replace('#.*\s([\w-]*)$#', '$1', $name);
     $first_name = trim( preg_replace('#'.$last_name.'#', '', $name ) );
     return array('first_name'=>$first_name, 'last_name'=>$last_name);
+}
+
+function generateReceiptByOrderId($order_id=0, $user_id=0)
+{
+	$receiptCreated = false;
+	
+	if($order_id)
+	{
+		$CI =& get_instance();
+	
+		$orderInfo			= $CI->order->get_order_detail($order_id);
+		$paymentTransaction	= $CI->order->get_payment_transaction_by_order($order_id);
+		$storeDetails		= $CI->profile->checkUserStoreDetails($user_id);
+		$userDetails		= $CI->profile->get_user_detail($user_id);
+
+		//store details
+		$storeName 			= @$storeDetails['name'];
+		$storeLogo 			= @$storeDetails['logo'];
+		$storeEmail			= @$storeDetails['email'];
+		$storeAddress 		= @$storeDetails['address'];
+		$receiptHeaderText	= @$storeDetails['receipt_header_text'];
+		$receiptFooterText	= @$storeDetails['receipt_footer_text'];
+		$receiptBGColor		= @$storeDetails['receipt_bg_color'];
+		$receiptTextColor	= @$storeDetails['receipt_text_color'];
+		
+		//transaction details
+		$invoiceId			= @$paymentTransaction['transaction_id'];
+		$cashAmount			= @$paymentTransaction['amount_cash'];
+		$ccAmount			= @$paymentTransaction['amount_cc'];
+		$ccNumber			= @$paymentTransaction['cc_number'];
+		$ccName				= @$paymentTransaction['cc_name'];
+		
+		//order details
+		$totalAmount		= @$orderInfo['total_amount'];
+		$customerSignature	= @$orderInfo['customer_signature'];
+		$customerEmail		= @$orderInfo['customer_email'];
+		$orderDate			= date(CONST_DATE_FORMAT, strtotime(@$orderInfo['created']));
+		$orderTime			= date(CONST_TIME_FORMAT, strtotime(@$orderInfo['created']));
+		$orderReceipt		= @$orderInfo['receipt'];
+		
+		
+		//user details
+		$userFirstName		= @$userDetails['first_name'];
+		$userEmail			= @$userDetails['email'];
+		
+		$paymentCurrency	= CONST_DEFAULT_CURRENCY;
+		$paymentNotice		= CONST_CC_PAYMENT_SUCCESS_NOTICE;
+
+		if($orderReceipt) //means Receipt already generated and already emailed to customer. So, no need to do it again!
+		{
+			return $receiptCreated;
+		}
+		
+
+		if(!$storeName)
+		{
+			if($userFirstName)
+			{
+				$storeName = ucfirst($userFirstName)." Store";
+			}
+		}
+		
+		if(!$storeEmail)
+		{
+			if($userEmail)
+			{
+				$storeEmail = $userEmail;
+			}
+		}
+
+		/************************************ PDF Creation **************************/
+		
+		$tplLogo = '';
+		if($storeLogo)
+		{
+			if(isValidURL($storeLogo))
+			{
+				$tplLogo = <<<EOT
+		
+					<tr>
+						<td align="center">
+							<img src="$storeLogo" width="100" />
+						</td>
+					</tr>
+EOT;
+			}
+		}
+		
+		$tplStoreName = '';
+		if($storeName)
+		{
+			$tplStoreName = <<<EOT
+		
+					<tr>
+						<td align="center" style="font-family: verdana; font-size: 14px;">
+							$storeName
+						</td>
+					</tr>
+EOT;
+		}
+		
+				
+		$tplStoreAddress = '';
+		if($storeAddress)
+		{
+			$tplStoreAddress = <<<EOT
+		
+					<tr>
+						<td align="center" style="font-family: verdana; font-size: 10px;">
+							$storeAddress
+						</td>
+					</tr>
+EOT;
+		}
+		
+		$tplReceiptHeaderText = '';
+		if($receiptHeaderText)
+		{
+			$tplReceiptHeaderText = <<<EOT
+		
+					<tr>
+						<td align="center" style="font-family: verdana; font-size: 10px;">
+							$receiptHeaderText
+						</td>
+					</tr>
+EOT;
+		}
+		
+		$tplCCNumber = '';
+		if($ccNumber)
+		{
+			$tplCCNumber = <<<EOT
+		
+					<tr>
+						<td align="left" colspan="2" style="font-family: 'Courier New'; font-size: 13px;">
+							<strong>$ccNumber</strong>
+							
+							<br />
+							<span style="font-size: 8px;">$ccName</span>
+						</td>
+					</tr>
+					
+					<tr>
+						<td colspan="2" height="10" style="height: 10px;"></td>
+					</tr>
+EOT;
+		}
+		
+		$tplCustomerSignature = '';
+		if($customerSignature)
+		{
+			if(isValidURL($customerSignature))
+			{
+				$tplCustomerSignature = <<<EOT
+		
+					<tr>
+						<td align="center" style="font-family: 'Courier New'; font-size: 11px;">
+							<strong>VERIIED BY SIGNATURE</strong>
+						</td>
+					</tr>
+					<tr>
+						<td align="center">
+							<img src="$customerSignature" width="150" />
+						</td>
+					</tr>
+EOT;
+			}
+		}
+		
+		$tplReceiptFooterText = '';
+		if($receiptFooterText)
+		{	
+			$tplReceiptFooterText = <<<EOT
+		
+					<tr>
+						<td align="center" style="font-family: verdana; font-size: 10px;">
+							$receiptFooterText
+						</td>
+					</tr>
+EOT;
+		}
+		
+		$tplPaymentNotice = '';
+		if($paymentNotice)
+		{	
+			$tplPaymentNotice = <<<EOT
+		
+					<tr>
+						<td align="left" style="font-family: verdana; font-size: 10px;">
+							$paymentNotice
+						</td>
+					</tr>
+EOT;
+		}
+		
+$html = <<<EOT
+
+		<table width="200px" border="0" cellpadding="5" cellspacing="0" style="border: 1px solid #000;">
+			
+			$tplLogo
+			
+			$tplStoreName
+			
+			$tplStoreAddress
+			
+			$tplReceiptHeaderText
+			
+			<tr>
+				<td align="center" style="font-family: 'Courier New'; font-size: 10px;">
+					<table width="100%" border="0" cellpadding="2" cellspacing="0" >
+						<tr>
+							<td align="left" style="font-family: 'Courier New'; font-size: 10px;">
+								<strong>MERCHANT ID:</strong>
+							</td>
+							<td align="right" style="font-family: 'Courier New'; font-size: 10px;">
+								<strong>$user_id</strong>
+							</td>
+						</tr>
+						<tr>
+							<td align="left" style="font-family: 'Courier New'; font-size: 10px;">
+								<strong>ORDER ID:</strong>
+							</td>
+							<td align="right" style="font-family: 'Courier New'; font-size: 10px;">
+								<strong>$order_id</strong>
+							</td>
+						</tr>
+						<tr>
+							<td align="left" style="font-family: 'Courier New'; font-size: 10px;">
+								<strong>INVOICE ID:</strong>
+							</td>
+							<td align="right" style="font-family: 'Courier New'; font-size: 10px;">
+								<strong>$invoiceId</strong>
+							</td>
+						</tr>
+						<tr>
+							<td align="left" style="font-family: 'Courier New'; font-size: 8px;">
+								DATE: $orderDate
+							</td>
+							<td align="right" style="font-family: 'Courier New'; font-size: 8px;">
+								TIME: $orderTime
+							</td>
+						</tr>					
+						<tr>
+							<td colspan="2" height="10" style="height: 10px;"></td>
+						</tr>
+						
+						$tplCCNumber
+						
+						<tr>
+							<td align="left" style="font-family: 'Courier New'; font-size: 10px;">
+								<strong>By Cash</strong>
+							</td>
+							<td align="right" style="font-family: 'Courier New'; font-size: 10px;">
+								<strong>$paymentCurrency $cashAmount</strong>
+							</td>
+						</tr>
+						<tr>
+							<td align="left" style="font-family: 'Courier New'; font-size: 10px;">
+								<strong>By Credit Card</strong>
+							</td>
+							<td align="right" style="font-family: 'Courier New'; font-size: 10px;">
+								<strong>$paymentCurrency $ccAmount</strong>
+							</td>
+						</tr>						
+						<tr>
+							<td align="left" style="font-family: 'Courier New'; font-size: 10px;">
+								<strong>TOTAL AMOUNT</strong>
+							</td>
+							<td align="right" style="font-family: 'Courier New'; font-size: 10px;">
+								<strong>$paymentCurrency $totalAmount</strong>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+			
+			$tplCustomerSignature
+			
+			$tplReceiptFooterText
+			
+			$tplPaymentNotice
+			
+		</table>
+
+EOT;
+
+//echo $html;
+//exit;
+		if($html)
+		{
+			$CI->load->library('Pdf');
+			
+			$pdf = new Pdf(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+			
+			// remove default header/footer
+			$pdf->setPrintHeader(false);
+			$pdf->setPrintFooter(false);
+
+			/*
+			$pdf->SetHeaderData(PDF_HEADER_LOGO, 50);
+			$pdf->setFooterData();*/
+
+			// set margins
+			//$pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+
+			/*$pdf->SetMargins(PDF_MARGIN_LEFT, 35, PDF_MARGIN_RIGHT);
+			$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
+			$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);*/
+
+			$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+
+			$pdf->AddPage();
+			$pdf->writeHTML($html, true, false, false, false, '');
+			
+			$pdfFileName = 'order-'. $order_id .'-'.date('M-d-Y-h-i-a').'.pdf';
+
+			$pdfFilePath = FCPATH.'assets/img/orders/receipt/'.$pdfFileName;
+			
+			$pdf->Output($pdfFilePath, 'F');
+			
+			$receiptCreated = true;
+			
+			$receiptBaseUrl = asset_url('img/orders/receipt/');
+			
+			$receiptCreated =  $receiptBaseUrl.'/'.$pdfFileName;
+			
+			/*
+				PDF OutPut:
+				
+				I: send the file inline to the browser. The plug-in is used if available. The name given by name is used when one selects the "Save as" option on the link generating the PDF.
+				
+				D: send to the browser and force a file download with the name given by name.
+				
+				F: save to a local file with the name given by name (may include a path).
+				
+				S: return the document as a string. name is ignored.
+			*/
+			
+			if($receiptCreated)
+			{
+				$order_data = array();
+				
+				$order_data['receipt'] = $receiptCreated;		//it has recipt path!
+				$order_data['updated'] = date('Y-m-d H:i:s');
+				
+				$CI->order->edit_order($order_id, $order_data);
+				
+				//sending receipt to customer!
+				if($customerEmail && $storeEmail)
+				{
+					$emailTo = $customerEmail;
+				
+					$CI->load->library('email');
+					$CI->email->from($storeEmail);
+					$CI->email->to($emailTo);
+					$CI->email->subject('Receipt for Order# '.$order_id);
+					$CI->email->message('Please check attachment to view the receipt for Order# '.$order_id);	
+					$CI->email->attach($pdfFilePath);
+					@$CI->email->send();
+				}
+			}
+		}
+
+	}
+	
+	return $receiptCreated;
+}
+
+
+function isValidURL($url='')
+{
+	$isValid = false;
+	
+	$arrHeaders = get_headers($url);
+	$headerCode = @$arrHeaders[0];
+	
+	if(strpos($headerCode, "200"))
+	{
+		$isValid = true;
+	}
+	
+	return $isValid;
 }

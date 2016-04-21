@@ -150,6 +150,27 @@ Class Profile extends CI_Model
             return false;
         }
     }
+	
+	function checkUserStoreDetails($user_id=0)
+    {
+        $this->db->select('*');
+        $this->db->from('user_stores');
+        $this->db->where('user_id', $user_id);
+        $this->db->limit(1);
+
+        $query = $this->db->get();
+
+        if($query->num_rows() == 1)
+        {	
+			$result = $query->result_array();
+			$query->free_result();
+			return $result[0];
+        }
+        else
+        {
+            return false;
+        }
+    }
 
     function add_user_bank($data)
     {
