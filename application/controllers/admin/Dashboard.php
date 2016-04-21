@@ -27,6 +27,7 @@ class Dashboard extends CI_Controller {
         if (!$this->session->userdata('logged_in')) {
             redirect(base_url());
         }
+        $this->load->model('report','',TRUE);
     }
 
     public function index() {
@@ -35,7 +36,8 @@ class Dashboard extends CI_Controller {
         // $data['total_stores'] = $this->store->get_total_stores();
         // $data['latest_five_users'] = $this->user->get_latest_five_users();
         // $data['latest_five_stores'] = $this->store->get_latest_five_stores();
-
+        $data['item_sales'] = $this->report->get_item_sales_summary($FormData=null);
+        $data['category_sales'] = $this->report->get_category_sales_summary($FormData=null);
         $content = $this->load->view('content.php', $data, true);
         $this->load->view('main', array('content' => $content));
     }

@@ -72,7 +72,7 @@ else
       function drawChart() {
 
         var data = new google.visualization.DataTable();
-       data.addColumn('string', 'Date');
+        data.addColumn('string', 'Date');
 
         <?php 
         for ($i=0; $i <count($ArrCategories) ; $i++) 
