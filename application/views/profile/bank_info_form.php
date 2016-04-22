@@ -1,10 +1,17 @@
 <?php 
-$bank_name = $bank_info[0]['bank_name'];
-$bank_address = $bank_info[0]['bank_address'];
-$swift_code = $bank_info[0]['swift_code'];
-$account_number = $bank_info[0]['account_number'];
-$account_title = $bank_info[0]['account_title'];
-
+$bank_name ="";
+$bank_address ="";
+$swift_code ="";
+$account_number ="";
+$account_title ="";
+if(!empty($bank_info))
+{
+	$bank_name = $bank_info[0]['bank_name'];
+	$bank_address = $bank_info[0]['bank_address'];
+	$swift_code = $bank_info[0]['swift_code'];
+	$account_number = $bank_info[0]['account_number'];
+	$account_title = $bank_info[0]['account_title'];
+}
 ?>
 <div class="panel-body">
 	<h2>Bank Information</h2>

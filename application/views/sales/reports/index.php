@@ -37,7 +37,7 @@ if($this->uri->segment(3) == 'category_sales')
 		<!-- START PANEL -->
 		<div class="panel">
 			<div class="panel-heading">
-				<div class="panel-title"><h1>Reporting</h1></div>
+				<div class="panel-title"><h1>Reports</h1></div>
 			</div>
 			<div class="panel-body">              
 				<div class="row">
@@ -68,7 +68,8 @@ if($this->uri->segment(3) == 'category_sales')
 								  
 						</div>
 						<br>
-						<?php $this->load->view($load_page); ?>	
+						<?php //$this->load->view($load_page); ?>	
+						<?php $this->load->view('sales/reports/under_construction'); ?>	
 					</div>
 				</div>
 			</div>

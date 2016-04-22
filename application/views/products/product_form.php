@@ -11,6 +11,7 @@ if(isset($edit_data) && is_array($edit_data))
 	{
 		$ArrEditCategoriesId[] = $row['category_id'];
 	}
+	
 	$product_name = $edit_data[0]['product_name'];
 	$description = $edit_data[0]['description'];
 	$price = $edit_data[0]['price'];
@@ -32,7 +33,6 @@ if(isset($edit_data) && is_array($edit_data))
 				<form role="form" action="<?php echo $form_url;?>" method="post">
 					<div class="form-group">
 						<label>Product Name</label>
-						<span class="help">e.g. "T-Shirt"</span>
 						<input type="text" value="<?php echo $product_name;?>" name="product_name" class="form-control" required="">
 					</div>
 					<div class="form-group">
@@ -40,6 +40,7 @@ if(isset($edit_data) && is_array($edit_data))
 						<textarea  name="description" class="form-control"><?php echo $description;?></textarea>
 					</div>
 					<div class="form-group">
+						<label>Categories</label>
 						<select required="" name="categories[]" id="multi" class="full-width select2-offscreen" multiple="" tabindex="-1">
 							<?php
 							foreach ($categories as $category) 
@@ -51,7 +52,6 @@ if(isset($edit_data) && is_array($edit_data))
 					</div>
 					<div class="form-group">
 						<label>Price</label>
-						<span class="help">e.g. "$45.50"</span>
 						<input required="" value="<?php echo $price;?>" name="price" type="text" data-a-sign="$ " class="autonumeric form-control">
 					</div>
 					<br /><br />

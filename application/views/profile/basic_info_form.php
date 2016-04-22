@@ -1,9 +1,18 @@
 <?php
-$first_name = $basic_info[0]['first_name'];
-$last_name = $basic_info[0]['last_name'];
-$email = $basic_info[0]['email'];
-$security_question_id = $basic_info[0]['security_question_id'];
-$security_answer = $basic_info[0]['security_answer'];
+$first_name = '';
+$last_name = '';
+$email = '';
+$security_question_id = '';
+$security_answer = '';
+
+if(!empty($basic_info))
+{
+	$first_name = $basic_info[0]['first_name'];
+	$last_name = $basic_info[0]['last_name'];
+	$email = $basic_info[0]['email'];
+	$security_question_id = $basic_info[0]['security_question_id'];
+	$security_answer = $basic_info[0]['security_answer'];
+}
 ?>
 <div class="panel-body">
 	<h2>Personal Information</h2>
@@ -25,27 +34,22 @@ $security_answer = $basic_info[0]['security_answer'];
 		<form role="form" method ="post"action="<?php echo $basic_info_form_url;?>">
 			<div class="form-group">
 				<label>First Name</label>
-				<span class="help">e.g. "Carlos"</span>
 				<input name="first_name" type="text" class="form-control" value="<?php echo $first_name;?>" required="">
 			</div>
 			<div class="form-group">
 				<label>Last Name</label>
-				<span class="help">e.g. "Brathwaite"</span>
 				<input name="last_name" type="text" value="<?php echo $last_name;?>" class="form-control" required="">
 			</div>
 			<div class="form-group">
 				<label>Email</label>
-				<span class="help">e.g. "abcd@hotmail.com"</span>
 				<input name="email" value="<?php echo $email;?>" type="email" class="form-control" required="">
 			</div>
 			<div class="form-group">
 				<label>Password</label>
-				<span class="help">Note. "Make sure your Password is strong"</span>
 				<input name="password" type="password" class="form-control" >
 			</div>
 			<div class="form-group">
 				<label>Confirm Password</label>
-				<span class="help">Note. "Make sure your Password is strong"</span>
 				<input name="confirm_password" type="password" class="form-control" >
 			</div>
 

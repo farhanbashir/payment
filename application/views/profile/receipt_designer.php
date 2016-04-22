@@ -1,8 +1,16 @@
 <?php
-$receipt_header_text = $business_info[0]['receipt_header_text'];
-$receipt_footer_text = $business_info[0]['receipt_footer_text'];
-$receipt_bg_color 	 = $business_info[0]['receipt_bg_color'];
-$receipt_text_color  = $business_info[0]['receipt_text_color'];
+$receipt_header_text ="";
+$receipt_footer_text ="";
+$receipt_bg_color ="";
+$receipt_text_color ="";
+
+if(!empty($business_info))
+{
+	$receipt_header_text = $business_info[0]['receipt_header_text'];
+	$receipt_footer_text = $business_info[0]['receipt_footer_text'];
+	$receipt_bg_color 	 = $business_info[0]['receipt_bg_color'];
+	$receipt_text_color  = $business_info[0]['receipt_text_color'];
+}
 
 ?>
 <div class="panel-body">

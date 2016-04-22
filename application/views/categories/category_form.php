@@ -21,12 +21,10 @@ if(isset($edit_data) && is_array($edit_data))
       <form role="form" method="post" action='<?php echo $form_url;?>'>
         <div class="form-group">
           <label>Category Name</label>
-          <span class="help">e.g. "T-Shirt"</span>
           <input type="text" name="category_name" class="form-control" required="" value="<?php echo $category_name;?>">
         </div>
         <div class="form-group">
           <label>Parent Category</label>
-          <span class="help">Note: "Select Parent Category if you want"</span>
           <select name="parent_category" class="full-width select2-offscreen" data-init-plugin="select2" tabindex="-1" title="">
             <option value="0">No Parent Category</option>
             <?php foreach ($categories as $category)

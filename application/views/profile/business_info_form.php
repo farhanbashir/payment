@@ -1,13 +1,26 @@
 <?php
-$business_name = $business_info[0]['name'];
-$description = $business_info[0]['description'];
-$email = $business_info[0]['email'];
-$phone = $business_info[0]['phone'];
-$logo = $business_info[0]['logo'];
-$address = $business_info[0]['address'];
-$facebook = $business_info[0]['facebook'];
-$twitter = $business_info[0]['twitter'];
-$website = $business_info[0]['website'];
+$business_name="";
+$description="";
+$email="";
+$phone="";
+$logo="";
+$address="";
+$facebook="";
+$twitter="";
+$website="";
+
+if(!empty($business_info))
+{
+	$business_name = $business_info[0]['name'];
+	$description = $business_info[0]['description'];
+	$email = $business_info[0]['email'];
+	$phone = $business_info[0]['phone'];
+	$logo = $business_info[0]['logo'];
+	$address = $business_info[0]['address'];
+	$facebook = $business_info[0]['facebook'];
+	$twitter = $business_info[0]['twitter'];
+	$website = $business_info[0]['website'];
+}
 
 ?>
 
@@ -46,8 +59,7 @@ $website = $business_info[0]['website'];
 			</div>
 			<div class="form-group">
 				<label>Email</label>
-				<span class="help">e.g. "abcd@hotmail.com"</span>
-				<input name="email" value="<?php echo $email;?>"type="email" class="form-control" required="">
+				<input name="email" value="<?php echo $email;?>"type="email" class="form-control">
 			</div>
 			<div class="form-group">
 				<label>Phone</label>

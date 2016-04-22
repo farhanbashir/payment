@@ -106,8 +106,14 @@ class Products extends CI_Controller {
       }
       $data = array();
       $data['categories'] = $this->Category->get_all_categories();
+
       $data['form_title'] = "Edit Product";
+
       $data['edit_data'] = $this->Product->edit_product_record($product_id);
+      if(empty($data['edit_data']))
+      {
+          redirect('admin/products','refresh');
+      }
       $data['form_url'] = site_url('admin/products/update_product/'.$product_id);
       $content = $this->load->view('products/product_form', $data, true);
       $this->load->view('main', array('content' => $content));
