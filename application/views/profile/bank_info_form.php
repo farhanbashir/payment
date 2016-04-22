@@ -4,13 +4,14 @@ $bank_address ="";
 $swift_code ="";
 $account_number ="";
 $account_title ="";
+
 if(!empty($bank_info))
 {
-	$bank_name = $bank_info[0]['bank_name'];
-	$bank_address = $bank_info[0]['bank_address'];
-	$swift_code = $bank_info[0]['swift_code'];
-	$account_number = $bank_info[0]['account_number'];
-	$account_title = $bank_info[0]['account_title'];
+	$bank_name = $basic_info['bank_name'];
+	$bank_address = $basic_info['bank_address'];
+	$swift_code = $basic_info['swift_code'];
+	$account_number = $basic_info['account_number'];
+	$account_title = $basic_info['account_title'];
 }
 ?>
 <div class="panel-body">

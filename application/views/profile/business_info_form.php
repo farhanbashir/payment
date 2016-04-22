@@ -11,15 +11,15 @@ $website="";
 
 if(!empty($business_info))
 {
-	$business_name = $business_info[0]['name'];
-	$description = $business_info[0]['description'];
-	$email = $business_info[0]['email'];
-	$phone = $business_info[0]['phone'];
-	$logo = $business_info[0]['logo'];
-	$address = $business_info[0]['address'];
-	$facebook = $business_info[0]['facebook'];
-	$twitter = $business_info[0]['twitter'];
-	$website = $business_info[0]['website'];
+	$business_name = $business_info['name'];
+	$description = $business_info['description'];
+	$email = $business_info['email'];
+	$phone = $business_info['phone'];
+	$logo = $business_info['logo'];
+	$address = $business_info['address'];
+	$facebook = $business_info['facebook'];
+	$twitter = $business_info['twitter'];
+	$website = $business_info['website'];
 }
 
 ?>

@@ -7,11 +7,11 @@ $security_answer = '';
 
 if(!empty($basic_info))
 {
-	$first_name = $basic_info[0]['first_name'];
-	$last_name = $basic_info[0]['last_name'];
-	$email = $basic_info[0]['email'];
-	$security_question_id = $basic_info[0]['security_question_id'];
-	$security_answer = $basic_info[0]['security_answer'];
+	$first_name = $basic_info['first_name'];
+	$last_name = $basic_info['last_name'];
+	$email = $basic_info['email'];
+	$security_question_id = $basic_info['security_question_id'];
+	$security_answer = $basic_info['security_answer'];
 }
 ?>
 <div class="panel-body">

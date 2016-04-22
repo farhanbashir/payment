@@ -4,7 +4,8 @@ Class Settings extends CI_Controller
 	function __construct()
 	{
         parent::__construct();
-        $this->load->model('Setting');
+        $this->load->model('User');
+         $this->load->model('Profile');
         if (!$this->session->userdata('logged_in'))
         {
             redirect(base_url());
@@ -15,12 +16,13 @@ Class Settings extends CI_Controller
    	{	
    		
    		$data = array();
-   		$data['basic_info'] = $this->Setting->get_user_basic_info();
-   		$data['security_questions'] = $this->Setting->get_security_questions();
+   		$user_id 	= 	getLoggedInUserId();
+   		$store_id 	=	getLoggedInStoreId(); 
+   		$data['basic_info'] = $this->Profile->get_user_detail($user_id);
+   		$data['security_questions'] = $this->Profile->get_questions();
    		$data['basic_info_form_url'] = site_url('admin/settings/update_basic_info');
-   		$data['business_info'] = $this->Setting->get_user_business_info();
+   		$data['business_info'] = $this->Profile->get_store_detail($store_id);
    		$data['business_info_form_url'] =  site_url('admin/settings/update_business_info');
-   		$data['bank_info'] = $this->Setting->get_user_bank_info();
    		$data['bank_info_form_url'] =  site_url('admin/settings/update_bank_info');
    		$data['receipt_designer_form_url'] =  site_url('admin/settings/update_receipt_designer');
    		$content = $this->load->view('profile/index.php', $data, true);
@@ -29,9 +31,10 @@ Class Settings extends CI_Controller
 
    	function update_basic_info()
    	{
-   		$user_id = getLoggedInUserId();
+   		$user_id 	= 	getLoggedInUserId();
+		$store_id 	=	getLoggedInStoreId(); 
 		$ArrFormValues = array(
-			array(
+			
 				'first_name'		=>	htmlentities($this->input->post('first_name')),  		
 				'last_name' 		=>  htmlentities($this->input->post('last_name')),   		
 				'email' 			=> 	htmlentities($this->input->post('email')),   		
@@ -39,67 +42,85 @@ Class Settings extends CI_Controller
 				'confirm_password' 	=> 	htmlentities($this->input->post('confirm_password')),
 				'security_question_id' => 	htmlentities($this->input->post('security_question')),   		
 				'security_answer' 	=> 	htmlentities($this->input->post('security_answer')),
-			)
 		);
-		if(!$ArrFormValues[0]['first_name'] || !$ArrFormValues[0]['last_name'] || !$ArrFormValues[0]['email'] || !$ArrFormValues[0]['security_question_id'] || !$ArrFormValues[0]['security_answer'])
+		if(!$ArrFormValues['first_name'] || !$ArrFormValues['last_name'] || !$ArrFormValues['email'] || !$ArrFormValues['security_question_id'] || !$ArrFormValues['security_answer'])
 		{
 			redirect(base_url(),'refresh');
 		}
 		$data = array();
 		$ArrSeurityInfo = array(
-			'security_question_id' 	=> $ArrFormValues[0]['security_question_id'],
-			'security_answer'		=> $ArrFormValues[0]['security_answer'],
+			'security_question_id' 	=> $ArrFormValues['security_question_id'],
+			'security_answer'		=> $ArrFormValues['security_answer'],
 		);
-		if($ArrFormValues[0]['password']!='')
+		if($ArrFormValues['password']!='')
 		{
-			if($ArrFormValues[0]['password']!=$ArrFormValues[0]['confirm_password'])
+			if($ArrFormValues['password']!=$ArrFormValues['confirm_password'])
 			{	
 				$ErrorMessage = "Passwords does not match";
 				/**/
 			}
 			//if($ArrFormValues[0]['password']==$ArrFormValues[0]['confirm_password'])
-			if($ArrFormValues[0]['password'] == $ArrFormValues[0]['confirm_password'])
+			if($ArrFormValues['password'] == $ArrFormValues['confirm_password'])
 			{
-				$data['first_name'] = $ArrFormValues[0]['first_name'];
-				$data['last_name'] = $ArrFormValues[0]['last_name'];
-				$data['email'] = $ArrFormValues[0]['email'];
-				$data['password'] = md5($ArrFormValues[0]['password']);
-				$data['new_password'] = md5($ArrFormValues[0]['confirm_password']);
+				$data['first_name'] = $ArrFormValues['first_name'];
+				$data['last_name'] = $ArrFormValues['last_name'];
+				$data['email'] = $ArrFormValues['email'];
+				$data['password'] = md5($ArrFormValues['password']);
+				$data['new_password'] = md5($ArrFormValues['confirm_password']);
 				$data['updated'] = date("Y-m-d H:i:s");
 			}
 		}
 		else
 		{
-			$data['first_name'] = $ArrFormValues[0]['first_name'];
-			$data['last_name'] 	= $ArrFormValues[0]['last_name'];
-			$data['email']		= $ArrFormValues[0]['email'];
-			$data['updated'] 	= date("Y-m-d H:i:s");
+			$data['first_name'] = $ArrFormValues['first_name'];
+			$data['last_name'] 	= $ArrFormValues['last_name'];
+			$data['email']		= $ArrFormValues['email'];
+
+			//$data['updated'] 	= date("Y-m-d H:i:s");
 		}
+
 		if(isset($ErrorMessage) && $ErrorMessage!='')
-		{
-			$this->session->set_flashdata('ErrorMessageTab1','Passwords does not match');
-				$data['basic_info'] = $ArrFormValues;
-				$data['security_questions'] = $this->Setting->get_security_questions();
-	   			$data['basic_info_form_url'] = site_url('admin/settings/update_basic_info');
-		   		$data['business_info'] = $this->Setting->get_user_business_info();
-   				$data['business_info_form_url'] =  site_url('admin/settings/update_business_info');
-		   		$data['bank_info'] = $this->Setting->get_user_bank_info();
-   				$data['bank_info_form_url'] =  site_url('admin/settings/update_bank_info');
-   				$data['receipt_designer_form_url'] =  site_url('admin/settings/update_receipt_designer');
+		{		
+				$this->session->set_flashdata('ErrorMessageTab1','Passwords does not match');
+		   		$data['basic_info'] = $ArrFormValues;
+		   		$data['security_questions'] = $this->Profile->get_questions();
+		   		$data['basic_info_form_url'] = site_url('admin/settings/update_basic_info');
+		   		$data['business_info'] = $this->Profile->get_store_detail($store_id);
+		   		$data['business_info_form_url'] =  site_url('admin/settings/update_business_info');
+		   		$data['bank_info_form_url'] =  site_url('admin/settings/update_bank_info');
+		   		$data['receipt_designer_form_url'] =  site_url('admin/settings/update_receipt_designer');
 		   		$content = $this->load->view('profile/index.php', $data, true);
 	        	$this->load->view('main', array('content' => $content));
 		}
+
 		else
 		{
-			$this->Setting->update_basic_info($data);
-			$this->Setting->update_security_info($ArrSeurityInfo);
+			$this->User->edit_user($user_id,$data);
+
+			$user_detail = $this->Profile->checkUserDetails($user_id);
+
+			if(!$user_detail)
+			{	
+				$data['created'] 	= date("Y-m-d H:i:s");
+
+				$data['status']		= CONST_BANK_STATUS_NOT_VERIFIED;
+				
+				$this->Profile->add_user_detail($ArrSeurityInfo);
+			}
+			else
+			{	
+				$data['updated'] 	= date("Y-m-d H:i:s");
+				$this->Profile->edit_user_detail($user_id,$ArrSeurityInfo);
+			}
+			
 			$this->session->set_flashdata('MessageTab1','Basic Information updated successfully');
 			redirect('admin/settings','refresh');
    		}
    	}
 
    	function update_business_info()
-   	{	$data =array();
+   	{	
+   		$data =array();
    		$file_name ="";
    		$ArrFormValues = array(
 			array(
@@ -160,6 +181,7 @@ Class Settings extends CI_Controller
 
    	function update_bank_info()
    	{	
+   		$bankInfo = $this->profile->checkUserBankDetails($this->user_id);
    		$data =array(
 				
 			'bank_name'				=>	htmlentities($this->input->post('bank_name')),  		
