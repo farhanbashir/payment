@@ -25,8 +25,7 @@ Class Category extends CI_Model
 
     function get_category_detail($category_id)
     {   
-        $store_id   = getLoggedInStoreId();
-        $user_id    = getLoggedInUserId();
+       
         $sql = "SELECT * FROM categories WHERE category_id='$category_id' AND store_id = '$store_id' AND user_id = '$store_id' " ;
         $query = $this->db->query($sql);
         $result = $query->result_array();
@@ -69,10 +68,9 @@ Class Category extends CI_Model
         return $result;   
     }
 
-    function get_all_categories()
+    function get_all_categories($user_id)
     {
-        
-        $user_id = getLoggedInUserId();
+       
         $sql = "SELECT name,category_id,parent_id,(SELECT COUNT(category_id) FROM product_categories WHERE category_id=categories.category_id) AS total_products
                 FROM categories WHERE user_id='$user_id'";
         $query = $this->db->query($sql);

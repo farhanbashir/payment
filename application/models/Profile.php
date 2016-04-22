@@ -7,7 +7,8 @@ Class Profile extends CI_Model
         $sql = "select 
 						u.first_name, u.last_name, u.email,u.role_id, ud.security_question_id, 
 						ud.security_answer,ub.bank_id, ub.bank_name, ub.account_number, 
-						ub.status as bank_status,us.store_id, us.name as store_name,us.logo,ub.bank_address,
+						ub.status as bank_status,us.store_id, us.name as store_name,us.logo,
+                        ub.bank_address,ub.swift_code,ub.account_title,
 						us.status as store_status 
 				from users u 						
 				left join user_details ud on u.user_id=ud.user_id 

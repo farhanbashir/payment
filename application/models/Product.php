@@ -18,9 +18,9 @@ Class Product extends CI_Model
 		}
     }
 
-    function get_all_products($store_id=0)
+    function get_all_products($store_id=0,$user_id)
     {   
-        $user_id = getLoggedInUserId();
+       
 		if($store_id)
 		{
 			$sql = "select * from products where status=1 and store_id=$store_id" ;
@@ -87,7 +87,7 @@ Class Product extends CI_Model
 
     function edit_product_record($product_id)
     {   
-        $user_id = getLoggedInUserId();
+        
         $sql = "SELECT pc.product_id,p.description,pc.category_id,p.price,p.name AS product_name, c.name AS category_name FROM 
                 product_categories AS pc
                 LEFT JOIN products AS p

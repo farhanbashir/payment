@@ -5,7 +5,7 @@ $swift_code ="";
 $account_number ="";
 $account_title ="";
 
-if(!empty($bank_info))
+if(!empty($basic_info))
 {
 	$bank_name = $basic_info['bank_name'];
 	$bank_address = $basic_info['bank_address'];

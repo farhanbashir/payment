@@ -13,10 +13,10 @@ class Categories extends CI_Controller
 
     function index()
     {   
-
+        $user_id = getLoggedInUserId();
        
     	$data = array();
-	    $data['categories'] = $this->Category->get_all_categories();
+	    $data['categories'] = $this->Category->get_all_categories($user_id);
 	    $content = $this->load->view('categories/categories', $data, true);
      	$this->load->view('main', array('content' => $content));
     }
@@ -24,9 +24,10 @@ class Categories extends CI_Controller
     function create_category()
     {   
         $data = array();
+        $user_id = getLoggedInUserId();
         $data['form_title'] = "Add Category";
         $data['button_title'] = "Create a new Category";
-        $data['categories'] = $this->Category->get_all_categories();
+        $data['categories'] = $this->Category->get_all_categories($user_id);
         $data['form_url'] = site_url('admin/categories/add_category');
         $content = $this->load->view('categories/category_form', $data, true);
         $this->load->view('main', array('content' => $content));
@@ -61,7 +62,7 @@ class Categories extends CI_Controller
         {
             redirect('admin','refresh');
         }
-
+        $user_id = getLoggedInUserId();
         $data['form_title'] = "Edit Category";
         $data['button_title'] = "Edit Category";
 		$data['id']= $category_id;
@@ -71,7 +72,7 @@ class Categories extends CI_Controller
             redirect('admin/categories','refresh');
         }
         $data['form_url'] = site_url('admin/categories/update_category/'.$category_id);
-        $data['categories'] = $this->Category->get_all_categories();
+        $data['categories'] = $this->Category->get_all_categories($user_id);
         $content = $this->load->view('categories/category_form', $data, true);
         $this->load->view('main', array('content' => $content));
     }

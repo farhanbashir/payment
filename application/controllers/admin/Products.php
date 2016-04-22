@@ -31,13 +31,14 @@ class Products extends CI_Controller {
         }
     }
     public function index() 
-    {
+    { 
+        $user_id = getLoggedInUserId();
         $data = array();
         // $data['total_users'] = $this->user->get_total_users();
         // $data['total_stores'] = $this->store->get_total_stores();
         // $data['latest_five_users'] = $this->user->get_latest_five_users();
         // $data['latest_five_stores'] = $this->store->get_latest_five_stores();
-        $data['products'] = $this->Product->get_all_products();
+        $data['products'] = $this->Product->get_all_products($store_id=null,$user_id);
         $content = $this->load->view('products/products', $data, true);
         $this->load->view('main', array('content' => $content));
     }
@@ -45,7 +46,8 @@ class Products extends CI_Controller {
     function create_product()
     {   
         $data = array();
-        $data['categories'] = $this->Category->get_all_categories();
+        $user_id = getLoggedInUserId();
+        $data['categories'] = $this->Category->get_all_categories($user_id);
         $data['form_title'] = "Add Product";
         $data['form_url'] = site_url('admin/products/add_product');
         $content = $this->load->view('products/product_form', $data, true);
@@ -104,12 +106,14 @@ class Products extends CI_Controller {
       {
         redirect('admin','refresh');
       }
+
       $data = array();
-      $data['categories'] = $this->Category->get_all_categories();
+      $user_id = getLoggedInUserId();
+      $data['categories'] = $this->Category->get_all_categories($user_id);
 
       $data['form_title'] = "Edit Product";
 
-      $data['edit_data'] = $this->Product->edit_product_record($product_id);
+      $data['edit_data'] = $this->Product->edit_product_record($product_id,$user_id);
       if(empty($data['edit_data']))
       {
           redirect('admin/products','refresh');
