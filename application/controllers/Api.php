@@ -41,11 +41,15 @@ class Api extends REST_Controller {
 
 	   if(!in_array($this->router->method, $this->config->item('allowed_calls_without_token')))
        {
-            if(isset($headers['Token']))
+			$headerToken	= @$headers['Token'];
+			$headerUserId	= @$headers['Userid'];
+			$headerStoreId	= @$headers['Storeid'];
+			
+            if($headerToken)
             {
-                if(isset($headers['Userid']))
+                if($headerUserId)
                 {
-                    if(!$this->device->validToken($headers['Userid'],$headers['Token']))
+                    if(!$this->device->validToken($headerUserId,$headerToken))
                     {
                         $data["header"]["error"] = "1";
                         $data["header"]["message"] = "Please provide valid token";
@@ -53,7 +57,7 @@ class Api extends REST_Controller {
                     }
                     else
                     {
-                        if(!$this->user->validStore($headers['Userid'],@$headers['Storeid']))
+                        if(!$this->user->validStore($headerUserId,$headerStoreId))
                         {
                             $data["header"]["error"] = "1";
                             $data["header"]["message"] = "Please provide valid store id";
@@ -61,9 +65,9 @@ class Api extends REST_Controller {
                         }
                         else
                         {
-                            $this->user_id  = $headers['Userid'];
-                            $this->token    = $headers['Token'];
-                            $this->store_id = @$headers['Storeid'];
+                            $this->user_id  = $headerUserId;
+                            $this->token    = $headerToken;
+                            $this->store_id = $headerStoreId;
                         }    
                     }  
                 }   
@@ -1816,7 +1820,7 @@ class Api extends REST_Controller {
     }
 	
 	function setCustomerInfoForOrder_post()
-	{
+	{		
 		$created			= date('Y-m-d H:i:s');
 		$updated			= date('Y-m-d H:i:s');
 		 
@@ -1943,7 +1947,12 @@ class Api extends REST_Controller {
 		}
 		
 		// update order
-		$order_id = $this->order->edit_order($order_id, $order_data);
+		$this->order->edit_order($order_id, $order_data);
+		
+		if($signature)
+		{
+			$receiptCreated = generateReceiptByOrderId($order_id, $this->user_id);
+		}
 		
 		$data["header"]["error"]   = "0";
 		$data["header"]["message"] = "Customer details has been successfully saved for the order";

@@ -159,7 +159,7 @@ where t.order_id=$order_id";
 	function get_payment_transaction_by_order($order_id)
     {
 		$sql = "SELECT 
-						t.amount_cc, t.amount_cash, t.is_cc_swipe, 
+						t.transaction_id, t.amount_cc, t.amount_cash, t.is_cc_swipe, 
 						t.cc_name, t.cc_number, t.cc_expiry_year, t.cc_expiry_month, t.cc_code, 
 						cx_transaction_id, t.created 
 				FROM transactions t 

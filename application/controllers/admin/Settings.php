@@ -158,7 +158,11 @@ Class Settings extends CI_Controller
 			$file_name = $this->upload->data();
 			$old_image = $this->input->post('old-image');
 			$old_image = str_replace(base_url(),'', $old_image);
-			unlink($old_image);
+			
+			if($old_image)
+			{
+				@unlink($old_image);
+			}
 		}
 		$data['name'] 			= $ArrFormValues[0]['name'];
 		$data['description'] 	= $ArrFormValues[0]['description'];
