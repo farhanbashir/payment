@@ -6,7 +6,7 @@
       <div class="panel-heading">
         <div class="panel-title"><h1>Transactions</h1></div>		
 		
-		<div class="row">		
+		<div class="row" style="display: none;">		
 			<div class="col-md-4">
 				<div id="datepicker-component" class="input-group date col-sm-8">
 					<input type="text" class="form-control"><span class="input-group-addon"><i class="fa fa-calendar"></i></span>

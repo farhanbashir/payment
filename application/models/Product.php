@@ -85,10 +85,9 @@ Class Product extends CI_Model
 
     }
 
-    function edit_product_record($product_id)
-    {   
-        
-        $sql = "SELECT pc.product_id,p.description,pc.category_id,p.price,p.name AS product_name, c.name AS category_name FROM 
+    function edit_product_record($product_id=0, $user_id=0)
+    {
+		$sql = "SELECT pc.product_id,p.description,pc.category_id,p.price,p.name AS product_name, c.name AS category_name FROM 
                 product_categories AS pc
                 LEFT JOIN products AS p
                 ON pc.product_id = p.product_id

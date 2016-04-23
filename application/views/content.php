@@ -9,7 +9,8 @@
 			
 			<div class="panel-body">              
 				<div class="row">
-						<?php $this->load->view('graph.php');?>
+						<?php //-->$this->load->view('graph.php');?>
+						Dashboard will show here!
 				</div>	
 				
 				<!-- END ROW -->

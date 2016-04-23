@@ -44,10 +44,17 @@ if(!empty($business_info))
 		<form role="form" method ="post"action="<?php echo $business_info_form_url;?>" enctype="multipart/form-data" accept-charset="utf-8">
 			<div class="form-group">
 				<label>Logo</label>
-				<input type="file" name="image" class="form-control">
+				<input type="file" name="image" >
 				<input type="hidden" name="old-image" value="<?php echo $logo;?>">
-				<br /><br />
-				<img src="<?php echo $logo;?>" width="150" />
+				<?php
+					if($logo)						
+					{
+						?>
+							<br /><br />
+							<img src="<?php echo $logo;?>" width="150" alt="." />
+						<?php
+					}
+				?>				
 			</div>
 			<div class="form-group">
 				<label>Business Name</label>

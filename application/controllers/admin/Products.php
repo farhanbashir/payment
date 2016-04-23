@@ -48,7 +48,7 @@ class Products extends CI_Controller {
         $data = array();
         $user_id = getLoggedInUserId();
         $data['categories'] = $this->Category->get_all_categories($user_id);
-        $data['form_title'] = "Add Product";
+        $data['form_title'] = "Add New Product";
         $data['form_url'] = site_url('admin/products/add_product');
         $content = $this->load->view('products/product_form', $data, true);
         $this->load->view('main', array('content' => $content));
