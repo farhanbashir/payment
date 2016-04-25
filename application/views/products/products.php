@@ -89,7 +89,7 @@ foreach ($products as $row)
                         <button class="btn btn-primary btn-cons">Edit</button>
                       </a>
                       <a onclick="return confirm('Are you sure want to delete','<?php echo site_url('admin/products/delete_product/'.$product['product_id']);?>')"href="<?php echo site_url('admin/products/delete_product/'.$product['product_id']);?>">
-                        <button class="btn btn-danger btn-cons">Delete</button>
+                        <button class="btn btn-danger btn-cons">Remove</button>
                       </a>
                     </p>
                   </td>

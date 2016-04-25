@@ -33,6 +33,7 @@ Class Settings extends CI_Controller
    	{
    		$user_id 	= 	getLoggedInUserId();
 		$store_id 	=	getLoggedInStoreId(); 
+
 		$ArrFormValues = array(
 			
 				'first_name'		=>	htmlentities($this->input->post('first_name')),  		
@@ -43,15 +44,19 @@ Class Settings extends CI_Controller
 				'security_question_id' => 	htmlentities($this->input->post('security_question')),   		
 				'security_answer' 	=> 	htmlentities($this->input->post('security_answer')),
 		);
+
 		if(!$ArrFormValues['first_name'] || !$ArrFormValues['last_name'] || !$ArrFormValues['email'] || !$ArrFormValues['security_question_id'] || !$ArrFormValues['security_answer'])
 		{
 			redirect(base_url(),'refresh');
 		}
+
 		$data = array();
+
 		$ArrSeurityInfo = array(
 			'security_question_id' 	=> $ArrFormValues['security_question_id'],
 			'security_answer'		=> $ArrFormValues['security_answer'],
 		);
+
 		if($ArrFormValues['password']!='')
 		{
 			if($ArrFormValues['password']!=$ArrFormValues['confirm_password'])
@@ -70,6 +75,7 @@ Class Settings extends CI_Controller
 				$data['updated'] = date("Y-m-d H:i:s");
 			}
 		}
+
 		else
 		{
 			$data['first_name'] = $ArrFormValues['first_name'];
@@ -95,7 +101,6 @@ Class Settings extends CI_Controller
 
 		else
 		{
-			$this->User->edit_user($user_id,$data);
 
 			$user_detail = $this->Profile->checkUserDetails($user_id);
 
@@ -107,6 +112,7 @@ Class Settings extends CI_Controller
 				
 				$this->Profile->add_user_detail($ArrSeurityInfo);
 			}
+			
 			else
 			{	
 				$data['updated'] 	= date("Y-m-d H:i:s");
@@ -230,7 +236,6 @@ Class Settings extends CI_Controller
 		if($bankInfo=='')
 		{	
 			$data['created'] = date("Y-m-d H:i:s");
-			var_dump($data);die;
 			$this->Profile->add_user_bank($data);
 		}
 		else
