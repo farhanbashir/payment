@@ -78,12 +78,12 @@ print_r($parent_categories);die;*/
     <div class="panel-body">
       <div id="tableWithSearch_wrapper" class="dataTables_wrapper form-inline no-footer">
         <div class="table-responsive">
-          <table class="table table-hover demo-table-search dataTable no-footer" id="" role="grid" aria-describedby="tableWithSearch_info">
+          <table class="table table-hover demo-table-search_UJ dataTable no-footer" id="" role="grid" aria-describedby="tableWithSearch_info">
             <thead>
               <tr role="row">
-                <th style="width:33.33%;" class="sorting" tabindex="0" aria-controls="basicTable" rowspan="1" colspan="1" aria-label="Status: activate to sort column ascending">Categories</th>
-                <th style="width:33.33%;" class="sorting" tabindex="0" aria-controls="basicTable" rowspan="1" colspan="1" aria-label="Last Update: activate to sort column ascending">No. of products</th>
-                <th class="sorting" tabindex="0" aria-controls="basicTable" rowspan="1" colspan="1" aria-label="Last Update: activate to sort column ascending">Actions</th>
+                <th width="20%">Categories</th>
+                <th width="20%">No. of products</th>
+                <th width="60%">Actions</th>
               </tr>
             </thead>
             <tbody>

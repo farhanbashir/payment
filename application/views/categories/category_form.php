@@ -42,7 +42,8 @@ if(isset($edit_data) && is_array($edit_data))
             }?>
           </select>
         </div>
-        <button class="btn btn-primary" type="submit"><?php echo $button_title;?></button>
+		<br /><br />
+        <button class="btn btn-primary" type="submit">Submit</button>
       </form>
     </div>
   </div>

@@ -25,7 +25,7 @@ class Categories extends CI_Controller
     {   
         $data = array();
         $user_id = getLoggedInUserId();
-        $data['form_title'] = "Add Category";
+        $data['form_title'] = "Add New Category";
         $data['button_title'] = "Create a new Category";
         $data['categories'] = $this->Category->get_all_categories($user_id);
         $data['form_url'] = site_url('admin/categories/add_category');

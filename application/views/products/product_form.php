@@ -37,7 +37,7 @@ if(isset($edit_data) && is_array($edit_data))
 					</div>
 					<div class="form-group">
 						<label>Description</label>
-						<textarea  name="description" class="form-control"><?php echo $description;?></textarea>
+						<textarea name="description" class="form-control no-resize" rows="8"><?php echo $description;?></textarea>
 					</div>
 					<div class="form-group">
 						<label>Categories</label>

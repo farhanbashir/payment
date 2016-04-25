@@ -50,7 +50,7 @@ foreach ($products as $row)
           </div>
           <?php 
         }?>
-        <div class="pull-right">
+        <div class="pull-right" style="display: none;">
           <div class="col-xs-12">
             <input type="text" id="search-table" class="form-control pull-right" placeholder="Search">
           </div>
@@ -60,7 +60,7 @@ foreach ($products as $row)
        <div class="panel-body">
             <div id="tableWithSearch_wrapper" class="dataTables_wrapper form-inline no-footer">
                 <div class="table-responsive_UJ">
-                    <table class="table table-hover demo-table-search_UJ dataTable no-footer" id="tableWithSearch" role="grid" aria-describedby="tableWithSearch_info">
+                    <table class="table table-hover demo-table-search_UJ dataTable no-footer" id="tableWithSearch_UJ123" role="grid" aria-describedby="tableWithSearch_info">
             <thead>
               <tr role="row">
                 <th width="20%">Product</th>

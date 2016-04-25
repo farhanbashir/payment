@@ -2,8 +2,8 @@
 	  <div class="copyright sm-text-center">
 		<p class="small no-margin pull-left sm-pull-reset">		  
 		  <span class="sm-block">
-			<a href="#" class="m-l-10 m-r-10">Terms &amp; Conditions</a> | 
-			<a href="#" class="m-l-10">Privacy Policy</a>
+			<a href="Javascript: void();" class="m-l-10 m-r-10">Terms &amp; Conditions</a> | 
+			<a href="Javascript: void();" class="m-l-10">Privacy Policy</a>
 		   </span>
 		</p>
 		<p class="small no-margin pull-right sm-pull-reset">

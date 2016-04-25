@@ -43,14 +43,14 @@
 		<div class="bg-pic">
 			
 			<!-- START Background Pic-->
-			<img src="<?php echo asset_url('img/demo/new-york-city-buildings-sunrise-morning-hd-wallpaper.jpg');?>" data-src="<?php echo asset_url('img/demo/new-york-city-buildings-sunrise-morning-hd-wallpaper.jpg');?>" data-src-retina="<?php echo asset_url('img/demo/new-york-city-buildings-sunrise-morning-hd-wallpaper.jpg');?>" alt="" class="lazy" />
+			<img src="<?php echo asset_url('img/demo/hong-kong-busy-street.jpg');?>" data-src="<?php echo asset_url('img/demo/hong-kong-busy-street.jpg');?>" data-src-retina="<?php echo asset_url('img/demo/hong-kong-busy-street.jpg');?>" alt="" class="lazy" />
 			<!-- END Background Pic-->
 			
 			<!-- START Background Caption-->
 			<div class="bg-caption pull-bottom sm-pull-bottom text-white p-l-20 m-b-20">
-				<h2 class="semi-bold text-white">iCannPay make it easy to enjoy what matters the most in the life</h2>
-				<p class="small">Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
-				<p class="small">&copy; 2016</p>
+				<h2 class="semi-bold text-white">iCannPay started on the busy streets of Hong Kong</h2>
+				<p class="small">iCannPay can virtually be used for any business you can dream of and imagine.</p>
+				<p class="small">&copy;2016 Artisan Markets, Limited  All Right Reserved</p>
 			</div>
 			<!-- END Background Caption-->
 			
@@ -112,10 +112,11 @@
 					<button class="btn btn-primary btn-cons m-t-10" type="submit">Log In</button>
 				</form>
 				<!--END Login Form-->
-				
 			</div>
 		</div>
 		<!-- END Login Right Container-->
+		
+		
 	  
 	</div> <!-- End: .login-wrapper -->
 	

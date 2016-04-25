@@ -24,7 +24,7 @@
         <div class=" pull-left sm-table hidden-xs hidden-sm">
           <div class="header-inner">
             <div class="brand inline">
-              <a href="<?php echo site_url('admin/dashboard') ?>"><img src="<?php echo asset_url('img/logo.png');?>" alt="logo" data-src="<?php echo asset_url('img/logo.png');?>" data-src-retina="<?php echo asset_url('img/logo_2x.png');?>" height="22" /></a>
+              <img src="<?php echo asset_url('img/logo.png');?>" alt="logo" data-src="<?php echo asset_url('img/logo.png');?>" data-src-retina="<?php echo asset_url('img/logo_2x.png');?>" height="22" />
             </div>
             <!-- START NOTIFICATION LIST -->
             <?php //$this->load->view('notifications'); ?>

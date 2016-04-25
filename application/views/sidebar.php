@@ -26,7 +26,7 @@
       <!-- END SIDEBAR MENU TOP TRAY CONTENT-->
       <!-- BEGIN SIDEBAR MENU HEADER-->
       <div class="sidebar-header">
-        <img src="<?php echo asset_url('img/logo_white.png');?>" alt="logo" class="brand" data-src="<?php echo asset_url('img/logo_white.png');?>" data-src-retina="<?php echo asset_url('img/logo_white_2x.png');?>" width="78" height="22">
+        <img src="<?php echo asset_url('img/logo_white.png');?>" alt="logo" class="brand" data-src="<?php echo asset_url('img/logo_white.png');?>" data-src-retina="<?php echo asset_url('img/logo_white_2x.png');?>" height="22">
         <!-- <div class="sidebar-header-controls">
           <button type="button" class="btn btn-xs sidebar-slide-toggle btn-link m-l-20" data-pages-toggle="#appMenu"><i class="fa fa-angle-down fs-16"></i>
           </button>
@@ -61,33 +61,11 @@
 				?>
 					<li class="m-t-30 ">
 						<a href="<?php echo site_url('admin/dashboard') ?>" class="detailed">
-						  <span class="title">Home</span>
+						  <span class="title">Dashboard</span>
 						</a>
-						<span class="<?php echo ($this->uri->segment(2) == 'dashboard') ? 'bg-success' : '';?> icon-thumbnail"><i class="pg-home"></i></span>
-					  </li>
-					  <li>
-						<a href="javascript:;"><span class="title">Sales</span>
-						<span class=" arrow"></span></a>
-						<span class="<?php echo ($this->uri->segment(2) == 'reports') ? 'bg-success' : '';?> icon-thumbnail"><i class="fa fa-dollar"></i></span>
-						<ul class="sub-menu">
-						  <li class="">
-							<a href="<?php echo site_url('admin/reports') ?>">Reports</a>
-							<span class="icon-thumbnail">R</span>
-						  </li>
-						  <li class="">
-							<a href="<?php echo site_url('admin/sales/transactions') ?>">Transactions</a>
-							<span class="icon-thumbnail">T</span>
-						  </li>
-						</ul>
-					  </li>
-					  <li class="">
-						<a href="<?php echo site_url('admin/products/index');?>">
-						  <span class="title">Products</span>
-						</a>
-						<span class="<?php echo ($this->uri->segment(2) == 'products')&&(($this->uri->segment(3) == 'index')||$this->uri->segment(3) == 'add_product')? 'bg-success' : '';?> icon-thumbnail">
-						  <i class="fa fa-product-hunt"></i>
-						</span>
-					  </li>
+						<span class="<?php echo ($this->uri->segment(2) == 'dashboard') ? 'bg-success' : '';?> icon-thumbnail"><i class="fa fa-dashboard"></i></span>
+					  </li>					  
+					  
 					  <li class="">
 						<a href="<?php echo site_url('admin/categories');?>">
 						  <span class="title">Categories</span>
@@ -95,7 +73,35 @@
 						<span class="<?php echo ($this->uri->segment(2) == 'categories')||($this->uri->segment(3) == 'add_category') ? 'bg-success' : '';?> icon-thumbnail">
 						  <i class="fa fa-tags"></i>
 						</span>
-					  </li>  
+					  </li>
+					 
+					  <li class="">
+						<a href="<?php echo site_url('admin/products/index');?>">
+						  <span class="title">Products</span>
+						</a>
+						<span class="<?php echo ($this->uri->segment(2) == 'products')&&(($this->uri->segment(3) == 'index')||$this->uri->segment(3) == 'add_product')? 'bg-success' : '';?> icon-thumbnail">
+						  <i class="fa fa-th"></i>
+						</span>
+					  </li>
+					  
+					  <li class="">
+						<a href="<?php echo site_url('admin/sales/transactions') ?>">
+						  <span class="title">Transactions</span>
+						</a>
+						<span class="<?php echo ($this->uri->segment(3) == 'transactions') ? 'bg-success' : '';?> icon-thumbnail">
+						  <i class="fa fa-dollar"></i>
+						</span>
+					  </li>
+					  
+					  <li class="">
+						<a href="<?php echo site_url('admin/reports');?>">
+						  <span class="title">Reports</span>
+						</a>
+						<span class="<?php echo ($this->uri->segment(2) == 'reports') ? 'bg-success' : '';?> icon-thumbnail">
+						  <i class="fa fa-list"></i>
+						</span>
+					  </li>
+					  
 					  <li class="">
 						<a href="<?php echo site_url('admin/settings') ?>">
 						  <span class="title">Settings</span>
