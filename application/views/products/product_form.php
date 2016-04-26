@@ -4,21 +4,25 @@ $product_name ="";
 $price = "";
 $description = ""; 
 
-if(isset($edit_data) && is_array($edit_data))
+if(isset($postedData) && !empty($postedData))
 {	
-	$ArrEditCategories = array();
-	foreach ($edit_data as $row) 
+	if(isset($postedData['categories']) && !empty($postedData['categories']))
 	{
-		$ArrEditCategoriesId[] = $row['category_id'];
+		$ArrEditCategories = array();
+		for ($i=0;$i<count($postedData['categories']);$i++) 
+		{
+			$ArrEditCategoriesId[] = $postedData['categories'][$i];
+		}
 	}
-	
-	$product_name = $edit_data[0]['product_name'];
-	$description = $edit_data[0]['description'];
-	$price = $edit_data[0]['price'];
-
-	for ($i=0; $i <count($ArrEditCategoriesId) ; $i++)
-	{ 
-		$ArrEditCategoriesId[$i]='"'.$ArrEditCategoriesId[$i].'"';
+	$product_name = $postedData['product_name'];
+	$description = $postedData['description'];
+	$price = $postedData['price'];
+	if(!empty($ArrEditCategories))
+	{
+		for ($i=0; $i <count($ArrEditCategoriesId) ; $i++)
+		{ 
+			$ArrEditCategoriesId[$i]='"'.$ArrEditCategoriesId[$i].'"';
+		}
 	}
 }
 ?>
@@ -26,14 +30,23 @@ if(isset($edit_data) && is_array($edit_data))
 <div class="content ">
 	<div class="panel panel-default">
 		<div class="panel-body">
+			<?php 
+		        if($this->session->flashdata('showErrorMessage')!='')
+	          	{?>   
+	        	    <div class="alert alert-danger">
+		              <strong>Alert!</strong>&nbsp;&nbsp;<?php echo $this->session->flashdata('showErrorMessage');?>
+		            </div>
+	        	    <?php 
+	        	}
+		    ?>
 			<h1>
-				<?php echo $form_title;?>
+				<?php echo $formHeading;?>
 			</h1>
 			<div class="col-xs-6">
-				<form role="form" action="<?php echo $form_url;?>" method="post">
+				<form role="form" action="" method="post">
 					<div class="form-group">
 						<label>Product Name</label>
-						<input type="text" value="<?php echo $product_name;?>" name="product_name" class="form-control" required="">
+						<input type="text" value="<?php echo $product_name;?>" name="product_name" class="form-control" >
 					</div>
 					<div class="form-group">
 						<label>Description</label>
@@ -41,7 +54,7 @@ if(isset($edit_data) && is_array($edit_data))
 					</div>
 					<div class="form-group">
 						<label>Categories</label>
-						<select required="" name="categories[]" id="multi" class="full-width select2-offscreen" multiple="" tabindex="-1">
+						<select  name="categories[]" id="multi" class="full-width select2-offscreen" multiple="" tabindex="-1">
 							<?php
 							foreach ($categories as $category) 
 							{?>
@@ -52,10 +65,10 @@ if(isset($edit_data) && is_array($edit_data))
 					</div>
 					<div class="form-group">
 						<label>Price</label>
-						<input required="" value="<?php echo $price;?>" name="price" type="text" data-a-sign="$ " class="autonumeric form-control">
+						<input  value="<?php echo $price;?>" name="price" type="text" data-a-sign="$ " class="autonumeric form-control">
 					</div>
 					<br /><br />
-					<button class="btn btn-primary" type="submit">Submit</button>
+					<button name="btn-submit" value="submit" class="btn btn-primary" type="submit">Submit</button>
 				</form>
 			</div>     
 		</div>

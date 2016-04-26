@@ -18,23 +18,15 @@ Class Product extends CI_Model
 		}
     }
 
-    function get_all_products($store_id=0,$user_id)
-    {   
-       
-		if($store_id)
-		{
-			$sql = "select * from products where status=1 and store_id=$store_id" ;
-		}
-		else
-		{
-			$sql = "SELECT pc.product_id,pc.category_id,p.price,p.name AS product_name, c.name AS category_name FROM 
+    function get_all_products($storeId=0,$userId=0)
+    {       
+		$sql = "SELECT pc.product_id,pc.category_id,p.price,p.name AS product_name, c.name AS category_name FROM 
                     product_categories AS pc
                     LEFT JOIN products AS p
                     ON pc.product_id = p.product_id
                     LEFT JOIN categories AS c
                     ON pc.category_id = c.category_id
-                    WHERE p.user_id ='$user_id'" ;
-		}
+                    WHERE p.user_id ='$userId' AND p.store_id='$storeId'" ;
         $query = $this->db->query($sql);
         $result = $query->result_array();
         $query->free_result();
@@ -68,32 +60,33 @@ Class Product extends CI_Model
         return $this->db->insert_id();
     }
 
-    function add_product_categories($arrCategoryIds,$product_id=0)
+    function add_product_categories($arrCategoryIds,$productId=0)
     {
         for ($i=0; $i <count($arrCategoryIds) ; $i++) 
         {   
-            $this->db->insert('product_categories',array("product_id" => $product_id,"category_id" => $arrCategoryIds[$i]));
+            $this->db->insert('product_categories',array("product_id" => $productId,"category_id" => $arrCategoryIds[$i]));
         }
     }
 
-    function delete_product($product_id)
+    function delete_product($productId)
     {
-        $this->db->where('product_id', $product_id);
+        $this->db->where('product_id', $productId);
         $this->db->delete('products');
-        $this->db->where('product_id', $product_id);
+        $this->db->where('product_id', $productId);
         $this->db->delete('product_categories');
 
     }
 
-    function edit_product_record($product_id=0, $user_id=0)
+    function getById($productId=0, $userId=0, $storeId=0)
     {
-		$sql = "SELECT pc.product_id,p.description,pc.category_id,p.price,p.name AS product_name, c.name AS category_name FROM 
-                product_categories AS pc
-                LEFT JOIN products AS p
-                ON pc.product_id = p.product_id
-                LEFT JOIN categories AS c
-                ON pc.category_id = c.category_id
-                WHERE p.user_id ='$user_id' AND p.product_id='$product_id'";
+		$sql = "    SELECT pc.product_id,pc.category_id,p.price,p.name AS product_name,p.description, c.name AS category_name FROM 
+                    product_categories AS pc
+                    LEFT JOIN products AS p
+                    ON pc.product_id = p.product_id
+                    LEFT JOIN categories AS c
+                    ON pc.category_id = c.category_id
+                    WHERE p.product_id ='$productId' AND p.user_id ='$userId' AND p.store_id='$storeId'";
+        
         $query = $this->db->query($sql);
         $result = $query->result_array();
         $query->free_result();
@@ -111,15 +104,15 @@ Class Product extends CI_Model
         }
     }
 
-    function update_product($data,$product_id)
+    /*function update_product($data,$product_id)
     {
         $this->db->where('product_id', $product_id);
         $this->db->update('products', $data);
-    }
+    }*/
 
-    function edit_product($product_id, $data)
+    function edit_product($productId, $data)
     {
-        $this->db->where('product_id', $product_id);
+        $this->db->where('product_id', $productId);
         $this->db->update('products',$data);
         return ($this->db->affected_rows() != 1) ? false : true;
         

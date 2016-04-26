@@ -1,27 +1,37 @@
 <?php
+
 $category_name = ''; 
 $parent_category = '';
 $child_category_id ='';
 
-if(isset($edit_data) && is_array($edit_data))
+if(isset($postedData) && !empty($postedData))
 { 
 
-  $category_name = $edit_data[0]['category'];
-  $parent_category = $edit_data[0]['parent_category'];
-  $child_category_id = $edit_data[0]['parent_category_id'];
+  $category_name = $postedData['category_name'];
+  $parent_category = $postedData['parent_category'];
 }
 
 ?>
+
 <div class="content ">
   <div class="panel panel-default">
     <div class="panel-body">
+      <?php 
+        if($this->session->flashdata('showErrorMessage')!='')
+          {?>   
+            <div class="alert alert-danger">
+              <strong>Alert!</strong>&nbsp;&nbsp;<?php echo $this->session->flashdata('showErrorMessage');?>
+            </div>
+            <?php 
+          }
+      ?>
       <h1>
-       <?php echo $form_title;?>
+       <?php echo $formHeading;?>
       </h1>
-      <form role="form" method="post" action='<?php echo $form_url;?>'>
+      <form role="form" method="post" action="">
         <div class="form-group">
           <label>Category Name</label>
-          <input type="text" name="category_name" class="form-control" required="" value="<?php echo $category_name;?>">
+          <input type="text" name="category_name" class="form-control" value="<?php echo $category_name;?>">
         </div>
         <div class="form-group">
           <label>Parent Category</label>
@@ -29,12 +39,12 @@ if(isset($edit_data) && is_array($edit_data))
             <option value="0">No Parent Category</option>
             <?php foreach ($categories as $category)
             { 
-              if($category['name']==$parent_category)
+              if($category['category_id']==$parent_category)
               {?>
-                <option selected value="<?php echo $child_category_id?>"><?php echo $parent_category;?></option>
+                <option selected value="<?php echo $category['category_id']?>"><?php echo $category['name'];?></option>
                 <?php
               }
-              if($category['name']!=$category_name)
+              else
               {?>
                 <option value="<?php echo $category['category_id'];?>"><?php echo $category['name'];?></option>
                 <?php
@@ -43,7 +53,7 @@ if(isset($edit_data) && is_array($edit_data))
           </select>
         </div>
 		<br /><br />
-        <button class="btn btn-primary" type="submit">Submit</button>
+        <button value ="submit" name="btn-submit" class="btn btn-primary" type="submit">Submit</button>
       </form>
     </div>
   </div>

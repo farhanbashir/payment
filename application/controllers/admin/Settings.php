@@ -107,12 +107,12 @@ Class Settings extends CI_Controller
 			if(!$user_detail)
 			{	
 				$data['created'] 	= date("Y-m-d H:i:s");
-
-				$data['status']		= CONST_BANK_STATUS_NOT_VERIFIED;
+				$data['user_id']    = getLoggedInUserId();
+				$data['status']		= 1;
 				
 				$this->Profile->add_user_detail($ArrSeurityInfo);
 			}
-			
+
 			else
 			{	
 				$data['updated'] 	= date("Y-m-d H:i:s");

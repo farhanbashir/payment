@@ -13,50 +13,124 @@ class Categories extends CI_Controller
 
     function index()
     {   
-        $user_id = getLoggedInUserId();
+        $userId  = getLoggedInUserId();
+        $storeId = getLoggedInStoreId();
        
     	$data = array();
-	    $data['categories'] = $this->Category->get_all_categories($user_id);
+	    $data['categories'] = $this->Category->get_all_categories($userId, $storeId);
 	    $content = $this->load->view('categories/categories', $data, true);
      	$this->load->view('main', array('content' => $content));
     }
 
-    function create_category()
-    {   
+    function save($categoryId=0)
+    {	
         $data = array();
-        $user_id = getLoggedInUserId();
-        $data['form_title'] = "Add New Category";
-        $data['button_title'] = "Create a new Category";
-        $data['categories'] = $this->Category->get_all_categories($user_id);
-        $data['form_url'] = site_url('admin/categories/add_category');
+        $postedData = array();
+        $aErrorMessage = array();
+        $showErrorMessage = "";
+
+        $userId = getLoggedInUserId();
+        $storeId = getLoggedInStoreId();
+
+        $formHeading = "Create Category";
+
+        if($categoryId)
+        {
+            $categoryInfo = $this->Category->getById($categoryId, $userId, $storeId);
+            
+            if($categoryInfo)
+            {
+                $formHeading = "Edit Category";
+
+                $postedData = $categoryInfo;
+            }
+            else
+            {                
+                redirect(site_url('admin/categories'));
+            }
+        }
+        
+        #Submitter - Start!        
+        if($this->input->post('btn-submit'))
+        {
+            $postedData = $this->input->post();
+        
+            extract($postedData);
+
+            $category_name = htmlentities($category_name);
+
+            if(!$category_name)
+            {
+               $aErrorMessage[] = "Category name required";
+            }
+            
+            if(is_array($aErrorMessage) && count($aErrorMessage))
+            {
+                $showErrorMessage = getFormValidationErrorMessage($aErrorMessage);
+                $showErrorMessage = $this->session->set_flashdata('showErrorMessage',$showErrorMessage);
+            }
+
+            else
+            {
+                $saveData = array(
+                    'name'      => $category_name,
+                    'store_id'  => $storeId,
+                    'user_id'   => $userId,
+                    'parent_id' => $parent_category,
+                    'status'    => CONST_STATUS_ID_ACTIVE,
+                );
+                
+                if($categoryId)
+                {
+                    $saveData['updated'] = date("Y-m-d H:i:s");   
+                    
+                    $this->Category->update_category($saveData, $categoryId);
+                }
+
+                else
+                {   
+
+                    $saveData['created'] = date("Y-m-d H:i:s");
+
+                    $this->Category->add_category($saveData);                
+                }
+
+                $this->session->set_flashdata('Message','Category has been successfully saved!');
+                redirect('admin/categories','refresh');
+            }
+           
+        }
+       
+       
+        $data['formHeading'] = $formHeading;
+        $data['postedData'] = $postedData;
+
+        $data['button_title'] = "Save";
+        $data['categories'] = $this->Category->get_all_categories($userId, $storeId);
+
         $content = $this->load->view('categories/category_form', $data, true);
         $this->load->view('main', array('content' => $content));
+
     }
 
-    function add_category()
-    {	
-    	
-    	$category_name = htmlentities($this->input->post('category_name'));
-    	
-    	$parent_category = htmlentities($this->input->post('parent_category'));
-		
-		$data = array(
-			
-			'store_id'		=>	getLoggedInStoreId(),
-			'user_id'		=>	getLoggedInUserId(),
-			'name'			=>	$category_name,
-			'parent_id'		=>	$parent_category,
-			'status'		=>	1,
-			'created'		=>  date("Y-m-d H:i:s"),
-			);
-    	
-    	$this->Category->add_category($data);
-    	$this->session->set_flashdata('Message','Category add successfully');
-    	
-    	redirect('admin/categories','refresh');
-    }
+    function delete_category($categoryId)
+    {
+        if(!intval($categoryId) || $categoryId<0)
+        {
+            redirect('admin/categories','refresh');
+        }
 
-    function edit_category($category_id)
+        $userId  = getLoggedInUserId();
+        $storeId = getLoggedInStoreId();
+        $categoryInfo = $this->Category->getById($categoryId, $userId, $storeId);
+        if($categoryInfo)
+        {
+            $this->Category->delete_category($categoryId);
+            $this->session->set_flashdata('Message','Category Delete successfully');
+        }
+        redirect('admin/categories','refresh');
+    }
+    /*function edit_category($category_id)
     {
     	if(!intval($category_id) || $category_id<0)
         {
@@ -76,8 +150,8 @@ class Categories extends CI_Controller
         $content = $this->load->view('categories/category_form', $data, true);
         $this->load->view('main', array('content' => $content));
     }
-
-    function update_category($category_id)
+*/
+   /* function update_category($category_id)
     {
         if(!intval($category_id) || $category_id<0)
         {
@@ -97,19 +171,9 @@ class Categories extends CI_Controller
         $this->Category->update_category($data,$category_id);
         $this->session->set_flashdata('Message','Category Updated successfully');
         redirect('admin/categories','refresh');
-    }
+    }*/
 
-    function delete_category($id)
-    {
-        if(!intval($id) || $id<0)
-        {
-            redirect('admin','refresh');
-        }
-
-        $this->Category->delete_category($id);
-        $this->session->set_flashdata('Message','Category Delete successfully');
-        redirect('admin/categories','refresh');
-    }
+   
 }
 
 

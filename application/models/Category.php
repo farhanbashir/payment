@@ -23,7 +23,7 @@ Class Category extends CI_Model
         }
     }
 
-    function get_category_detail($category_id)
+   /* function get_category_detail($category_id)
     {   
        
         $sql = "SELECT * FROM categories WHERE category_id='$category_id' AND store_id = '$store_id' AND user_id = '$store_id' " ;
@@ -40,17 +40,19 @@ Class Category extends CI_Model
 			return false;
 		}
     }
-
-    function update_category($data,$id)
+*/
+    function update_category($data,$categoryId)
     {
-        $this->db->where('category_id', $id);
+        $this->db->where('category_id', $categoryId);
         $this->db->update('categories', $data); 
     }
 
-    function delete_category($id)
-    {
-        $this->db->where('category_id', $id);
-        $this->db->delete('categories');
+    function delete_category($categoryId)
+    {   
+        $sql = "UPDATE categories SET status ='".CONST_STATUS_ID_DELETE."' WHERE category_id='$categoryId'";
+        $this->db->query($sql);
+        $sql = "UPDATE categories SET status ='".CONST_STATUS_ID_DELETE."' WHERE parent_id='$categoryId'";
+        $this->db->query($sql);
     }
 
     function delete_all_categories_for_product($product_id)
@@ -68,11 +70,11 @@ Class Category extends CI_Model
         return $result;   
     }
 
-    function get_all_categories($user_id)
+    function get_all_categories($userId, $storeId)
     {
        
         $sql = "SELECT name,category_id,parent_id,(SELECT COUNT(category_id) FROM product_categories WHERE category_id=categories.category_id) AS total_products
-                FROM categories WHERE user_id='$user_id'";
+                FROM categories WHERE status >0 AND user_id='$userId' AND store_id='$storeId' ";
         $query = $this->db->query($sql);
         $result = $query->result_array();
         $query->free_result();
@@ -85,17 +87,14 @@ Class Category extends CI_Model
         return $this->db->insert_id();
     }
 
-    
-
-    function edit_category($category_id)
-    {   
-        $sql = "SELECT t1.name AS category, t2.name AS parent_category,t1.parent_id AS parent_category_id 
-                FROM categories AS t1 LEFT JOIN categories AS t2 ON t2.category_id = t1.parent_id WHERE t1.category_id ='$category_id'";
+    function getById($categoryId, $userId, $storeId)
+    {
+        $sql = "SELECT name AS category_name, category_id, parent_id AS parent_category FROM categories WHERE category_id = '$categoryId' AND user_id = '$userId' AND store_id = '$storeId'";
         $query = $this->db->query($sql);
         $result = $query->result_array();
         $query->free_result();
-        return $result;
-    }
+        return $result[0];
+    }     
 
     function add_product_category($data)
     {

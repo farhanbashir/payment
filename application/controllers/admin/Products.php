@@ -32,129 +32,146 @@ class Products extends CI_Controller {
     }
     public function index() 
     { 
-        $user_id = getLoggedInUserId();
+        $userId  = getLoggedInUserId();
+        $storeId = getLoggedInStoreId();
         $data = array();
         // $data['total_users'] = $this->user->get_total_users();
         // $data['total_stores'] = $this->store->get_total_stores();
         // $data['latest_five_users'] = $this->user->get_latest_five_users();
         // $data['latest_five_stores'] = $this->store->get_latest_five_stores();
-        $data['products'] = $this->Product->get_all_products($store_id=null,$user_id);
+        $data['products'] = $this->Product->get_all_products($storeId,$userId);
+
         $content = $this->load->view('products/products', $data, true);
         $this->load->view('main', array('content' => $content));
     }
 
-    function create_product()
+    function save($productId=0)
     {   
         $data = array();
-        $user_id = getLoggedInUserId();
-        $data['categories'] = $this->Category->get_all_categories($user_id);
-        $data['form_title'] = "Add New Product";
-        $data['form_url'] = site_url('admin/products/add_product');
+        $storeId = getLoggedInStoreId();
+        $userId = getLoggedInUserId();
+        $postedData = array();
+        $aErrorMessage = array();
+        $showErrorMessage = "";
+        $formHeading = "Add New Product";
+
+        if($productId)
+        {
+
+          $productInfo = $this->Product->getById($productId, $userId, $storeId);
+          if($productInfo)
+          { 
+           
+            $categories = array();
+            foreach ($productInfo as $row) 
+            {
+              $categories[] = $row['category_id'];
+            }
+            $postedData['product_name'] =   $productInfo[0]['product_name'];
+            $postedData['description']  =   $productInfo[0]['description'];
+            $postedData['price']  =   $productInfo[0]['price'];
+            $postedData['categories']  =   $categories;
+            $formHeading = "Edit Product";
+          }
+          else
+          {
+            redirect('admin/products');
+          }
+        }
+
+        if($this->input->post('btn-submit'))
+        {
+          $postedData = $this->input->post();
+        
+          extract($postedData);
+          $categoryIds = array();
+          $product_name  = htmlentities($product_name); 
+          $description   = htmlentities($description);
+          $replaceWordInPrice = array('$',',');
+          $price = htmlentities(str_replace($replaceWordInPrice,'',$price));
+
+          
+          if(!$product_name)
+          {
+            $aErrorMessage[]= "Product name required";
+          }
+
+          if(!$price)
+          {
+            $aErrorMessage[]= "Price Required";
+          }
+          if(empty($categories))
+          {
+            $aErrorMessage[]= "Select atlease one category";
+          }
+          else
+          {
+            for ($i=0; $i <count($categories) ; $i++) 
+            { 
+              $categoryIds[] = htmlentities($categories[$i]);
+            }
+
+          }
+
+          if(is_array($aErrorMessage) && count($aErrorMessage))
+          {
+            $showErrorMessage = getFormValidationErrorMessage($aErrorMessage);
+            $showErrorMessage = $this->session->set_flashdata('showErrorMessage',$showErrorMessage);
+          }
+          else
+          {
+            $saveData = array(
+
+                'store_id'      =>  $storeId,
+                'user_id'       =>  $userId,
+                'name'          =>  $product_name,
+                'description'   =>  $description,
+                'price'         =>  $price,
+                'status'        =>  CONST_STATUS_ID_ACTIVE,
+              );
+              if($productId)
+              { 
+                
+                $saveData['updated'] = date("Y-m-d H:i:s");
+
+                $this->Product->edit_product($productId, $saveData);
+                $this->Product->update_product_categories($categories,$productId);
+              }
+              else
+              {
+                
+                $saveData['created'] = date("Y-m-d H:i:s");
+                $productId = $this->Product->add_product($saveData);
+                $this->Product->add_product_categories($categories, $productId);
+                
+              }
+              $this->session->set_flashdata('Message','Category has been successfully saved!');
+              redirect('admin/products','refresh');
+          }
+          
+        }
+
+        $data['postedData'] = $postedData;
+        $data['categories'] = $this->Category->get_all_categories($userId, $storeId);
+        $data['formHeading'] = $formHeading;
         $content = $this->load->view('products/product_form', $data, true);
         $this->load->view('main', array('content' => $content));
     }
 
-    function add_product()
-    {   
-        $product_name = htmlentities($this->input->post('product_name'));
-        $arrCategoryIds = array();
-        $categories_array = $this->input->post('categories');
-        for ($i=0; $i <count($categories_array) ; $i++) 
-        { 
-            $arrCategoryIds[] = htmlentities($categories_array[$i]);
-        }
-        $replaceWordInPrice = array('$',',');
-        $price = htmlentities(str_replace($replaceWordInPrice,'',$this->input->post('price')));
-        $description = htmlentities($this->input->post('description'));
-        if(!$price || !$product_name)
-        {
-          redirect(base_url(),'refresh');
-        }
-
-        $data = array(
-
-          'store_id'      =>  getLoggedInStoreId(),
-          'user_id'       =>  getLoggedInUserId(),
-          'name'          =>  $product_name,
-          'description'   =>  $description,
-          'price'         =>  $price,
-          'status'        =>  1,
-          'created'       =>  date("Y-m-d H:i:s"),
-          );
-
-        $product_id = $this->Product->add_product($data);
-        $this->Product->add_product_categories($arrCategoryIds,$product_id);
-        $this->session->set_flashdata('Message','Product add successfully');
-        redirect('admin/products','refresh');
-    }
-
     function delete_product($product_id)
-    {
+    { 
       if(!intval($product_id) || $product_id<0)
       {
         redirect('admin','refresh');
       }
-      $this->Product->delete_product($product_id);
-      $this->session->set_flashdata('Message','Product Delete successfully');
+      $productInfo = $this->Product->getById($productId, $userId, $storeId);
+      if($productInfo)
+      { 
+        $this->Product->delete_product($product_id);
+        $this->session->set_flashdata('Message','Product Delete successfully');
+      }
       redirect('admin/products','refresh');
 
-    }
-
-    function edit_product($product_id)
-    {
-      if(!intval($product_id) || $product_id<0)
-      {
-        redirect('admin','refresh');
-      }
-
-      $data = array();
-      $user_id = getLoggedInUserId();
-      $data['categories'] = $this->Category->get_all_categories($user_id);
-
-      $data['form_title'] = "Edit Product";
-
-      $data['edit_data'] = $this->Product->edit_product_record($product_id,$user_id);
-      if(empty($data['edit_data']))
-      {
-          redirect('admin/products','refresh');
-      }
-      $data['form_url'] = site_url('admin/products/update_product/'.$product_id);
-      $content = $this->load->view('products/product_form', $data, true);
-      $this->load->view('main', array('content' => $content));
-    }
-
-    function update_product($product_id)
-    {
-
-      if(!intval($product_id) || $product_id<0)
-      {
-        redirect('admin','refresh');
-      }
-      $product_name = htmlentities($this->input->post('product_name'));
-      $arrCategoryIds = array();
-      $categories_array = $this->input->post('categories');
-      for ($i=0; $i <count($categories_array) ; $i++) 
-      { 
-        $arrCategoryIds[] = htmlentities($categories_array[$i]);
-      }
-      $replaceWordInPrice = array('$',',');
-      $price = htmlentities(str_replace($replaceWordInPrice,'',$this->input->post('price')));
-      $description = htmlentities($this->input->post('description'));
-      if(!$price || !$product_name)
-      {
-        redirect(base_url(),'refresh');
-      }
-      $data = array(
-
-          'name'          =>  $product_name,
-          'description'   =>  $description,
-          'price'         =>  $price,
-          'updated'       =>  date("Y-m-d H:i:s"),
-          );
-        $this->Product->update_product($data,$product_id);
-        $this->Product->update_product_categories($arrCategoryIds,$product_id);
-        $this->session->set_flashdata('Message','Product Update successfully');
-        redirect('admin/products','refresh');
     }
 
     public function change_password()

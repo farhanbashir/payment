@@ -38,7 +38,7 @@ foreach ($products as $row)
         </div>
         <div class="btn-group pull-right m-b-10">
           <!--<a href="# class="btn btn-primary btn-cons">Import / Export</a>-->
-		      <a href="<?php echo site_url('admin/products/create_product');?>" class="btn btn-primary btn-cons">Add New Product</a>
+		      <a href="<?php echo site_url('admin/products/save');?>" class="btn btn-primary btn-cons">Add New Product</a>
         </div>
         <div class="btn-group pull-right m-b-10">
           
@@ -85,7 +85,7 @@ foreach ($products as $row)
                   </td>
                   <td class="v-align-middle">
                     <p>
-                      <a href="<?php echo site_url('admin/products/edit_product/'.$product['product_id']);?>">
+                      <a href="<?php echo site_url('admin/products/save/'.$product['product_id']);?>">
                         <button class="btn btn-primary btn-cons">Edit</button>
                       </a>
                       <a onclick="return confirm('Are you sure want to delete','<?php echo site_url('admin/products/delete_product/'.$product['product_id']);?>')"href="<?php echo site_url('admin/products/delete_product/'.$product['product_id']);?>">
