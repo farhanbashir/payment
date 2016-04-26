@@ -9,17 +9,17 @@ $facebook="";
 $twitter="";
 $website="";
 
-if(!empty($business_info))
+if(!empty($businessInfoData))
 {
-	$business_name = $business_info['name'];
-	$description = $business_info['description'];
-	$email = $business_info['email'];
-	$phone = $business_info['phone'];
-	$logo = $business_info['logo'];
-	$address = $business_info['address'];
-	$facebook = $business_info['facebook'];
-	$twitter = $business_info['twitter'];
-	$website = $business_info['website'];
+	$business_name = $businessInfoData['business'];
+	$description = $businessInfoData['description'];
+	$email = $businessInfoData['email'];
+	$phone = $businessInfoData['phone'];
+	$logo = $businessInfoData['old_image'];
+	$address = $businessInfoData['address'];
+	$facebook = $businessInfoData['facebook'];
+	$twitter = $businessInfoData['twitter'];
+	$website = $businessInfoData['website'];
 }
 
 ?>
@@ -27,25 +27,25 @@ if(!empty($business_info))
 <div class="panel-body">
 	<h2>Business Information</h2>
 	<div class="col-md-6" style="padding-left: 0px;">
-		<?php if($this->session->flashdata('ErrorMessageTab2')!='')
+		<?php if($this->session->flashdata('errMsgBusinessInfo')!='')
 	    {?>   
 	        <div class="alert alert-danger">
-	          <strong>Alert!</strong>&nbsp;&nbsp;<?php echo $this->session->flashdata('ErrorMessageTab2');?>
+	          <strong>Alert!</strong>&nbsp;&nbsp;<?php echo $this->session->flashdata('errMsgBusinessInfo');?>
 	        </div>
 	        <?php 
 	    }?>
-	    <?php if($this->session->flashdata('MessageTab2')!='')
+	    <?php if($this->session->flashdata('successMsgBusinessInfo')!='')
 	    {?>   
 	        <div class="alert alert-success">
-	          <strong>Success!</strong>&nbsp;&nbsp;<?php echo $this->session->flashdata('MessageTab2');?>
+	          <strong>Success!</strong>&nbsp;&nbsp;<?php echo $this->session->flashdata('successMsgBusinessInfo');?>
 	        </div>
 	        <?php 
 	    }?>
-		<form role="form" method ="post"action="<?php echo $business_info_form_url;?>" enctype="multipart/form-data" accept-charset="utf-8">
+		<form role="form" method ="post"action="" enctype="multipart/form-data" accept-charset="utf-8">
 			<div class="form-group">
 				<label>Logo</label>
 				<input type="file" name="image" >
-				<input type="hidden" name="old-image" value="<?php echo $logo;?>">
+				<input type="hidden" name="old_image" value="<?php echo $logo;?>">
 				<?php
 					if($logo)						
 					{
@@ -58,7 +58,7 @@ if(!empty($business_info))
 			</div>
 			<div class="form-group">
 				<label>Business Name</label>
-				<input name="business" value="<?php echo $business_name;?>" type="text" class="form-control" required="">
+				<input name="business" value="<?php echo $business_name;?>" type="text" class="form-control" >
 			</div>
 			<div class="form-group">
 				<label>Description</label>
@@ -70,7 +70,7 @@ if(!empty($business_info))
 			</div>
 			<div class="form-group">
 				<label>Phone</label>
-				<input name="phone" value="<?php echo $phone;?>" type="text" class="form-control" required="">
+				<input name="phone" value="<?php echo $phone;?>" type="text" class="form-control">
 			</div>
 			<div class="form-group">
 				<label>Address</label>
@@ -89,8 +89,12 @@ if(!empty($business_info))
 				<input name="website" value="<?php echo $website;?>" type="text" class="form-control">
 			</div>
 			<br /><br />
-			<button type="submit" class="btn btn-primary btn-cons">Save</button>
+			<button name="btn-business-info" value="submit" type="submit" class="btn btn-primary btn-cons">Save</button>
 		</form>
 	</div>
 
 </div>
+<?php
+$this->session->set_flashdata('successMsgBusinessInfo','');
+$this->session->set_flashdata('errMsgBusinessInfo','');
+?>

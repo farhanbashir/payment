@@ -58,6 +58,8 @@
     <link href="<?php echo asset_url('plugins/rickshaw/rickshaw.min.css');?>" rel="stylesheet" type="text/css" />
     <link href="<?php echo asset_url('plugins/datatables-responsive/css/datatables.responsive.css');?>" rel="stylesheet" type="text/css" />
     
+    <link rel="stylesheet" href="<?php echo asset_url('css/jquery.minicolors.css');?>">
+
     <link href="<?php echo asset_url('plugins/bootstrap-datepicker/css/datepicker3.css');?>" rel="stylesheet" type="text/css" media="screen">
     <link href="<?php echo asset_url('plugins/jquery-datatable/media/css/dataTables.bootstrap.min.css');?>" rel="stylesheet" type="text/css" media="screen">
     <link href="<?php echo asset_url('plugins/jquery-metrojs/MetroJs.css');?>" rel="stylesheet" type="text/css" media="screen" />
@@ -145,6 +147,8 @@
 	<script src="<?php echo asset_url('plugins/summernote/js/summernote.min.js');?>" type="text/javascript"></script>
 	<script src="<?php echo asset_url('plugins/bootstrap3-wysihtml5/bootstrap3-wysihtml5.all.min.js');?>" type="text/javascript"></script>
 	<script src="<?php echo asset_url('plugins/jquery-inputmask/jquery.inputmask.min.js');?>" type="text/javascript"></script>
+
+    <script src="<?php echo asset_url('js/jquery.minicolors.js');?>"></script>
 	
     <!-- END VENDOR JS -->
     <!-- BEGIN CORE TEMPLATE JS -->
@@ -213,6 +217,45 @@
 			return false;
 		}
 	</script>
+
+
+     
+    <script>
+    $(document).ready( function() {
+
+        $('.demo').each( function() {
+            //
+            // Dear reader, it's actually very easy to initialize MiniColors. For example:
+            //
+            //  $(selector).minicolors();
+            //
+            // The way I've done it below is just for the demo, so don't get confused
+            // by it. Also, data- attributes aren't supported at this time. Again,
+            // they're only used for the purposes of this demo.
+            //
+            $(this).minicolors({
+                control: $(this).attr('data-control') || 'hue',
+                defaultValue: $(this).attr('data-defaultValue') || '',
+                format: $(this).attr('data-format') || 'hex',
+                keywords: $(this).attr('data-keywords') || '',
+                inline: $(this).attr('data-inline') === 'true',
+                letterCase: $(this).attr('data-letterCase') || 'lowercase',
+                opacity: $(this).attr('data-opacity'),
+                position: $(this).attr('data-position') || 'bottom left',
+                swatches: $(this).attr('data-swatches') ? $(this).attr('data-swatches').split('|') : [],
+                change: function(hex, opacity) {
+                    var log;
+                    try {
+                        log = hex ? hex : 'transparent';
+                        if( opacity ) log += ', ' + opacity;
+                        console.log(log);
+                    } catch(e) {}
+                },
+                theme: 'default'
+            });
+        });
+    });
+    </script>
 	
 	
     <!-- END PAGE LEVEL JS -->

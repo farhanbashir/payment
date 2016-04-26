@@ -5,33 +5,33 @@ $email = '';
 $security_question_id = '';
 $security_answer = '';
 
-if(!empty($basic_info))
+if(!empty($basicInfoData))
 {
-	$first_name = $basic_info['first_name'];
-	$last_name = $basic_info['last_name'];
-	$email = $basic_info['email'];
-	$security_question_id = $basic_info['security_question_id'];
-	$security_answer = $basic_info['security_answer'];
+	$first_name = $basicInfoData['first_name'];
+	$last_name = $basicInfoData['last_name'];
+	$email = $basicInfoData['email'];
+	$security_question_id = $basicInfoData['security_question'];
+	$security_answer = $basicInfoData['security_answer'];
 }
 ?>
 <div class="panel-body">
 	<h2>Personal Information</h2>
 	<div class="col-md-6" style="padding-left: 0px;">
-		<?php if($this->session->flashdata('ErrorMessageTab1')!='')
+		<?php if($this->session->flashdata('errMsgBasicInfo')!='')
 	    {?>   
 	        <div class="alert alert-danger">
-	          <strong>Alert!</strong>&nbsp;&nbsp;<?php echo $this->session->flashdata('ErrorMessageTab1');?>
+	          <strong>Alert!</strong>&nbsp;&nbsp;<?php echo $this->session->flashdata('errMsgBasicInfo');?>
 	        </div>
 	        <?php 
 	    }?>
-	    <?php if($this->session->flashdata('MessageTab1')!='')
+	    <?php if($this->session->flashdata('successMsgBasicInfo')!='')
 	    {?>   
 	        <div class="alert alert-success">
-	          <strong>Success!</strong>&nbsp;&nbsp;<?php echo $this->session->flashdata('MessageTab1');?>
+	          <strong>Success!</strong>&nbsp;&nbsp;<?php echo $this->session->flashdata('successMsgBasicInfo');?>
 	        </div>
 	        <?php 
 	    }?>
-		<form role="form" method ="post"action="<?php echo $basic_info_form_url;?>">
+		<form role="form" method ="post"action="">
 			<div class="form-group">
 				<label>First Name</label>
 				<input name="first_name" type="text" class="form-control" value="<?php echo $first_name;?>" required="">
@@ -84,7 +84,11 @@ if(!empty($basic_info))
 				<a href="Javascript: void();">DEACTIVATE NOW</a>
 			</p>
 			<br /><br />
-			<button type="submit" class="btn btn-primary btn-cons">Save</button>
+			<button name="btn-basic-info" value="submit" type="submit" class="btn btn-primary btn-cons">Save</button>
 		</form>
 	</div>
 </div>
+<?php
+$this->session->set_flashdata('successMsgBasicInfo','');
+$this->session->set_flashdata('errMsgBasicInfo','');
+?>

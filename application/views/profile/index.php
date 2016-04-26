@@ -3,18 +3,18 @@
       $tab2 = "";
       $tab3 = "";
       $tab4 = "";
-      if($this->session->flashdata('ErrorMessageTab2')!='' || $this->session->flashdata('MessageTab2')!='' )
+      if($this->session->flashdata('errMsgBusinessInfo')!='' || $this->session->flashdata('successMsgBusinessInfo')!='' )
       {
           $tab1 = "";
           $tab2 = "active";
           
       }
-      if($this->session->flashdata('ErrorMessageTab3')!='' || $this->session->flashdata('MessageTab3')!='' )
+      if($this->session->flashdata('errMsgBankInfo')!='' || $this->session->flashdata('successMsgBankInfo')!='' )
       {
           $tab1 = "";
           $tab3 = "active";
       }
-      if($this->session->flashdata('ErrorMessageTab4')!='' || $this->session->flashdata('MessageTab4')!='' )
+      if($this->session->flashdata('successMsgReceiptInfo')!='' || $this->session->flashdata('successMsgReceiptInfo')!='' )
       {
           $tab1 = "";
           $tab4 = "active";

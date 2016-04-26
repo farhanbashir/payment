@@ -5,49 +5,60 @@ $swift_code ="";
 $account_number ="";
 $account_title ="";
 
-if(!empty($basic_info))
+if(!empty($bankInfoData))
 {
-	$bank_name = $basic_info['bank_name'];
-	$bank_address = $basic_info['bank_address'];
-	$swift_code = $basic_info['swift_code'];
-	$account_number = $basic_info['account_number'];
-	$account_title = $basic_info['account_title'];
+	$bank_name = $bankInfoData['bank_name'];
+	$bank_address = $bankInfoData['bank_address'];
+	$swift_code = $bankInfoData['swift_code'];
+	$account_number = $bankInfoData['account_number'];
+	$account_title = $bankInfoData['account_title'];
 }
 ?>
+
 <div class="panel-body">
 	<h2>Bank Information</h2>
 	<div class="col-md-6" style="padding-left: 0px;">
-		<?php if($this->session->flashdata('MessageTab3')!='')
+		<?php if($this->session->flashdata('successMsgBankInfo')!='')
 	    {?>   
 	        <div class="alert alert-success">
-	          <strong>Success!</strong>&nbsp;&nbsp;<?php echo $this->session->flashdata('MessageTab3');?>
+	          <strong>Success!</strong>&nbsp;&nbsp;<?php echo $this->session->flashdata('successMsgBankInfo');?>
 	        </div>
 	        <?php 
 	    }?>
-		<form role="form" action="<?php echo $bank_info_form_url;?>" method="post">
+	    <?php if($this->session->flashdata('errMsgBankInfo')!='')
+	    {?>   
+	        <div class="alert alert-danger">
+	          <strong>Alert!</strong>&nbsp;&nbsp;<?php echo $this->session->flashdata('errMsgBankInfo');?>
+	        </div>
+	        <?php 
+	    }?>
+		<form role="form" action="" method="post">
 			<div class="form-group">
 				<label>Bank Name</label>
-				<input name="bank_name" value="<?php echo $bank_name;?>" type="text" class="form-control" required="">
+				<input name="bank_name" value="<?php echo $bank_name;?>" type="text" class="form-control" >
 			</div>
 			<div class="form-group">
 				<label>Bank Address</label>
-				<input name="bank_address" value="<?php echo $bank_address;?>"type="text" class="form-control" required="">
+				<input name="bank_address" value="<?php echo $bank_address;?>"type="text" class="form-control" >
 			</div>
 			<div class="form-group">
 				<label>Routing No / SWIFT Code</label>
-				<input name="swift_code" value="<?php echo $swift_code;?>" type="text" class="form-control" required="">
+				<input name="swift_code" value="<?php echo $swift_code;?>" type="text" class="form-control" >
 			</div>
 			<div class="form-group">
 				<label>Account Title</label>
-				<input name="account_title" value="<?php echo $account_title;?>"type="text" class="form-control" required="">
+				<input name="account_title" value="<?php echo $account_title;?>"type="text" class="form-control" >
 			</div>
 			<div class="form-group">
 				<label>Account Number / IBAN</label>
-				<input  name="account_number" value="<?php echo $account_number;?>" type="text" class="form-control" required="">
+				<input  name="account_number" value="<?php echo $account_number;?>" type="text" class="form-control" >
 			</div>
 			<br /><br />
-			<button type="submit" class="btn btn-primary btn-cons">Save</button>
+			<button name="btn-bank-info" value="submit" type="submit" class="btn btn-primary btn-cons">Save</button>
 		</form>
 	</div>
 </div>
-
+<?php
+$this->session->set_flashdata('successMsgBankInfo','');
+$this->session->set_flashdata('errMsgBankInfo','');
+?>
