@@ -83,14 +83,11 @@ class Users extends CI_Controller {
             }
         }
        
-        $limit = '';
-        
         if ( isset($_GET['start']) && $_GET['length'] != -1 ) 
         {
             $limit = "LIMIT ".intval($_GET['start']).", ".intval($_GET['length']);
         }
 
-        $where = '';
         if ( isset($_GET['search']) && $_GET['search']['value'] != '' )
         {
             $str = $_GET['search']['value'];
@@ -101,28 +98,29 @@ class Users extends CI_Controller {
         $users_list = $this->user->test_ajax($where, $order, $limit);
         $total_rows = $this->user->test_ajax_count();
 
-        $Array2 = array();
+        $usersData = array();
 
         foreach ($users_list as $row) 
         {
-            $Array = array();
-            $Array[] = $row['first_name'];
-            $Array[] = $row['last_name'];
-            $Array[] = $row['email'];
-            $Array[] = '<p><span class="label label-success">Active</span></p>';
-            $Array[] = '<p><a href="Javascript: void();" class="btn btn-primary ">Edit</a>
+            $tempArray   = array();
+
+            $tempArray[] = $row['first_name'];
+            $tempArray[] = $row['last_name'];
+            $tempArray[] = $row['email'];
+            $tempArray[] = '<p><span class="label label-success">Active</span></p>';
+            $tempArray[] = '<p><a href="Javascript: void();" class="btn btn-primary ">Edit</a>
                             <a href="Javascript: void();" class="btn btn-danger">Delete</a>
                             <br><br>
                             <a href="'.site_url("admin/users/login_merchant/".$row["user_id"]).'" class="btn btn-warning">Log-In as this Merchant</a>
                         </p>';
-            $Array2[] = $Array;
+            $usersData[] = $tempArray;
         }
 
         $data = array(
             "draw"            =>isset ( $_GET['draw'] ) ? intval( $_GET['draw'] ) : 0,
             "recordsTotal"    => $total_rows,
             "recordsFiltered" => $total_rows,
-            "data"            => $Array2
+            "data"            => $usersData
         );
      
         echo json_encode($data);
