@@ -292,4 +292,22 @@ Class User extends CI_Model
         return $query->result_array();
 
     }
+
+    function test_ajax($where, $order, $limit)
+    {
+        $sql = "SELECT * from users ".$where." ".$order." ".$limit;
+
+        $query = $this->db->query($sql);
+        return $query->result_array();
+    }
+
+    function test_ajax_count()
+    {
+        $sql = "SELECT user_id as total_rows from users";
+        $query = $this->db->query($sql);
+        if($query->num_rows() > 0)
+        {
+            return $query->num_rows();
+        }
+    }
 }

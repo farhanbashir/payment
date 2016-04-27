@@ -59,6 +59,75 @@ class Users extends CI_Controller {
         $this->load->view('main', array('content' => $content));
     }
 
+    function test()
+    {   
+        $data = array();
+        $content = $this->load->view('users/AjaxDataTable.php', $data, true);
+        $this->load->view('main', array('content' => $content));
+    }
+
+    function AjaxDataTable()
+    {   
+        $order ='';
+        $limit = '';
+        $where = '';
+        $col = array('first_name','last_name','email');
+        
+        if ( isset($_GET['order']) && count($_GET['order']) )
+        {   
+            $orderByCol = $_GET['order'][0]['column'];
+            $dir = $_GET['order'][0]['dir'];
+            if($orderByCol <= count($col)-1)
+            {
+                $order = "ORDER BY ".$col[$orderByCol]." ".$dir;
+            }
+        }
+       
+        $limit = '';
+        
+        if ( isset($_GET['start']) && $_GET['length'] != -1 ) 
+        {
+            $limit = "LIMIT ".intval($_GET['start']).", ".intval($_GET['length']);
+        }
+
+        $where = '';
+        if ( isset($_GET['search']) && $_GET['search']['value'] != '' )
+        {
+            $str = $_GET['search']['value'];
+            $where = "WHERE first_name LIKE '%".$str."%' OR last_name LIKE '%".$str."%' OR email LIKE '%".$str."%'";
+        }
+
+
+        $users_list = $this->user->test_ajax($where, $order, $limit);
+        $total_rows = $this->user->test_ajax_count();
+
+        $Array2 = array();
+
+        foreach ($users_list as $row) 
+        {
+            $Array = array();
+            $Array[] = $row['first_name'];
+            $Array[] = $row['last_name'];
+            $Array[] = $row['email'];
+            $Array[] = '<p><span class="label label-success">Active</span></p>';
+            $Array[] = '<p><a href="Javascript: void();" class="btn btn-primary ">Edit</a>
+                            <a href="Javascript: void();" class="btn btn-danger">Delete</a>
+                            <br><br>
+                            <a href="'.site_url("admin/users/login_merchant/".$row["user_id"]).'" class="btn btn-warning">Log-In as this Merchant</a>
+                        </p>';
+            $Array2[] = $Array;
+        }
+
+        $data = array(
+            "draw"            =>isset ( $_GET['draw'] ) ? intval( $_GET['draw'] ) : 0,
+            "recordsTotal"    => $total_rows,
+            "recordsFiltered" => $total_rows,
+            "data"            => $Array2
+        );
+     
+        echo json_encode($data);
+    }
+
     public function accounts() {
         $data = array();
         // $data['total_users'] = $this->user->get_total_users();
