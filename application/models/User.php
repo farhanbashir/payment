@@ -301,9 +301,9 @@ Class User extends CI_Model
         return $query->result_array();
     }
 
-    function test_ajax_count()
+    function test_ajax_count($where)
     {
-        $sql = "SELECT user_id as total_rows from users";
+        $sql = "SELECT user_id as total_rows from users ".$where;
         $query = $this->db->query($sql);
         if($query->num_rows() > 0)
         {

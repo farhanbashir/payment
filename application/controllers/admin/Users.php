@@ -96,7 +96,7 @@ class Users extends CI_Controller {
 
 
         $users_list = $this->user->test_ajax($where, $order, $limit);
-        $total_rows = $this->user->test_ajax_count();
+        $total_rows = $this->user->test_ajax_count($where);
 
         $usersData = array();
 
