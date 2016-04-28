@@ -9,28 +9,6 @@ function userdata( $key, $val = null ){
   }
 }
 
-function getFormValidationErrorMessage($aErrors)
-{
-  $htmlErrorMessages = '';
-  if(is_array($aErrors) && count($aErrors) > 0)
-  {
-    foreach($aErrors as $errorKey => $errorMessage)
-    {
-     $htmlErrorMessages .= '<li>'. $errorMessage .'</li>';
-    }
-
-    if($htmlErrorMessages)
-    {
-     $htmlErrorMessages = '<ul class="ul-text-danger-custom">'. $htmlErrorMessages .'</ul>';
-    }
-  }
-  else
-  {
-    $htmlErrorMessages = '<ul class="ul-text-danger-custom"><li>'. $aErrors .'</li></ul>';
-  }
-
-  return $htmlErrorMessages;
-}
 
 function getLoggedInUserId()
 { 

@@ -132,6 +132,114 @@ Class Product extends CI_Model
         $this->db->update('product_media',$data);
         return ($this->db->affected_rows() != 1) ? false : true;
     }
+
+    function getProducts($params=array(),$userId, $storeId)
+    {   
+        $params['queryForCount'] = false;
+
+        $sql = $this->getProductQuery($params,$userId,$storeId);
+
+        $query = $this->db->query($sql);
+        return $query->result_array();
+    }
+
+    function getProductsCount($params=array(),$userId, $storeId)
+    {   
+        $params['queryForCount'] = true;
+
+        $sql = $this->getProductQuery($params,$userId,$storeId);
+
+        $query = $this->db->query($sql);
+        $result = $query->result_array();
+        $totalRecordsCount = (int) @$result[0]['totalRecordsCount'];
+
+        return  $totalRecordsCount;
+    }
+
+    function getProductsCountWithFilter($params=array(),$userId, $storeId)
+    {   
+        $params['queryForCount'] = true;
+
+        $sql = $this->getProductQuery($params,$userId,$storeId);
+
+        $query = $this->db->query($sql);
+        $result = $query->result_array();
+        $totalRecordsCount = (int) @$result[0]['totalRecordsCount'];
+
+        return  $totalRecordsCount;
+    }
+
+    function getProductQuery($params=array(), $userId, $storeId)
+    {
+       $offset              = @$params['offset'];
+       $searchKeyword       = @$params['search_keyword'];
+       $sortColumn          = @$params['sort_column'];
+       $sortOrderDirection  = @$params['sort_direction'];
+       $isQueryForCount     = @$params['queryForCount'];
+      
+
+       $order = '';
+       $limit = '';
+
+        if (!$isQueryForCount)
+        {
+            if($sortColumn && $sortOrderDirection)
+            {           
+                $order = "ORDER BY ".$sortColumn." ".$sortOrderDirection;
+            }
+
+            $limit = "LIMIT ".intval($offset).", ".intval(CONST_PAGINATION_LIMIT);
+        }
+
+        $arrayWhereClause = array();
+
+        $arrayWhereClause[] = " p.user_id ='$userId' AND p.store_id='$storeId' ";
+        
+        if($searchKeyword)
+        {
+            $arrayWhereClause[] = " ( 
+                                        p.name LIKE '%$searchKeyword%'
+                                            OR 
+                                        c.name LIKE '%$searchKeyword%'
+                                            OR
+                                        p.price LIKE '%$searchKeyword%'
+                                    ) ";
+        }
+
+        $whereCondition = '';
+        
+        if(is_array($arrayWhereClause) && count($arrayWhereClause) > 0)
+        {
+            $whereCondition = ' WHERE ' . implode(' AND ', $arrayWhereClause);
+        }
+
+        $select = ' p.product_id,pc.product_id,pc.category_id,p.price,p.name AS product_name, c.name AS category_name FROM 
+                    product_categories AS pc
+                    LEFT JOIN products AS p
+                    ON pc.product_id = p.product_id
+                    LEFT JOIN categories AS c
+                    ON pc.category_id = c.category_id';
+        if($isQueryForCount)
+        {
+            $select = ' COUNT(p.product_id) AS totalRecordsCount FROM 
+                        product_categories AS pc
+                        LEFT JOIN products AS p
+                        ON pc.product_id = p.product_id
+                        LEFT JOIN categories AS c
+                        ON pc.category_id = c.category_id';
+        }
+        
+        $sql = "SELECT 
+                        $select 
+                    ". $whereCondition. " 
+                    ". $order. " 
+                    ". $limit. " 
+
+                    "; 
+        
+        return $sql;
+    }
+
     /*function get_user_detail($user_id)
     {
         $sql = "select * from users where user_id=$user_id" ;

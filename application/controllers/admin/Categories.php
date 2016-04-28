@@ -13,14 +13,70 @@ class Categories extends CI_Controller
 
     function index()
     {   
-        $userId  = getLoggedInUserId();
+        /*$userId  = getLoggedInUserId();
         $storeId = getLoggedInStoreId();
        
     	$data = array();
 	    $data['categories'] = $this->Category->get_all_categories($userId, $storeId);
 	    $content = $this->load->view('categories/categories', $data, true);
-     	$this->load->view('main', array('content' => $content));
+     	$this->load->view('main', array('content' => $content));*/
+        
+        $data = array();
+        $content = $this->load->view('categories/category_listing.php', $data, true);
+        $this->load->view('main', array('content' => $content));
     }
+    
+
+    function categoryListing()
+    {
+        $userId  = getLoggedInUserId();
+        $storeId = getLoggedInStoreId();
+
+        $_getParams = $_GET;
+        $params     = _processDataTableRequest($_getParams);
+        $draw       = $params['draw'];
+
+        $categoryList = $this->Category->getCategory($params,$userId, $storeId);
+
+        $recordsFiltered = $this->Category->getCategoryCount($params,$userId, $storeId); 
+        $recordsTotal = $this->Category->getCategoryCountWithFilter($params=array(),$userId, $storeId);
+
+        $categoryData = array();
+
+        if(is_array($categoryList) && count($categoryList) > 0)
+        {
+          foreach ($categoryList as $row) 
+          {
+            $tempArray   = array();
+
+            $tempArray[] = $row['category_id'];
+            $tempArray[] = $row['name'];
+            $tempArray[] = $row['total_products'];
+            $categoryId  = $row['category_id'];
+            $actionData = <<<EOT
+                        <p>
+                        <a href="<?php echo site_url('admin/categories/save/'.$categoryId);?>">
+                          <button class="btn btn-primary btn-cons">Edit</button>
+                        </a>
+                        <a onclick="return confirm('Are you sure want to delete','<?php echo site_url('admin/categories/delete_category/'.$categoryId);?>')"href="<?php echo site_url('admin/categories/delete_category/'.$categoryId);?>">
+                          <button class="btn btn-danger btn-cons">Delete</button>
+                        </a>
+                      </p>
+EOT;
+            $tempArray[] =$actionData;
+
+            $categoryData[] = $tempArray;
+          }
+        }
+        $data = array(
+          "draw"            =>isset ( $draw ) ? intval( $draw ) : 0,
+          "recordsTotal"    => $recordsTotal,
+          "recordsFiltered" => $recordsFiltered,
+          "data"            => $categoryData
+          );
+
+        echo json_encode($data);
+    } 
 
     function save($categoryId=0)
     {	

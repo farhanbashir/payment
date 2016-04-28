@@ -87,3 +87,4 @@ define('EXIT__AUTO_MAX', 125); // highest automatically-assigned error code
 define('CONST_IMAGE_UPLOAD_DIR', 'assets/img/stores/'); // highest automatically-assigned error code
 define('CONST_STATUS_ID_ACTIVE', 1);
 define('CONST_STATUS_ID_DELETE', -1);
+define('CONST_PAGINATION_LIMIT', 10);

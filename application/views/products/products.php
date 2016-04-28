@@ -28,6 +28,7 @@ foreach ($products as $row)
 }
 
 ?>
+
 <div class="content ">
   <!-- START CONTAINER FLUID -->
   <div class="container-fluid container-fixed-lg bg-white">

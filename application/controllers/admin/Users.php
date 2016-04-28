@@ -30,96 +30,54 @@ class Users extends CI_Controller {
         }
     }
 
-    public function index() {
+    public function index() 
+    {
        
         $data = array();
-        
-		/*
-		$this->load->library("pagination");
-        $total_rows = $this->user->get_total_users();
-
-        $pagination_config = get_pagination_config('users/index', $total_rows, $this->config->item('pagination_limit'), 4);
-
-        $this->pagination->initialize($pagination_config);
-
-        $page = ($this->uri->segment(4)) ? $this->uri->segment(4) : 0;
-
-
-        $data["links"] = $this->pagination->create_links();
-		*/
-
-        $users = $this->user->get_all_users(); //-->$this->user->get_users($page);
-
-        $data['users'] = $users;
-        //$this->load->view('header');
-        /* echo "<pre>";
-        print_r($data['users']);die;*/
-        $content = $this->load->view('users/tabular.php', $data, true);
-
+        $content = $this->load->view('users/user_listing.php', $data, true);
         $this->load->view('main', array('content' => $content));
     }
 
-    function test()
-    {   
-        $data = array();
-        $content = $this->load->view('users/AjaxDataTable.php', $data, true);
-        $this->load->view('main', array('content' => $content));
-    }
+    function merchuntsListing()
+    {
+      
+        $_getParams = $_GET;
+        $params     = _processDataTableRequest($_getParams);
+        $draw       = $params['draw'];
 
-    function AjaxDataTable()
-    {   
-        $order ='';
-        $limit = '';
-        $where = '';
-        $col = array('first_name','last_name','email');
+        $users_list = $this->user->getUsers($params);
         
-        if ( isset($_GET['order']) && count($_GET['order']) )
-        {   
-            $orderByCol = $_GET['order'][0]['column'];
-            $dir = $_GET['order'][0]['dir'];
-            if($orderByCol <= count($col)-1)
-            {
-                $order = "ORDER BY ".$col[$orderByCol]." ".$dir;
-            }
-        }
-       
-        if ( isset($_GET['start']) && $_GET['length'] != -1 ) 
-        {
-            $limit = "LIMIT ".intval($_GET['start']).", ".intval($_GET['length']);
-        }
-
-        if ( isset($_GET['search']) && $_GET['search']['value'] != '' )
-        {
-            $str = $_GET['search']['value'];
-            $where = "WHERE first_name LIKE '%".$str."%' OR last_name LIKE '%".$str."%' OR email LIKE '%".$str."%'";
-        }
-
-
-        $users_list = $this->user->test_ajax($where, $order, $limit);
-        $total_rows = $this->user->test_ajax_count($where);
+        $recordsFiltered = $this->user->getUsersCount($params); 
+        $recordsTotal = $this->user->getUsersCountWithFilter();
 
         $usersData = array();
 
-        foreach ($users_list as $row) 
+        if(is_array($users_list) && count($users_list) > 0)
         {
-            $tempArray   = array();
+            foreach ($users_list as $row) 
+            {
+                $tempArray   = array();
 
-            $tempArray[] = $row['first_name'];
-            $tempArray[] = $row['last_name'];
-            $tempArray[] = $row['email'];
-            $tempArray[] = '<p><span class="label label-success">Active</span></p>';
-            $tempArray[] = '<p><a href="Javascript: void();" class="btn btn-primary ">Edit</a>
-                            <a href="Javascript: void();" class="btn btn-danger">Delete</a>
-                            <br><br>
-                            <a href="'.site_url("admin/users/login_merchant/".$row["user_id"]).'" class="btn btn-warning">Log-In as this Merchant</a>
-                        </p>';
-            $usersData[] = $tempArray;
+                $tempArray[] = $row['user_id'];
+                $tempArray[] = $row['first_name'];
+                $tempArray[] = $row['last_name'];
+                $tempArray[] = $row['email'];
+                $tempArray[] = date("F, d, Y",strtotime($row['created']));
+                $tempArray[] = '<p><span class="label label-success">Active</span></p>';
+                $tempArray[] = '<p><a href="Javascript: void();" class="btn btn-primary ">Edit</a>
+                                <a href="Javascript: void();" class="btn btn-danger">Delete</a>
+                                <br><br>
+                                <a href="'.site_url("admin/users/login_merchant/".$row["user_id"]).'" class="btn btn-warning">Log-In as this Merchant</a>
+                            </p>';
+
+                $usersData[] = $tempArray;
+            }
         }
 
         $data = array(
-            "draw"            =>isset ( $_GET['draw'] ) ? intval( $_GET['draw'] ) : 0,
-            "recordsTotal"    => $total_rows,
-            "recordsFiltered" => $total_rows,
+            "draw"            =>isset ( $draw ) ? intval( $draw ) : 0,
+            "recordsTotal"    => $recordsTotal,
+            "recordsFiltered" => $recordsFiltered,
             "data"            => $usersData
         );
      

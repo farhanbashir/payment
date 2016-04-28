@@ -108,5 +108,100 @@ Class Category extends CI_Model
         $this->db->update('product_categories',$data);
         return ($this->db->affected_rows() != 1) ? false : true;
     }
+
+    function getCategory($params=array(), $userId, $storeId)
+    {   
+        $params['queryForCount'] = false;
+
+        $sql = $this->getCategoryQuery($params, $userId, $storeId);
+
+        $query = $this->db->query($sql);
+        return $query->result_array();
+    }
+
+    function getCategoryCount($params=array(), $userId, $storeId)
+    {   
+        $params['queryForCount'] = true;
+
+        $sql = $this->getCategoryQuery($params, $userId, $storeId);
+
+        $query = $this->db->query($sql);
+        $result = $query->result_array();
+        $totalRecordsCount = (int) @$result[0]['totalRecordsCount'];
+
+        return  $totalRecordsCount;
+    }
+
+    function getCategoryCountWithFilter($params=array(), $userId, $storeId)
+    {   
+        $params['queryForCount'] = true;
+
+        $sql = $this->getCategoryQuery($params, $userId, $storeId);
+
+        $query = $this->db->query($sql);
+        $result = $query->result_array();
+        $totalRecordsCount = (int) @$result[0]['totalRecordsCount'];
+
+        return  $totalRecordsCount;
+    }
+
+    function getCategoryQuery($params=array(), $userId, $storeId)
+    {
+       $offset              = @$params['offset'];
+       $searchKeyword       = @$params['search_keyword'];
+       $sortColumn          = @$params['sort_column'];
+       $sortOrderDirection  = @$params['sort_direction'];
+       $isQueryForCount     = @$params['queryForCount'];
+      
+
+       $order = '';
+       $limit = '';
+
+        if (!$isQueryForCount)
+        {
+            if($sortColumn && $sortOrderDirection)
+            {           
+                $order = "ORDER BY ".$sortColumn." ".$sortOrderDirection;
+            }
+
+            $limit = "LIMIT ".intval($offset).", ".intval(CONST_PAGINATION_LIMIT);
+        }
+
+        $arrayWhereClause = array();
+
+        $arrayWhereClause[] = " status >0 AND user_id='$userId' AND store_id='$storeId' ";
+        
+        if($searchKeyword)
+        {
+            $arrayWhereClause[] = " ( 
+                                        name LIKE '%$searchKeyword%'
+                                    ) ";
+        }
+
+        $whereCondition = '';
+        
+        if(is_array($arrayWhereClause) && count($arrayWhereClause) > 0)
+        {
+            $whereCondition = ' WHERE ' . implode(' AND ', $arrayWhereClause);
+        }
+
+        $select = 'category_id,name,category_id,parent_id,(SELECT COUNT(category_id) FROM product_categories WHERE category_id=categories.category_id) AS total_products ';
+        if($isQueryForCount)
+        {
+            $select = ' COUNT(user_id) AS totalRecordsCount ';
+        }
+        
+        $sql = "SELECT 
+                        $select 
+                    FROM 
+                            categories
+                    ". $whereCondition. " 
+                    ". $order. " 
+                    ". $limit. " 
+
+                    "; 
+        
+        return $sql;
+    }
 }
 ?>

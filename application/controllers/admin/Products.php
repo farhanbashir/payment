@@ -1,7 +1,7 @@
 <?php
 
 if (!defined('BASEPATH'))
-    exit('No direct script access allowed');
+  exit('No direct script access allowed');
 
 class Products extends CI_Controller {
 
@@ -21,17 +21,17 @@ class Products extends CI_Controller {
      * @see http://codeigniter.com/user_guide/general/urls.html
      */
     function __construct() {
-        parent::__construct();
+      parent::__construct();
         /*$this->load->model('user', '', TRUE);
         $this->load->model('store', '', TRUE);*/
         $this->load->model('Product');
         $this->load->model('Category');
         if (!$this->session->userdata('logged_in')) {
-            redirect(base_url());
+          redirect(base_url());
         }
-    }
-    public function index() 
-    { 
+      }
+      public function index() 
+      { 
         $userId  = getLoggedInUserId();
         $storeId = getLoggedInStoreId();
         $data = array();
@@ -39,123 +39,180 @@ class Products extends CI_Controller {
         // $data['total_stores'] = $this->store->get_total_stores();
         // $data['latest_five_users'] = $this->user->get_latest_five_users();
         // $data['latest_five_stores'] = $this->store->get_latest_five_stores();
-        $data['products'] = $this->Product->get_all_products($storeId,$userId);
+        /*$data['products'] = $this->Product->get_all_products($storeId,$userId);
 
         $content = $this->load->view('products/products', $data, true);
+        $this->load->view('main', array('content' => $content));*/
+        
+        $data = array();
+        $content = $this->load->view('products/products_listing.php', $data, true);
         $this->load->view('main', array('content' => $content));
-    }
+    
+      }
+
+      function productsListing()
+      {
+        $userId  = getLoggedInUserId();
+        $storeId = getLoggedInStoreId();
+
+        $_getParams = $_GET;
+        $params     = _processDataTableRequest($_getParams);
+        $draw       = $params['draw'];
+
+        $productsList = $this->Product->getProducts($params,$userId, $storeId);
+
+        $recordsFiltered = $this->Product->getProductsCount($params,$userId, $storeId); 
+        $recordsTotal = $this->Product->getProductsCountWithFilter($params=array(),$userId, $storeId);
+
+        $productsData = array();
+
+        if(is_array($productsList) && count($productsList) > 0)
+        {
+          foreach ($productsList as $row) 
+          {
+            $tempArray   = array();
+
+            $tempArray[] = $row['product_id'];
+            $tempArray[] = $row['product_name'];
+            $tempArray[] = $row['category_name'];
+            $tempArray[] = $row['price'];
+            $productId   = $row['product_id'];
+            $actionData = <<<EOT
+                        <p>
+                      <a href="<?php echo site_url('admin/products/save/'.$productId);?>">
+                        <button class="btn btn-primary btn-cons">Edit</button>
+                      </a>
+                      <a onclick="return confirm('Are you sure want to delete','<?php echo site_url('admin/products/delete_product/'.$productId);?>')"href="<?php echo site_url('admin/products/delete_product/'.$productId);?>">
+                        <button class="btn btn-danger btn-cons">Remove</button>
+                      </a>
+                    </p>
+EOT;
+            $tempArray[] =$actionData ;
+
+            $productsData[] = $tempArray;
+          }
+        }
+        $data = array(
+          "draw"            =>isset ( $draw ) ? intval( $draw ) : 0,
+          "recordsTotal"    => $recordsTotal,
+          "recordsFiltered" => $recordsFiltered,
+          "data"            => $productsData
+          );
+
+        echo json_encode($data);
+      }
 
     function save($productId=0)
     {   
-        $data = array();
-        $storeId = getLoggedInStoreId();
-        $userId = getLoggedInUserId();
-        $postedData = array();
-        $aErrorMessage = array();
-        $showErrorMessage = "";
-        $formHeading = "Add New Product";
+      $data = array();
+      $storeId = getLoggedInStoreId();
+      $userId = getLoggedInUserId();
+      $postedData = array();
+      $aErrorMessage = array();
+      $showErrorMessage = "";
+      $formHeading = "Add New Product";
 
-        if($productId)
-        {
+      if($productId)
+      {
 
-          $productInfo = $this->Product->getById($productId, $userId, $storeId);
-          if($productInfo)
-          { 
-           
-            $categories = array();
-            foreach ($productInfo as $row) 
-            {
-              $categories[] = $row['category_id'];
-            }
-            $postedData['product_name'] =   $productInfo[0]['product_name'];
-            $postedData['description']  =   $productInfo[0]['description'];
-            $postedData['price']  =   $productInfo[0]['price'];
-            $postedData['categories']  =   $categories;
-            $formHeading = "Edit Product";
-          }
-          else
+        $productInfo = $this->Product->getById($productId, $userId, $storeId);
+        if($productInfo)
+        { 
+
+          $categories = array();
+          foreach ($productInfo as $row) 
           {
-            redirect('admin/products');
+            $categories[] = $row['category_id'];
           }
+          $postedData['product_name'] =   $productInfo[0]['product_name'];
+          $postedData['description']  =   $productInfo[0]['description'];
+          $postedData['price']  =   $productInfo[0]['price'];
+          $postedData['categories']  =   $categories;
+          $formHeading = "Edit Product";
         }
-
-        if($this->input->post('btn-submit'))
+        else
         {
-          $postedData = $this->input->post();
+          redirect('admin/products');
+        }
+      }
+
+      if($this->input->post('btn-submit'))
+      {
+        $postedData = $this->input->post();
         
-          extract($postedData);
-          $categoryIds = array();
-          $product_name  = htmlentities($product_name); 
-          $description   = htmlentities($description);
-          $replaceWordInPrice = array('$',',');
-          $price = htmlentities(str_replace($replaceWordInPrice,'',$price));
+        extract($postedData);
+        $categoryIds = array();
+        $product_name  = htmlentities($product_name); 
+        $description   = htmlentities($description);
+        $replaceWordInPrice = array('$',',');
+        $price = htmlentities(str_replace($replaceWordInPrice,'',$price));
 
-          
-          if(!$product_name)
-          {
-            $aErrorMessage[]= "Product name required";
-          }
 
-          if(!$price)
-          {
-            $aErrorMessage[]= "Price Required";
-          }
-          if(empty($categories))
-          {
-            $aErrorMessage[]= "Select atlease one category";
-          }
-          else
-          {
-            for ($i=0; $i <count($categories) ; $i++) 
-            { 
-              $categoryIds[] = htmlentities($categories[$i]);
-            }
-
-          }
-
-          if(is_array($aErrorMessage) && count($aErrorMessage))
-          {
-            $showErrorMessage = getFormValidationErrorMessage($aErrorMessage);
-            $showErrorMessage = $this->session->set_flashdata('showErrorMessage',$showErrorMessage);
-          }
-          else
-          {
-            $saveData = array(
-
-                'store_id'      =>  $storeId,
-                'user_id'       =>  $userId,
-                'name'          =>  $product_name,
-                'description'   =>  $description,
-                'price'         =>  $price,
-                'status'        =>  CONST_STATUS_ID_ACTIVE,
-              );
-              if($productId)
-              { 
-                
-                $saveData['updated'] = date("Y-m-d H:i:s");
-
-                $this->Product->edit_product($productId, $saveData);
-                $this->Product->update_product_categories($categories,$productId);
-              }
-              else
-              {
-                
-                $saveData['created'] = date("Y-m-d H:i:s");
-                $productId = $this->Product->add_product($saveData);
-                $this->Product->add_product_categories($categories, $productId);
-                
-              }
-              $this->session->set_flashdata('Message','Category has been successfully saved!');
-              redirect('admin/products','refresh');
-          }
-          
+        if(!$product_name)
+        {
+          $aErrorMessage[]= "Product name required";
         }
 
-        $data['postedData'] = $postedData;
-        $data['categories'] = $this->Category->get_all_categories($userId, $storeId);
-        $data['formHeading'] = $formHeading;
-        $content = $this->load->view('products/product_form', $data, true);
-        $this->load->view('main', array('content' => $content));
+        if(!$price)
+        {
+          $aErrorMessage[]= "Price Required";
+        }
+        if(empty($categories))
+        {
+          $aErrorMessage[]= "Select atlease one category";
+        }
+        else
+        {
+          for ($i=0; $i <count($categories) ; $i++) 
+          { 
+            $categoryIds[] = htmlentities($categories[$i]);
+          }
+
+        }
+
+        if(is_array($aErrorMessage) && count($aErrorMessage))
+        {
+          $showErrorMessage = getFormValidationErrorMessage($aErrorMessage);
+          $showErrorMessage = $this->session->set_flashdata('showErrorMessage',$showErrorMessage);
+        }
+        else
+        {
+          $saveData = array(
+
+            'store_id'      =>  $storeId,
+            'user_id'       =>  $userId,
+            'name'          =>  $product_name,
+            'description'   =>  $description,
+            'price'         =>  $price,
+            'status'        =>  CONST_STATUS_ID_ACTIVE,
+            );
+          if($productId)
+          { 
+
+            $saveData['updated'] = date("Y-m-d H:i:s");
+
+            $this->Product->edit_product($productId, $saveData);
+            $this->Product->update_product_categories($categories,$productId);
+          }
+          else
+          {
+
+            $saveData['created'] = date("Y-m-d H:i:s");
+            $productId = $this->Product->add_product($saveData);
+            $this->Product->add_product_categories($categories, $productId);
+
+          }
+          $this->session->set_flashdata('Message','Category has been successfully saved!');
+          redirect('admin/products','refresh');
+        }
+
+      }
+
+      $data['postedData'] = $postedData;
+      $data['categories'] = $this->Category->get_all_categories($userId, $storeId);
+      $data['formHeading'] = $formHeading;
+      $content = $this->load->view('products/product_form', $data, true);
+      $this->load->view('main', array('content' => $content));
     }
 
     function delete_product($product_id)
@@ -176,9 +233,9 @@ class Products extends CI_Controller {
 
     public function change_password()
     {
-        $data = array("error"=>"");
-        $content = $this->load->view('change_password.php', $data, true);
-        $this->load->view('welcome_message', array('content' => $content));
+      $data = array("error"=>"");
+      $content = $this->load->view('change_password.php', $data, true);
+      $this->load->view('welcome_message', array('content' => $content));
     }
 
     public function change_password_submit()
@@ -190,42 +247,42 @@ class Products extends CI_Controller {
 
       if(md5($old_password) === $admin["password"])
       {
-          $data = array();
-          $this->user->edit_user($this->session->userdata["logged_in"]["id"],array("password"=>md5($new_password)));
-          $data["error"] = "Your password has been changed successfully";
-          $data["result"] = "info";
-          $content = $this->load->view('change_password.php', $data, true);
-          $this->load->view('welcome_message', array('content' => $content));   
+        $data = array();
+        $this->user->edit_user($this->session->userdata["logged_in"]["id"],array("password"=>md5($new_password)));
+        $data["error"] = "Your password has been changed successfully";
+        $data["result"] = "info";
+        $content = $this->load->view('change_password.php', $data, true);
+        $this->load->view('welcome_message', array('content' => $content));   
       } 
       else
       {
-          $data = array();
-          $data["error"] = "You type wrong old password";
-          $data["result"] = "danger";
-          $content = $this->load->view('change_password.php', $data, true);
-          $this->load->view('welcome_message', array('content' => $content));   
+        $data = array();
+        $data["error"] = "You type wrong old password";
+        $data["result"] = "danger";
+        $content = $this->load->view('change_password.php', $data, true);
+        $this->load->view('welcome_message', array('content' => $content));   
       }     
       
     }
 
     public function events() {
-        $type = 'events';
-        $data = array();
-        $this->load->library("pagination");
-        $total_rows = $this->content->get_total_content_by_type($type);
+      $type = 'events';
+      $data = array();
+      $this->load->library("pagination");
+      $total_rows = $this->content->get_total_content_by_type($type);
 
-        $pagination_config = get_pagination_config($type, $total_rows, $this->config->item('pagination_limit'), 3);
+      $pagination_config = get_pagination_config($type, $total_rows, $this->config->item('pagination_limit'), 3);
 
-        $this->pagination->initialize($pagination_config);
+      $this->pagination->initialize($pagination_config);
 
-        $page = ($this->uri->segment(3)) ? $this->uri->segment(3) : 0;
+      $page = ($this->uri->segment(3)) ? $this->uri->segment(3) : 0;
 
-        $data["links"] = $this->pagination->create_links();
+      $data["links"] = $this->pagination->create_links();
 
-        $pages = $this->content->get_content_by_type($type, $page);
-        $data['pages'] = $pages;
-        $content = $this->load->view('pages.php', $data, true);
-        $this->load->view('welcome_message', array('content' => $content));
+      $pages = $this->content->get_content_by_type($type, $page);
+      $data['pages'] = $pages;
+      $content = $this->load->view('pages.php', $data, true);
+      $this->load->view('welcome_message', array('content' => $content));
     }
 
 
@@ -577,10 +634,10 @@ class Products extends CI_Controller {
       {
       $this->feed->activate_feed($feed_id);
       redirect(base_url().'/index.php/welcome/feed_detail/'.$feed_id);
-      } */
-}
+    } */
+  }
 
-/* End of file welcome.php */
-/* Location: ./application/controllers/welcome.php */
+  /* End of file welcome.php */
+  /* Location: ./application/controllers/welcome.php */
 
 

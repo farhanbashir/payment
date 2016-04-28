@@ -293,8 +293,10 @@ Class User extends CI_Model
 
     }
 
-    function test_ajax($where, $order, $limit)
-    {
+    /*function test_ajax($_GET,$countRows=false)
+    {   
+        $sql = $this->
+
         $sql = "SELECT * from users ".$where." ".$order." ".$limit;
 
         $query = $this->db->query($sql);
@@ -309,5 +311,106 @@ Class User extends CI_Model
         {
             return $query->num_rows();
         }
+    }*/
+
+    function getUsers($params=array())
+    {   
+        $params['queryForCount'] = false;
+
+        $sql = $this->getUsersQuery($params);
+
+        $query = $this->db->query($sql);
+        return $query->result_array();
     }
+
+    function getUsersCount($params=array())
+    {   
+        $params['queryForCount'] = true;
+
+        $sql = $this->getUsersQuery($params);
+
+        $query = $this->db->query($sql);
+        $result = $query->result_array();
+        $totalRecordsCount = (int) @$result[0]['totalRecordsCount'];
+
+        return  $totalRecordsCount;
+    }
+
+    function getUsersCountWithFilter($params=array())
+    {   
+        $params['queryForCount'] = true;
+
+        $sql = $this->getUsersQuery($params);
+    
+        $query = $this->db->query($sql);
+        $result = $query->result_array();
+        $totalRecordsCount = (int) @$result[0]['totalRecordsCount'];
+
+        return  $totalRecordsCount;
+    }
+
+    function getUsersQuery($params=array())
+    {
+       $offset              = @$params['offset'];
+       $searchKeyword       = @$params['search_keyword'];
+       $sortColumn          = @$params['sort_column'];
+       $sortOrderDirection  = @$params['sort_direction'];
+       $isQueryForCount     = @$params['queryForCount'];
+      
+
+       $order = '';
+       $limit = '';
+
+        if (!$isQueryForCount)
+        {
+            if($sortColumn && $sortOrderDirection)
+            {           
+                $order = "ORDER BY ".$sortColumn." ".$sortOrderDirection;
+            }
+
+            $limit = "LIMIT ".intval($offset).", ".intval(CONST_PAGINATION_LIMIT);
+        }
+
+        $arrayWhereClause = array();
+
+        $arrayWhereClause[] = " (role_id = '". CONST_ROLE_ID_BUSINESS_ADMIN ."') ";
+        
+        if($searchKeyword)
+        {
+            $arrayWhereClause[] = " ( 
+                                        first_name LIKE '%$searchKeyword%'
+                                            OR 
+                                        last_name LIKE '%$searchKeyword%'
+                                            OR
+                                        email LIKE '%$searchKeyword%'
+                                    ) ";
+        }
+
+        $whereCondition = '';
+        
+        if(is_array($arrayWhereClause) && count($arrayWhereClause) > 0)
+        {
+            $whereCondition = ' WHERE ' . implode(' AND ', $arrayWhereClause);
+        }
+
+        $select = ' * ';
+        if($isQueryForCount)
+        {
+            $select = ' COUNT(user_id) AS totalRecordsCount ';
+        }
+        
+        $sql = "SELECT 
+                        $select 
+                    FROM 
+                            users
+                    ". $whereCondition. " 
+                    ". $order. " 
+                    ". $limit. " 
+
+                    "; 
+        
+        return $sql;
+    }
+
+
 }
