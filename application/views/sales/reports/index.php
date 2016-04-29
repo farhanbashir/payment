@@ -68,8 +68,8 @@ if($this->uri->segment(3) == 'category_sales')
 								  
 						</div>
 						<br>
-						<?php //$this->load->view($load_page); ?>	
-						<?php $this->load->view('sales/reports/under_construction'); ?>	
+						<?php $this->load->view($load_page); ?>	
+						<?php /*$this->load->view('sales/reports/under_construction');*/ ?>	
 					</div>
 				</div>
 			</div>

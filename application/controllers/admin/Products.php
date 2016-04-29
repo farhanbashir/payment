@@ -70,19 +70,24 @@ class Products extends CI_Controller {
         {
           foreach ($productsList as $row) 
           {
-            $tempArray   = array();
-
-            $tempArray[] = $row['product_id'];
-            $tempArray[] = $row['product_name'];
-            $tempArray[] = $row['category_name'];
-            $tempArray[] = $row['price'];
             $productId   = $row['product_id'];
-            $actionData = <<<EOT
+
+            $tempArray   = array();
+         
+            $tempArray[] = $productId;
+            $tempArray[] = $row['name'];            
+            $tempArray[] = $this->Product->getProductCategory($productId, $userId, $storeId);
+            $tempArray[] = $row['price'];
+            
+            $editUrl     = site_url('admin/products/save/'.$productId);
+            $deleteUrl   = site_url('admin/products/delete_product/'.$productId);
+
+            $actionData  = <<<EOT
                         <p>
-                      <a href="<?php echo site_url('admin/products/save/'.$productId);?>">
+                      <a href="$editUrl">
                         <button class="btn btn-primary btn-cons">Edit</button>
                       </a>
-                      <a onclick="return confirm('Are you sure want to delete','<?php echo site_url('admin/products/delete_product/'.$productId);?>')"href="<?php echo site_url('admin/products/delete_product/'.$productId);?>">
+                      <a onclick="return confirm('Are you sure want to delete','$deleteUrl')"href="$deleteUrl">
                         <button class="btn btn-danger btn-cons">Remove</button>
                       </a>
                     </p>
@@ -202,7 +207,7 @@ EOT;
             $this->Product->add_product_categories($categories, $productId);
 
           }
-          $this->session->set_flashdata('Message','Category has been successfully saved!');
+          $this->session->set_flashdata('Message','Product has been successfully saved!');
           redirect('admin/products','refresh');
         }
 

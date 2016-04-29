@@ -193,19 +193,17 @@ Class Product extends CI_Model
 
         $arrayWhereClause = array();
 
-        $arrayWhereClause[] = " p.user_id ='$userId' AND p.store_id='$storeId' ";
+        $arrayWhereClause[] = " user_id ='$userId' AND store_id='$storeId' ";
         
         if($searchKeyword)
         {
             $arrayWhereClause[] = " ( 
-                                        p.name LIKE '%$searchKeyword%'
+                                        name LIKE '%$searchKeyword%'
                                             OR 
-                                        c.name LIKE '%$searchKeyword%'
-                                            OR
-                                        p.price LIKE '%$searchKeyword%'
+                                        price LIKE '%$searchKeyword%'
                                     ) ";
         }
-
+       
         $whereCondition = '';
         
         if(is_array($arrayWhereClause) && count($arrayWhereClause) > 0)
@@ -213,33 +211,39 @@ Class Product extends CI_Model
             $whereCondition = ' WHERE ' . implode(' AND ', $arrayWhereClause);
         }
 
-        $select = ' p.product_id,pc.product_id,pc.category_id,p.price,p.name AS product_name, c.name AS category_name FROM 
-                    product_categories AS pc
-                    LEFT JOIN products AS p
-                    ON pc.product_id = p.product_id
-                    LEFT JOIN categories AS c
-                    ON pc.category_id = c.category_id';
+        $select = '*';
         if($isQueryForCount)
         {
-            $select = ' COUNT(p.product_id) AS totalRecordsCount FROM 
-                        product_categories AS pc
-                        LEFT JOIN products AS p
-                        ON pc.product_id = p.product_id
-                        LEFT JOIN categories AS c
-                        ON pc.category_id = c.category_id';
+            $select     = 'COUNT(product_id) AS totalRecordsCount';
+            
         }
         
         $sql = "SELECT 
                         $select 
+                    FROM
+                        products
                     ". $whereCondition. " 
                     ". $order. " 
                     ". $limit. " 
-
+                    
                     "; 
         
         return $sql;
     }
 
+    function getProductCategory($productId, $userId, $storeId)
+    {
+        $sql  ="    SELECT p.product_id, GROUP_CONCAT(c.name SEPARATOR ', ') AS category_name 
+                    FROM product_categories AS pc 
+                    LEFT JOIN products AS p ON pc.product_id = p.product_id 
+                    LEFT JOIN categories AS c ON pc.category_id = c.category_id 
+                    WHERE p.user_id ='$userId' AND p.store_id='$storeId' AND p.product_id = '$productId'";
+        
+        $query = $this->db->query($sql);
+        $result = $query->result_array();
+        $category_name = @$result[0]['category_name'];
+        return $category_name;
+    }
     /*function get_user_detail($user_id)
     {
         $sql = "select * from users where user_id=$user_id" ;

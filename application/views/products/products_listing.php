@@ -99,10 +99,10 @@ $(document).ready(function()
     "order": [[ 0, "desc" ]],
     "aoColumns": [
 
-    { "sType": "html", "sName": "p.product_id" },
-    { "sType": "html", "sName": "product_name" },
-    { "sType": "html", "sName": "category_name" },
-    { "sType": "html", "sName": "p.price" },
+    { "sType": "html", "sName": "product_id" },
+    { "sType": "html", "sName": "name" },
+    { "sType": "html", "bSortable": false, "bSearchable": false },
+    { "sType": "html", "sName": "price" },
     { "sType": "html", "bSortable": false, "bSearchable": false },
     ]
   } );
