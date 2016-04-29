@@ -28,7 +28,7 @@
 if(empty($sales_summary))
 {
 
-	echo "<h2>No Records Founds</h2>";
+	echo "No Records Founds";
 }
 else
 {	

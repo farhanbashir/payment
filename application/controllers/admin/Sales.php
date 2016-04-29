@@ -164,7 +164,7 @@ class Sales extends CI_Controller {
             $tempArray[] = $paymentMethod; 
             $tempArray[] = $customInfo; 
             $actionsUrls .= '</p>';
-            $tempArray[] = date("F, d, Y",strtotime($row['created']));
+            $tempArray[] = date(CONST_DATE_TIME_DISPLAY, strtotime($row['created']));
             $tempArray[] = $actionsUrls;
 
             $transactionData[] = $tempArray;

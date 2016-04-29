@@ -93,7 +93,8 @@ $(document).ready(function()
     "bLengthChange": false,
     "oLanguage": 
     {
-      "sEmptyTable":     "No product found"
+      "sEmptyTable"   : "No Product Found",
+      "sZeroRecords"  : "No Product Found"
     },
 
     "order": [[ 0, "desc" ]],
