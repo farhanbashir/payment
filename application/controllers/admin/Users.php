@@ -31,16 +31,14 @@ class Users extends CI_Controller {
     }
 
     public function index() 
-    {
-       
+    {  
         $data = array();
         $content = $this->load->view('users/user_listing.php', $data, true);
         $this->load->view('main', array('content' => $content));
     }
 
-    function merchuntsListing()
-    {
-      
+    function merchantsListing()
+    {      
         $_getParams = $_GET;
         $params     = _processDataTableRequest($_getParams);
         $draw       = $params['draw'];

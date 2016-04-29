@@ -1397,7 +1397,7 @@ class Api extends REST_Controller {
 
     function getCategories_post()
     {
-        $categories              = $this->category->get_all_categories(); //TODO: Revert back to get_all_categories($this->store_id);
+        $categories              = $this->category->get_all_categories($this->user_id, $this->store_id);
         $data["header"]["error"] = "0";
         $data['body']            = array("categories"=>$categories);
         $this->response($data, 200);
@@ -1405,7 +1405,7 @@ class Api extends REST_Controller {
 
     function getProducts_post()
     {
-        $products                = $this->product->get_all_products(); //TODO: Revert back to get_all_products($this->store_id);
+        $products                = $this->product->get_all_products($this->store_id, $this->user_id);
         $data["header"]["error"] = "0";
         $data['body']            = array("products"=>$products);
         $this->response($data, 200);
