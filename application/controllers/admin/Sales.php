@@ -148,7 +148,7 @@ class Sales extends CI_Controller {
                             <strong>Zipcode:</strong>".trim($row['customer_zipcode'])."<br />
                           </p>";
 
-            $actionsUrls = '<p><a href="#'.$order_id.'" class="btn btn-primary" onclick="Javascript: return openPopupForOrderDetails("'. $order_id.'");">View Details</a>
+            $actionsUrls = '<p><a href="#'.$order_id.'" class="btn btn-primary" onclick="Javascript: return openPopupForOrderDetails('. $order_id.');">View Details</a>
                             <br /><br />';
             if($receipt)
             {

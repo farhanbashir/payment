@@ -33,23 +33,26 @@ class Api extends REST_Controller {
 		$this->load->model('customer','',TRUE);
 		$this->load->model('logs','',TRUE);
     	
-        $this->user_id  = '';
-        $this->token    = '';
-        $this->store_id = '';
+        $this->user_id  	= 0;
+        $this->token    	= 0;
+        $this->store_id 	= 0;
+		$this->device_type	= 0;
 
         $headers = getallheaders();
 
 	   if(!in_array($this->router->method, $this->config->item('allowed_calls_without_token')))
        {
-			$headerToken	= @$headers['Token'];
-			$headerUserId	= @$headers['Userid'];
-			$headerStoreId	= @$headers['Storeid'];
+			$headerToken	= @$headers['token'];
+			$headerUserId	= @$headers['userid'];
+			$headerStoreId	= @$headers['storeid'];
 			
             if($headerToken)
             {
                 if($headerUserId)
                 {
-                    if(!$this->device->validToken($headerUserId,$headerToken))
+					$deviceInfo = $this->device->validToken($headerUserId,$headerToken);
+					
+                    if(!$deviceInfo)
                     {
                         $data["header"]["error"] = "1";
                         $data["header"]["message"] = "Please provide valid token";
@@ -68,6 +71,7 @@ class Api extends REST_Controller {
                             $this->user_id  = $headerUserId;
                             $this->token    = $headerToken;
                             $this->store_id = $headerStoreId;
+							$this->device_type = @$deviceInfo['type'];
                         }    
                     }  
                 }   
@@ -1730,7 +1734,8 @@ class Api extends REST_Controller {
 												"cc_expiry_year"	=> $cc_expiry_year,
 												"cc_expiry_month"	=> $cc_expiry_month,
 												"cc_code"			=> $cc_code,
-												'cx_transaction_id' => $cx_transaction_id
+												'cx_transaction_id' => $cx_transaction_id,
+												'app_type'			=> $this->device_type
 											);
 
 					$this->order->add_transaction($transaction_data);

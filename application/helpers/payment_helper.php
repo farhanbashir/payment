@@ -9,6 +9,10 @@ define('CONST_CC_PAYMENT_SUCCESS_NOTICE',	'<strong>IMPORTANT:</strong> This purc
 //Products!
 define('CONST_PRODUCT_ID_NUMPAD',	   -1);
 
+//Device Type!
+define('CONST_DEVICE_ID_IPHONE',	   1);
+define('CONST_DEVICE_ID_ANDROID',	   2);
+
 //Roles!
 define('CONST_ROLE_ID_SUPER_ADMIN',		1);
 define('CONST_ROLE_ID_BUSINESS_ADMIN',	2);
@@ -1417,4 +1421,16 @@ function isValidURL($url='')
 	}
 	
 	return $isValid;
+}
+
+function getDeviceTypeNameById($deviceTypeId=0)
+{
+	$deviceTypeName = 'iPhone';
+	
+	if($deviceTypeId ==  CONST_DEVICE_ID_ANDROID)
+	{
+		$deviceTypeName = 'Android';
+	}
+	
+	return $deviceTypeName;
 }
