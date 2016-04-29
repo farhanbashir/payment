@@ -204,6 +204,106 @@ where t.order_id=$order_id";
 		}
     }
 	
+    function getUserTransaction($params=array(),$userId)
+    {   
+        $params['queryForCount'] = false;
+
+        $sql = $this->getUserTransactionQuery($params,$userId);
+
+        $query = $this->db->query($sql);
+        return $query->result_array();
+    }
+
+    function getUserTransactionCount($params=array(),$userId)
+    {   
+        $params['queryForCount'] = true;
+
+        $sql = $this->getUserTransactionQuery($params,$userId);
+
+        $query = $this->db->query($sql);
+        $result = $query->result_array();
+        $totalRecordsCount = (int) @$result[0]['totalRecordsCount'];
+
+        return  $totalRecordsCount;
+    }
+
+    function getUserTransactionCountWithoutFilter($params=array(),$userId)
+    {   
+        $params['queryForCount'] = true;
+
+        $sql = $this->getUserTransactionQuery($params,$userId);
+
+        $query = $this->db->query($sql);
+        $result = $query->result_array();
+        $totalRecordsCount = (int) @$result[0]['totalRecordsCount'];
+
+        return  $totalRecordsCount;
+    }
+
+    function getUserTransactionQuery($params=array(), $userId)
+    {
+       $offset              = @$params['offset'];
+       $searchKeyword       = @$params['search_keyword'];
+       $sortColumn          = @$params['sort_column'];
+       $sortOrderDirection  = @$params['sort_direction'];
+       $isQueryForCount     = @$params['queryForCount'];
+      
+
+       $order = '';
+       $limit = '';
+
+        if (!$isQueryForCount)
+        {
+            if($sortColumn && $sortOrderDirection)
+            {           
+                $order = "ORDER BY ".$sortColumn." ".$sortOrderDirection;
+            }
+
+            $limit = "LIMIT ".intval($offset).", ".intval(CONST_PAGINATION_LIMIT);
+        }
+
+        $arrayWhereClause = array();
+
+        $arrayWhereClause[] = " o.order_id=t.order_id 
+                                AND t.type='". CONST_TRANSACTION_TYPE_PAYMENT ."' 
+                                AND o.user_id='". $userId."' ";
+        
+        if($searchKeyword)
+        {
+            $arrayWhereClause[] = " ( 
+                                        o.order_id LIKE '%$searchKeyword%'
+                                            OR 
+                                        o.total_amount LIKE '%$searchKeyword%'
+                                    ) ";
+        }
+       
+        $whereCondition = '';
+        
+        if(is_array($arrayWhereClause) && count($arrayWhereClause) > 0)
+        {
+            $whereCondition = ' WHERE ' . implode(' AND ', $arrayWhereClause);
+        }
+
+        $select = ' o.*, t.* ';
+        if($isQueryForCount)
+        {
+            $select     = 'COUNT(o.order_id) AS totalRecordsCount';
+            
+        }
+        
+        $sql = "SELECT 
+                        $select 
+                    FROM
+                       orders o, transactions t
+                    ". $whereCondition. " 
+                    ". $order. " 
+                    ". $limit. " 
+                    
+                    "; 
+        
+        return $sql;
+    }
+
     /*function get_user_detail($user_id)
     {
         $sql = "select * from users where user_id=$user_id" ;

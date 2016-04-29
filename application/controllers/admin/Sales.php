@@ -1,7 +1,7 @@
 <?php
 
 if (!defined('BASEPATH'))
-    exit('No direct script access allowed');
+  exit('No direct script access allowed');
 
 class Sales extends CI_Controller {
 
@@ -21,20 +21,20 @@ class Sales extends CI_Controller {
      * @see http://codeigniter.com/user_guide/general/urls.html
      */
     function __construct() {
-        parent::__construct();
+      parent::__construct();
         /*$this->load->model('user', '', TRUE);
         $this->load->model('store', '', TRUE);*/
         if (!$this->session->userdata('logged_in')) {
-            redirect(base_url());
+          redirect(base_url());
         }
-		
-		$this->load->model('user','',TRUE);
-        $this->load->model('product','',TRUE);
-		$this->load->model('order','',TRUE);
-		$this->load->model('profile','',TRUE);
-    }
 
-    public function index() {
+        $this->load->model('user','',TRUE);
+        $this->load->model('product','',TRUE);
+        $this->load->model('order','',TRUE);
+        $this->load->model('profile','',TRUE);
+      }
+
+      public function index() {
         $data = array();
         // $data['total_users'] = $this->user->get_total_users();
         // $data['total_stores'] = $this->store->get_total_stores();
@@ -43,9 +43,9 @@ class Sales extends CI_Controller {
 
         $content = $this->load->view('content.php', $data, true);
         $this->load->view('main', array('content' => $content));
-    }
+      }
 
-    public function reports() {
+      public function reports() {
         $data = array();
         // $data['total_users'] = $this->user->get_total_users();
         // $data['total_stores'] = $this->store->get_total_stores();
@@ -55,84 +55,191 @@ class Sales extends CI_Controller {
         $data['order_summary'] = $this->order->get_order_summary();
         $content = $this->load->view('sales/reports/index', $data, true);
         $this->load->view('main', array('content' => $content));
-    }
+      }
 
-    public function transactions() {
+      public function transactions()
+      {
         $data = array();
         // $data['total_users'] = $this->user->get_total_users();
         // $data['total_stores'] = $this->store->get_total_stores();
         // $data['latest_five_users'] = $this->user->get_latest_five_users();
         // $data['latest_five_stores'] = $this->store->get_latest_five_stores();
-		
-		$user_id = getLoggedInUserId();
-		
-		$orders = $this->order->get_all_order_transactions_by_user($user_id);
-		
-		$data['orders'] = $orders;
+
+        /*$user_id = getLoggedInUserId();
+
+        $orders = $this->order->get_all_order_transactions_by_user($user_id);
+
+        $data['orders'] = $orders;
 
         $content = $this->load->view('sales/transactions.php', $data, true);
+        $this->load->view('main', array('content' => $content));*/
+
+        $data = array();
+        $content = $this->load->view('sales/transaction_listing.php', $data, true);
         $this->load->view('main', array('content' => $content));
-    }
-	
-	public function popup_order($order_id=0)
-	{
-		$orderInfo				= $this->order->get_order_detail($order_id);
-		$paymentTransaction 	= $this->order->get_payment_transaction_by_order($order_id);
-		$products 				= $this->product->get_order_products($order_id);
-		$refundTransaction		= $this->order->get_refund_transactions_by_order($order_id);
-		
-		$data = array();
-		
-		$data['order_id'] 			= $order_id;
-		$data['products'] 			= $products;
-		$data['orderInfo'] 			= $orderInfo;
-		$data['paymentTransaction'] = $paymentTransaction;		
-		$data['refundTransaction'] 	= $refundTransaction;
-		
+      }
+      
+      
+
+      function ajaxTransactionListing()
+      {
+        $userId = getLoggedInUserId();
+        $_getParams = $_GET;
+        $params     = _processDataTableRequest($_getParams);
+        $draw       = $params['draw'];
+
+        $transactionList = $this->order->getUserTransaction($params, $userId);
+        
+        $recordsFiltered = $this->order->getUserTransactionCount($params, $userId); 
+        $recordsTotal = $this->order->getUserTransactionCountWithoutFilter($params=null, $userId);
+
+        $transactionData = array();
+
+        if(is_array($transactionList) && count($transactionList) > 0)
+        {   
+          foreach ($transactionList as $row) 
+          {   
+            $order_id    = $row['order_id'];
+            $receipt     = $row['receipt'];
+
+            $paymentMethod = '';
+            $paymentMethod .='<p><strong>iPhone App</strong></p>';
+
+
+            $amount_cash = $row['amount_cash'];
+
+            if($amount_cash > 0)
+            {
+              $paymentMethod .= "<p><strong>Cash:</strong>".$amount_cash."</p>";
+            }
+
+            $amount_cc = $row['amount_cc'];
+            $is_cc_swipe = $row['is_cc_swipe'];
+
+            if($amount_cc > 0)
+            {
+
+              $paymentMethod .='
+                                <p>
+                                <strong>Credit Card:</strong> $ '.$amount_cc.'
+                                <br /> 
+                                <span class="small" style="font-size: 10px;">'.$row['cc_number']. '</span>
+                                </p>';
+
+              $iconSwipe = '<i class="fs-14 fa fa-remove" style="color: red;"></i>';
+              if($is_cc_swipe)
+              {
+                $iconSwipe = '<i class="fs-14 fa fa-check" style="color: green;"></i>';
+              }
+
+              $paymentMethod .='
+                                <p>
+                                <strong>Swipe:</strong> '.$iconSwipe.'
+                                </p>';
+
+            }
+
+            $customInfo = "<p>
+                            <strong>Email:</strong>".$row['customer_email']."<br />
+                            <strong>Phone:</strong>".$row['customer_phone']."<br />
+                            <strong>State:</strong>".$row['customer_state']."<br />
+                            <strong>City:</strong>".$row['customer_city']."<br />
+                            <strong>Address:</strong>".trim($row['customer_address1']." ".$row['customer_address2'])."<br />
+                            <strong>Zipcode:</strong>".trim($row['customer_zipcode'])."<br />
+                          </p>";
+
+            $actionsUrls = '<p><a href="#'.$order_id.'" class="btn btn-primary" onclick="Javascript: return openPopupForOrderDetails("'. $order_id.'");">View Details</a>
+                            <br /><br />';
+            if($receipt)
+            {
+              $actionsUrls .= '<a target="_blank" href="'.$receipt.'" class="btn btn-info">View Receipt</a>';
+            }
+            else
+            {
+              $actionsUrls .= '<a target="_blank" href="'.site_url('admin/sales/generate_receipt/'.$order_id).'" class="btn btn-info">Generate Receipt</a>';
+            }
+            $tempArray   = array();
+            $tempArray[] = $order_id;
+            $tempArray[] = $row['total_amount'];
+            $tempArray[] = $paymentMethod; 
+            $tempArray[] = $customInfo; 
+            $actionsUrls .= '</p>';
+            $tempArray[] = date("F, d, Y",strtotime($row['created']));
+            $tempArray[] = $actionsUrls;
+
+            $transactionData[] = $tempArray;
+          }
+        }
+
+        $data = array(
+          "draw"            =>isset ( $draw ) ? intval( $draw ) : 0,
+          "recordsTotal"    => $recordsTotal,
+          "recordsFiltered" => $recordsFiltered,
+          "data"            => $transactionData
+          );
+
+        echo json_encode($data);
+      }
+
+      public function popup_order($order_id=0)
+      {
+        $orderInfo				= $this->order->get_order_detail($order_id);
+        $paymentTransaction 	= $this->order->get_payment_transaction_by_order($order_id);
+        $products 				= $this->product->get_order_products($order_id);
+        $refundTransaction		= $this->order->get_refund_transactions_by_order($order_id);
+
+        $data = array();
+
+        $data['order_id'] 			= $order_id;
+        $data['products'] 			= $products;
+        $data['orderInfo'] 			= $orderInfo;
+        $data['paymentTransaction'] = $paymentTransaction;		
+        $data['refundTransaction'] 	= $refundTransaction;
+
         $this->load->view('sales/popup_order.php', $data);
-	}
-	
-	public function receipt($order_id=0)
-	{
-		$data = array();
-		
-		$this->load->view('sales/receipt.php', $data);
-	}
-	
-	public function generate_receipt($order_id=0)
-	{
-		$user_id = getLoggedInUserId();
-		
-		$receiptCreated = generateReceiptByOrderId($order_id, $user_id);
-		
-		if($receiptCreated)
-		{
-			redirect($receiptCreated);
-			exit;
-		}
-		else
-		{
-			$orderInfo			= $this->order->get_order_detail($order_id);
-			$orderReceipt		= @$orderInfo['receipt'];
-			
-			if($orderReceipt)
-			{
-				redirect($orderReceipt);
-				exit;
-			}
-			else
-			{
-				echo 'Not able to generate receipt for Order # '.$order_id;
-				exit;
-			}
-		}
-	}
-	
+      }
+
+      public function receipt($order_id=0)
+      {
+        $data = array();
+
+        $this->load->view('sales/receipt.php', $data);
+      }
+
+      public function generate_receipt($order_id=0)
+      {
+        $user_id = getLoggedInUserId();
+
+        $receiptCreated = generateReceiptByOrderId($order_id, $user_id);
+
+        if($receiptCreated)
+        {
+         redirect($receiptCreated);
+         exit;
+       }
+       else
+       {
+         $orderInfo			= $this->order->get_order_detail($order_id);
+         $orderReceipt		= @$orderInfo['receipt'];
+
+         if($orderReceipt)
+         {
+          redirect($orderReceipt);
+          exit;
+        }
+        else
+        {
+          echo 'Not able to generate receipt for Order # '.$order_id;
+          exit;
+        }
+      }
+    }
+
     public function change_password()
     {
-        $data = array("error"=>"");
-        $content = $this->load->view('change_password.php', $data, true);
-        $this->load->view('welcome_message', array('content' => $content));
+      $data = array("error"=>"");
+      $content = $this->load->view('change_password.php', $data, true);
+      $this->load->view('welcome_message', array('content' => $content));
     }
 
     public function change_password_submit()
@@ -144,42 +251,42 @@ class Sales extends CI_Controller {
 
       if(md5($old_password) === $admin["password"])
       {
-          $data = array();
-          $this->user->edit_user($this->session->userdata["logged_in"]["id"],array("password"=>md5($new_password)));
-          $data["error"] = "Your password has been changed successfully";
-          $data["result"] = "info";
-          $content = $this->load->view('change_password.php', $data, true);
-          $this->load->view('welcome_message', array('content' => $content));   
+        $data = array();
+        $this->user->edit_user($this->session->userdata["logged_in"]["id"],array("password"=>md5($new_password)));
+        $data["error"] = "Your password has been changed successfully";
+        $data["result"] = "info";
+        $content = $this->load->view('change_password.php', $data, true);
+        $this->load->view('welcome_message', array('content' => $content));   
       } 
       else
       {
-          $data = array();
-          $data["error"] = "You type wrong old password";
-          $data["result"] = "danger";
-          $content = $this->load->view('change_password.php', $data, true);
-          $this->load->view('welcome_message', array('content' => $content));   
+        $data = array();
+        $data["error"] = "You type wrong old password";
+        $data["result"] = "danger";
+        $content = $this->load->view('change_password.php', $data, true);
+        $this->load->view('welcome_message', array('content' => $content));   
       }     
       
     }
 
     public function events() {
-        $type = 'events';
-        $data = array();
-        $this->load->library("pagination");
-        $total_rows = $this->content->get_total_content_by_type($type);
+      $type = 'events';
+      $data = array();
+      $this->load->library("pagination");
+      $total_rows = $this->content->get_total_content_by_type($type);
 
-        $pagination_config = get_pagination_config($type, $total_rows, $this->config->item('pagination_limit'), 3);
+      $pagination_config = get_pagination_config($type, $total_rows, $this->config->item('pagination_limit'), 3);
 
-        $this->pagination->initialize($pagination_config);
+      $this->pagination->initialize($pagination_config);
 
-        $page = ($this->uri->segment(3)) ? $this->uri->segment(3) : 0;
+      $page = ($this->uri->segment(3)) ? $this->uri->segment(3) : 0;
 
-        $data["links"] = $this->pagination->create_links();
+      $data["links"] = $this->pagination->create_links();
 
-        $pages = $this->content->get_content_by_type($type, $page);
-        $data['pages'] = $pages;
-        $content = $this->load->view('pages.php', $data, true);
-        $this->load->view('welcome_message', array('content' => $content));
+      $pages = $this->content->get_content_by_type($type, $page);
+      $data['pages'] = $pages;
+      $content = $this->load->view('pages.php', $data, true);
+      $this->load->view('welcome_message', array('content' => $content));
     }
 
     function sales_summary()
@@ -534,10 +641,10 @@ class Sales extends CI_Controller {
       {
       $this->feed->activate_feed($feed_id);
       redirect(base_url().'/index.php/welcome/feed_detail/'.$feed_id);
-      } */
-}
+    } */
+  }
 
-/* End of file welcome.php */
-/* Location: ./application/controllers/welcome.php */
+  /* End of file welcome.php */
+  /* Location: ./application/controllers/welcome.php */
 
 
