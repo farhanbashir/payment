@@ -195,9 +195,19 @@
   <body>
     <!--Divs that will hold the charts-->
     <h1>Monthly Item Sales</h1>
-    <div id="chart_div"></div>
     
+    <?php if(empty($category_sales))
+    {
+    	echo "No Records Found";
+    }?>
+    <div id="chart_div"></div>
+    <br>
 	<h1>Monthly Category Sales</h1>
+	
+    <?php if(empty($item_sales))
+    {
+    	echo "No Records Found";
+    }?>
     <div id="chart_div2"></div>
     
   </body>

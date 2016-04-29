@@ -53,8 +53,10 @@ $(document).ready(function()
     "bLengthChange": false,
     "oLanguage": 
     {
-      "sEmptyTable":     "No Category found"
+      "sEmptyTable" : "No Category Found",
+      "sZeroRecords": "No Category Found"
     },
+  
     "order": [[ 0, "desc" ]],
     "aoColumns": [
     { "sType": "html", "sName": "category_id" },

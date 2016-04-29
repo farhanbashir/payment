@@ -44,3 +44,18 @@ function getFormValidationErrorMessage($aErrors)
 
   return $htmlErrorMessages;
 }
+
+function getLoggedInRoleId()
+{ 
+  $ci = &get_instance();
+
+  $sess_logged_in_merchant = $ci->session->userdata('logged_in_merchant');
+  if($sess_logged_in_merchant)
+  {       
+    $_logged_in_merchant_user_id = @$sess_logged_in_merchant['role_id'];
+    
+    return $_logged_in_merchant_user_id;
+  }
+  
+  return $ci->session->userdata['logged_in']['role_id'];
+}

@@ -88,3 +88,4 @@ define('CONST_IMAGE_UPLOAD_DIR', 'assets/img/stores/'); // highest automatically
 define('CONST_STATUS_ID_ACTIVE', 1);
 define('CONST_STATUS_ID_DELETE', -1);
 define('CONST_PAGINATION_LIMIT', 10);
+define('CONST_DATE_TIME_DISPLAY', 'F d, Y');

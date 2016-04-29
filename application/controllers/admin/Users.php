@@ -62,7 +62,7 @@ class Users extends CI_Controller {
                 $tempArray[] = $row['first_name'];
                 $tempArray[] = $row['last_name'];
                 $tempArray[] = $row['email'];
-                $tempArray[] = date("F, d, Y",strtotime($row['created']));
+                $tempArray[] = date(CONST_DATE_TIME_DISPLAY,strtotime($row['created']));
                 $tempArray[] = '<p><span class="label label-success">Active</span></p>';
                 $tempArray[] = '<p><a href="Javascript: void();" class="btn btn-primary ">Edit</a>
                                 <a href="Javascript: void();" class="btn btn-danger">Delete</a>
