@@ -101,16 +101,17 @@ class Sales extends CI_Controller {
           {   
             $order_id    = $row['order_id'];
             $receipt     = $row['receipt'];
+			$app_type     = $row['app_type'];
 
             $paymentMethod = '';
-            $paymentMethod .='<p><strong>iPhone App</strong></p>';
+            $paymentMethod .= "<p><strong>App:</strong> ". getDeviceTypeNameById($app_type) ."</p>";
 
 
             $amount_cash = $row['amount_cash'];
 
             if($amount_cash > 0)
             {
-              $paymentMethod .= "<p><strong>Cash:</strong>".$amount_cash."</p>";
+              $paymentMethod .= "<p><strong>Cash:</strong> ".$amount_cash."</p>";
             }
 
             $amount_cc = $row['amount_cc'];

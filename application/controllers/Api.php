@@ -42,9 +42,9 @@ class Api extends REST_Controller {
 
 	   if(!in_array($this->router->method, $this->config->item('allowed_calls_without_token')))
        {
-			$headerToken	= @$headers['token'];
-			$headerUserId	= @$headers['userid'];
-			$headerStoreId	= @$headers['storeid'];
+			$headerToken	= @$headers['Token'];
+			$headerUserId	= @$headers['Userid'];
+			$headerStoreId	= @$headers['Storeid'];
 			
             if($headerToken)
             {
