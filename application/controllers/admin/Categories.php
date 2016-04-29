@@ -27,7 +27,7 @@ class Categories extends CI_Controller
     }
     
 
-    function categoryListing()
+    function ajaxCategoryListing()
     {
         $userId  = getLoggedInUserId();
         $storeId = getLoggedInStoreId();
@@ -39,7 +39,7 @@ class Categories extends CI_Controller
         $categoryList = $this->Category->getCategory($params,$userId, $storeId);
 
         $recordsFiltered = $this->Category->getCategoryCount($params,$userId, $storeId); 
-        $recordsTotal = $this->Category->getCategoryCountWithFilter($params=array(),$userId, $storeId);
+        $recordsTotal = $this->Category->getCategoryCountWithoutFilter($params=array(),$userId, $storeId);
 
         $categoryData = array();
 

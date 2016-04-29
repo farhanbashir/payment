@@ -71,9 +71,9 @@ else
 			<table class="table table-hover demo-table-search dataTable no-footer" id="" role="grid" aria-describedby="tableWithSearch_info">
 				<thead>
 					<tr role="row">
-						<th width="33.33%" class="sorting_asc" tabindex="0" aria-controls="tableWithSearch" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Product: activate to sort column descending">Date</th>
-						<th width="33.33%" class="sorting" tabindex="0" aria-controls="tableWithSearch" rowspan="1" colspan="1" aria-label="Categories: activate to sort column ascending" style="width: 198px;">Total Orders</th>
-						<th width="33.33%" class="sorting" tabindex="0" aria-controls="tableWithSearch" rowspan="1" colspan="1" aria-label="Price: activate to sort column ascending" style="width: 79px;">Order Refund</th>
+						<th width="33.33%">Dates</th>
+						<th width="33.33%">Total Orders</th>
+						<th width="33.33%">Order Refunds</th>
 
 					</tr>
 				</thead>

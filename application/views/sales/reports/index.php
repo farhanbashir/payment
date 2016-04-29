@@ -51,12 +51,12 @@ if($this->uri->segment(3) == 'category_sales')
 								<li class="<?php echo $ActiveTab2;?>">
 									<a href="<?php echo site_url('admin/reports/order_summary');?>"><span>Order Summary</span></a>
 								</li>
-								<li>
+								<!-- <li>
 									<a href="#sales-trends"><span>Sales Trends</span></a>
 								</li>
 								<li>
 									<a href="#payment-methods"><span>Payment Methods</span></a>
-								</li>
+								</li> -->
 								<li class="<?php echo $ActiveTab5;?>">
 									<a href="<?php echo site_url('admin/reports/item_sales');?>"><span>Item Sales</span></a>
 								</li>

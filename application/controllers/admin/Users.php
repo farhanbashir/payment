@@ -38,7 +38,7 @@ class Users extends CI_Controller {
         $this->load->view('main', array('content' => $content));
     }
 
-    function merchuntsListing()
+    function ajaxMerchantsListing()
     {
       
         $_getParams = $_GET;
@@ -48,7 +48,7 @@ class Users extends CI_Controller {
         $users_list = $this->user->getUsers($params);
         
         $recordsFiltered = $this->user->getUsersCount($params); 
-        $recordsTotal = $this->user->getUsersCountWithFilter();
+        $recordsTotal = $this->user->getUsersCountWithoutFilter();
 
         $usersData = array();
 

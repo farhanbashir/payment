@@ -49,7 +49,7 @@ $(document).ready(function()
   {
     "processing":true,
     "serverSide": true,
-    "ajax": "<?php echo site_url('admin/categories/categoryListing');?>",
+    "ajax": "<?php echo site_url('admin/categories/ajaxCategoryListing');?>",
     "bLengthChange": false,
     "oLanguage": 
     {

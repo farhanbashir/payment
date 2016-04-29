@@ -46,7 +46,7 @@ $(document).ready(function()
     {
         "processing":true,
         "serverSide": true,
-        "ajax": "<?php echo site_url('admin/users/merchuntsListing');?>",
+        "ajax": "<?php echo site_url('admin/users/ajaxMerchantsListing');?>",
         "bLengthChange": false,
         "oLanguage": 
         {

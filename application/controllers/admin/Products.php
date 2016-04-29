@@ -50,7 +50,7 @@ class Products extends CI_Controller {
     
       }
 
-      function productsListing()
+      function ajaxProductsListing()
       {
         $userId  = getLoggedInUserId();
         $storeId = getLoggedInStoreId();
@@ -62,7 +62,7 @@ class Products extends CI_Controller {
         $productsList = $this->Product->getProducts($params,$userId, $storeId);
 
         $recordsFiltered = $this->Product->getProductsCount($params,$userId, $storeId); 
-        $recordsTotal = $this->Product->getProductsCountWithFilter($params=array(),$userId, $storeId);
+        $recordsTotal = $this->Product->getProductsCountWithoutFilter($params=array(),$userId, $storeId);
 
         $productsData = array();
 
