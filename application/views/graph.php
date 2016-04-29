@@ -1,6 +1,7 @@
 <?php
 
 ?>
+
 <script>
 
  // Load the Visualization API and the piechart package.
@@ -81,7 +82,7 @@
 					}
 					?>
 				]);
-				var options = 	{	'title':'Monthly Item Sales',
+				var options = 	{	
 									titleTextStyle: {
 							     	color: '333333',
 							        fontName: 'Arial',
@@ -158,8 +159,7 @@
 	            ?>
 	        ]);
 
-	        var options2 = 	{'title':'Monthly Category Sales',
-	        				titleTextStyle: {color: 'black', fontName: 'Arial', fontSize: '28', fontWidth: 'normal'},
+	        var options2 = 	{
 	                       'width':1150,
 	                       'height':400};
             var chart2 = new google.visualization.LineChart(document.getElementById('chart_div2'));
@@ -194,8 +194,11 @@
 
   <body>
     <!--Divs that will hold the charts-->
+    <h1>Monthly Item Sales</h1>
     <div id="chart_div"></div>
+    
+	<h1>Monthly Category Sales</h1>
     <div id="chart_div2"></div>
-    <div id="chart_div3"></div>
+    
   </body>
 </html>
