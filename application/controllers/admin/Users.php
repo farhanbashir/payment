@@ -31,14 +31,16 @@ class Users extends CI_Controller {
     }
 
     public function index() 
-    {  
+    {
+       
         $data = array();
         $content = $this->load->view('users/user_listing.php', $data, true);
         $this->load->view('main', array('content' => $content));
     }
 
-    function merchantsListing()
-    {      
+    function ajaxMerchantsListing()
+    {
+      
         $_getParams = $_GET;
         $params     = _processDataTableRequest($_getParams);
         $draw       = $params['draw'];
@@ -46,7 +48,7 @@ class Users extends CI_Controller {
         $users_list = $this->user->getUsers($params);
         
         $recordsFiltered = $this->user->getUsersCount($params); 
-        $recordsTotal = $this->user->getUsersCountWithFilter();
+        $recordsTotal = $this->user->getUsersCountWithoutFilter();
 
         $usersData = array();
 

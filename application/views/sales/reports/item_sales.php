@@ -174,11 +174,11 @@ else
 	    		<table class="table table-hover demo-table-search dataTable no-footer" id="" role="grid" aria-describedby="tableWithSearch_info">
 	    			<thead>
 	    				<tr role="row">
-	    					<th width="20%" class="sorting_asc" tabindex="0" aria-controls="tableWithSearch" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Product: activate to sort column descending">Date</th>
-	    					<th width="20%" class="sorting_asc" tabindex="0" aria-controls="tableWithSearch" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Product: activate to sort column descending">Product</th>
-	    					<th width="20%" class="sorting" tabindex="0" aria-controls="tableWithSearch" rowspan="1" colspan="1" aria-label="Categories: activate to sort column ascending" style="width: 198px;">Category</th>
-	    					<th width="10%" class="sorting" tabindex="0" aria-controls="tableWithSearch" rowspan="1" colspan="1" aria-label="Price: activate to sort column ascending" style="width: 79px;">Quantity</th>
-	    					<th width="10%" class="sorting" tabindex="0" aria-controls="tableWithSearch" rowspan="1" colspan="1" aria-label="Price: activate to sort column ascending" style="width: 79px;">Gross Sale</th>
+	    					<th width="20%">Dates</th>
+	    					<th width="20%">Products</th>
+	    					<th width="20%">Category</th>
+	    					<th width="10%">Quantity</th>
+	    					<th width="10%">Gross Sales</th>
 
 	    				</tr>
 	    			</thead>
@@ -200,7 +200,7 @@ else
 	    						<p><?php echo $row['total_quantity'];?></p>
 	    					</td>
 	    					<td class="v-align-middle">
-	    						<p><?php echo $row['total_price'];?></p>
+	    						<p>$<?php echo $row['total_price'];?></p>
 	    					</td>
 	    				</tr>
 	    				<?php

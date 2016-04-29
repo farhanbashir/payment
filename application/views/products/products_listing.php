@@ -89,7 +89,7 @@ $(document).ready(function()
   {
     "processing":true,
     "serverSide": true,
-    "ajax": "<?php echo site_url('admin/products/productsListing');?>",
+    "ajax": "<?php echo site_url('admin/products/ajaxProductsListing');?>",
     "bLengthChange": false,
     "oLanguage": 
     {

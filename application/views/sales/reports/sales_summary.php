@@ -4,9 +4,9 @@
 		<div class="form-group"style="width: 200px;">
 			<select name="select" class="full-width select2-offscreen" data-init-plugin="select2" tabindex="-1" title="">
 				<option value="0">Summary</option>
-				<option <?php echo $SelctedValue['Daily'];?> value="Daily">Daily</option>
-				<option <?php echo $SelctedValue['Weekly'];?> value="Weekly">Weekly</option>
-				<option <?php echo $SelctedValue['Monthly'];?> value="Monthly">Monthly</option>
+				<option <?php echo $SelctedValue['Daily'];?> 	value="Daily">Daily</option>
+				<option <?php echo $SelctedValue['Weekly'];?> 	value="Weekly">Weekly</option>
+				<option <?php echo $SelctedValue['Monthly'];?> 	value="Monthly">Monthly</option>
 			</select>
 		</div>
 		<div style="margin-top: -38px;margin-left: 209px;">
@@ -73,10 +73,10 @@ else
 			<table class="table table-hover demo-table-search dataTable no-footer" id="" role="grid" aria-describedby="tableWithSearch_info">
 				<thead>
 					<tr role="row">
-						<th width="20%" class="sorting_asc" tabindex="0" aria-controls="tableWithSearch" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Product: activate to sort column descending">Date</th>
-						<th width="20%" class="sorting" tabindex="0" aria-controls="tableWithSearch" rowspan="1" colspan="1" aria-label="Categories: activate to sort column ascending" style="width: 198px;">Gross Sale</th>
-						<th width="20%" class="sorting" tabindex="0" aria-controls="tableWithSearch" rowspan="1" colspan="1" aria-label="Categories: activate to sort column ascending" style="width: 198px;">Sales</th>
-						<th width="10%" class="sorting" tabindex="0" aria-controls="tableWithSearch" rowspan="1" colspan="1" aria-label="Price: activate to sort column ascending" style="width: 79px;">Refund</th>
+						<th width="20%">Dates</th>
+						<th width="20%">Gross Sales</th>
+						<th width="20%">Sales</th>
+						<th width="10%">Refunds</th>
 					</tr>
 				</thead>
 				<tbody>

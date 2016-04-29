@@ -336,7 +336,7 @@ Class User extends CI_Model
         return  $totalRecordsCount;
     }
 
-    function getUsersCountWithFilter($params=array())
+    function getUsersCountWithoutFilter($params=array())
     {   
         $params['queryForCount'] = true;
 

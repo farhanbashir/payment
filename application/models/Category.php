@@ -132,7 +132,7 @@ Class Category extends CI_Model
         return  $totalRecordsCount;
     }
 
-    function getCategoryCountWithFilter($params=array(), $userId, $storeId)
+    function getCategoryCountWithoutFilter($params=array(), $userId, $storeId)
     {   
         $params['queryForCount'] = true;
 

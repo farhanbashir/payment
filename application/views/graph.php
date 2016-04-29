@@ -82,6 +82,11 @@
 					?>
 				]);
 				var options = 	{	'title':'Monthly Item Sales',
+									titleTextStyle: {
+							     	color: '333333',
+							        fontName: 'Arial',
+								    fontSize: 10
+								    },
 		                       		'width':1150,
 		                       		'height':400
 	                       		};
@@ -153,9 +158,10 @@
 	            ?>
 	        ]);
 
-	        var options2 = {'title':'Monthly Category Sales',
-                       'width':1150,
-                       'height':400};
+	        var options2 = 	{'title':'Monthly Category Sales',
+	        				titleTextStyle: {color: 'black', fontName: 'Arial', fontSize: '28', fontWidth: 'normal'},
+	                       'width':1150,
+	                       'height':400};
             var chart2 = new google.visualization.LineChart(document.getElementById('chart_div2'));
         	chart2.draw(data2, options2);           
 	    	<?php

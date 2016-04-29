@@ -156,7 +156,7 @@ Class Product extends CI_Model
         return  $totalRecordsCount;
     }
 
-    function getProductsCountWithFilter($params=array(),$userId, $storeId)
+    function getProductsCountWithoutFilter($params=array(),$userId, $storeId)
     {   
         $params['queryForCount'] = true;
 
