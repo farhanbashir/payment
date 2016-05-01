@@ -82,7 +82,7 @@ foreach ($products as $row)
                     <p><?php echo $product['category_name'];?></p>
                   </td>
                   <td class="v-align-middle">
-                    <p>$<?php echo $product['price'];?></p>
+                    <p><?php echo CONST_CURRENCY_DISPLAY. $product['price'];?></p>
                   </td>
                   <td class="v-align-middle">
                     <p>

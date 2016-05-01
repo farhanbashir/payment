@@ -88,13 +88,13 @@ else
 							<p><?php echo date('F , d, Y',strtotime($row['sale_date']));?></p>
 						</td>
 						<td class="v-align-middle">
-							<p>$<?php echo $row['total_sale']+$row['total_refund'].".00";?></p>
+							<p><?php echo CONST_CURRENCY_DISPLAY. $row['total_sale']+$row['total_refund'].".00";?></p>
 						</td>
 						<td class="v-align-middle">
-							<p>$<?php echo $row['total_sale']?></p>
+							<p><?php echo CONST_CURRENCY_DISPLAY.$row['total_sale']?></p>
 						</td>
 						<td class="v-align-middle">
-							<p>$<?php echo $row['total_refund'];?></p>
+							<p><?php echo CONST_CURRENCY_DISPLAY.$row['total_refund'];?></p>
 						</td>
 					</tr>
 					<?php

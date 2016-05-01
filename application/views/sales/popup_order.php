@@ -76,7 +76,7 @@
 										?>
 											<tr>
 												<td><strong>Total Refunded:</strong></td>
-												<td>$<?php echo $total_refund; ?></td>
+												<td><?php echo CONST_CURRENCY_DISPLAY. $total_refund; ?></td>
 											</tr>
 										<?php
 									}

@@ -49,7 +49,8 @@
 					<?php
 						if($_logged_in_merchant_user_id)
 						{
-							?><small> &rarr; <strong>Merchant:</strong> <?php echo $_logged_in_merchant_name; ?> (<?php echo $_logged_in_merchant_email; ?>)</small><?php
+							?><small> &rarr; <strong>Merchant:</strong> <?php echo $_logged_in_merchant_name; ?> (<?php echo $_logged_in_merchant_email; ?>)</small>
+              <?php
 						}
 					?>
 				</div>

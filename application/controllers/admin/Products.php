@@ -77,7 +77,7 @@ class Products extends CI_Controller {
             $tempArray[] = $productId;
             $tempArray[] = $row['name'];            
             $tempArray[] = $this->Product->getProductCategory($productId, $userId, $storeId);
-            $tempArray[] = $row['price'];
+            $tempArray[] = CONST_CURRENCY_DISPLAY.$row['price'];
             
             $editUrl     = site_url('admin/products/save/'.$productId);
             $deleteUrl   = site_url('admin/products/delete_product/'.$productId);

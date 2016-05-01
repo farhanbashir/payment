@@ -200,7 +200,7 @@ else
 	    						<p><?php echo $row['total_quantity'];?></p>
 	    					</td>
 	    					<td class="v-align-middle">
-	    						<p>$<?php echo $row['total_price'];?></p>
+	    						<p><?php echo CONST_CURRENCY_DISPLAY.$row['total_price'];?></p>
 	    					</td>
 	    				</tr>
 	    				<?php

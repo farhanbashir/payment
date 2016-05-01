@@ -66,7 +66,7 @@
 											
 											if($amount_cash > 0)
 											{
-												?><p><strong>Cash:</strong> $<?php echo $amount_cash; ?></p><?php
+												?><p><strong>Cash:</strong> <?php echo CONST_CURRENCY_DISPLAY.$amount_cash; ?></p><?php
 											}
 											
 											$amount_cc = $orderInfo['amount_cc'];
@@ -75,7 +75,7 @@
 											{
 												?>
 													<p>
-														<strong>Credit Card:</strong> $<?php echo $amount_cc; ?> 
+														<strong>Credit Card:</strong> <?php echo CONST_CURRENCY_DISPLAY.$amount_cc; ?> 
 														<br /> 
 														<span class="small" style="font-size: 10px;"><?php echo $orderInfo['cc_number']; ?></span>
 													</p>

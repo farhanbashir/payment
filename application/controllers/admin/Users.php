@@ -84,6 +84,72 @@ class Users extends CI_Controller {
         echo json_encode($data);
     }
 
+    function bankstatus()
+    {
+        $data = array();
+        $content = $this->load->view('users/bankStatus_listing.php', $data, true);
+        $this->load->view('main', array('content' => $content));
+    }
+
+    function ajaxMerchantBankStatus()
+    {
+        $_getParams = $_GET;
+
+        $whereStatus = $_GET['where_status'];
+        
+        $params     = _processDataTableRequest($_getParams);
+        $draw       = $params['draw'];
+
+        $MerchantBankStatus_list = $this->user->getMerchantBankStatus($params,$whereStatus);
+        
+        $recordsFiltered = $this->user->getMerchantBankStatusCount($params,$whereStatus); 
+        $recordsTotal = $this->user->getMerchantBankStatusCountWithoutFilter($params=array(),$whereStatus);
+
+        $MerchantBankStatusData = array();
+
+        if(is_array($MerchantBankStatus_list) && count($MerchantBankStatus_list) > 0)
+        {
+            foreach ($MerchantBankStatus_list as $row) 
+            {
+                $tempArray   = array();
+
+                $status ='<p><span class="label label-danger">No Detail</span></p>';
+                
+                if($row['status']==CONST_BANK_STATUS_VERIFIED)
+                {
+                    $status ='<p><span class="label label-success">Verified</span></p>';
+                }
+
+                if($row['status']==CONST_BANK_STATUS_NOT_VERIFIED)
+                {
+                    $status ='<p><span class="label label-warning">Not Verified</span></p>';
+                }
+                $date = $row['created'];
+                if($row['updated']!='')
+                {
+                    $date = $row['updated'];
+                }
+                $tempArray[] = $row['user_id'];
+                $tempArray[] = $row['name'];
+                $tempArray[] = $row['email'];
+                $tempArray[] = $row['bank_name']."<br>".$row['account_title']."<br>".$row['account_number']."<br>".$row['swift_code'];
+                $tempArray[] = date(CONST_DATE_TIME_DISPLAY,strtotime($date));
+                $tempArray[] =  $status;
+
+                $MerchantBankStatusData[] = $tempArray;
+            }
+        }
+
+        $data = array(
+            "draw"            =>isset ( $draw ) ? intval( $draw ) : 0,
+            "recordsTotal"    => $recordsTotal,
+            "recordsFiltered" => $recordsFiltered,
+            "data"            => $MerchantBankStatusData
+        );
+     
+        echo json_encode($data);
+    }
+
     public function accounts() {
         $data = array();
         // $data['total_users'] = $this->user->get_total_users();

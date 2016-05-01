@@ -29,6 +29,7 @@ define('CONST_BANK_STATUS_NOT_VERIFIED',	2);
 
 define('CONST_TXT_BANK_STATUS_VERIFIED',	'verified');
 define('CONST_TXT_BANK_STATUS_NOT_VERIFIED','not verified');
+define('CONST_TXT_BANK_STATUS_NO_DETAIL','no detail');
 
 //Merchant Mode Ids
 define('CONST_MERCHANT_MODE_LIVE',			1);

@@ -121,7 +121,7 @@ class Sales extends CI_Controller {
 
               $paymentMethod .='
                                 <p>
-                                <strong>Credit Card:</strong> $ '.$amount_cc.'
+                                <strong>Credit Card:</strong> '.CONST_CURRENCY_DISPLAY.$amount_cc.'
                                 <br /> 
                                 <span class="small" style="font-size: 10px;">'.$row['cc_number']. '</span>
                                 </p>';
@@ -160,7 +160,7 @@ class Sales extends CI_Controller {
             }
             $tempArray   = array();
             $tempArray[] = $order_id;
-            $tempArray[] = $row['total_amount'];
+            $tempArray[] = CONST_CURRENCY_DISPLAY.$row['total_amount'];
             $tempArray[] = $paymentMethod; 
             $tempArray[] = $customInfo; 
             $actionsUrls .= '</p>';

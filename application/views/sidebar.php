@@ -50,7 +50,12 @@
 							  <span class="title">Merchants</span>
 							</a>
 							<span class="<?php echo ($this->uri->segment(2) == 'users')&&($this->uri->segment(3) == 'index') ? 'bg-success' : '';?> icon-thumbnail"><i class="fa fa-user"></i></span>
+							<a href="<?php echo site_url('admin/users/bankstatus') ?>">
+							  <span class="title">Bank Status</span>
+							</a>
+							<span class="<?php echo ($this->uri->segment(2) == 'users')&&($this->uri->segment(3) == 'bankstatus') ? 'bg-success' : '';?> icon-thumbnail"><i class="fa fa-university"></i></span>
 						</li>
+
 					<?php
 				}
 			?>
