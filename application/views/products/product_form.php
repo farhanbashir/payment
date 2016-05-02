@@ -1,5 +1,5 @@
 <?php
-
+$file_name = "";
 $product_name ="";
 $price = "";
 $description = ""; 
@@ -17,6 +17,7 @@ if(isset($postedData) && !empty($postedData))
 	$product_name = $postedData['product_name'];
 	$description = $postedData['description'];
 	$price = $postedData['price'];
+	$file_name = $postedData['old_image'];
 	if(!empty($ArrEditCategories))
 	{
 		for ($i=0; $i <count($ArrEditCategoriesId) ; $i++)
@@ -43,7 +44,7 @@ if(isset($postedData) && !empty($postedData))
 				<?php echo $formHeading;?>
 			</h1>
 			<div class="col-xs-6">
-				<form role="form" action="" method="post">
+				<form role="form" method ="post"action="" enctype="multipart/form-data" accept-charset="utf-8">
 					<div class="form-group">
 						<label>Product Name</label>
 						<input type="text" value="<?php echo $product_name;?>" name="product_name" class="form-control" >
@@ -67,6 +68,20 @@ if(isset($postedData) && !empty($postedData))
 						<label>Price</label>
 						<input  value="<?php echo $price;?>" name="price" type="text" data-a-sign="$ " class="autonumeric form-control">
 					</div>
+					<div class="form-group">
+						<label>Product Image</label>
+						<input type="file" name="image" >
+						<input type="hidden" name="old_image" value="<?php echo $file_name;?>">
+					</div>
+					<?php
+					if($file_name)						
+					{
+						?>
+							<br /><br />
+							<img src="<?php echo $file_name;?>" width="150" alt="." />
+						<?php
+					}
+					?>	
 					<br /><br />
 					<button name="btn-submit" value="submit" class="btn btn-primary" type="submit">Submit</button>
 				</form>

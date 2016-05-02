@@ -79,12 +79,14 @@ Class Product extends CI_Model
 
     function getById($productId=0, $userId=0, $storeId=0)
     {
-		$sql = "    SELECT pc.product_id,pc.category_id,p.price,p.name AS product_name,p.description, c.name AS category_name FROM 
+		$sql = "    SELECT pc.product_id,pc.category_id,p.price,p.name AS product_name,p.description, c.name AS category_name, pm.file_name FROM 
                     product_categories AS pc
                     LEFT JOIN products AS p
                     ON pc.product_id = p.product_id
                     LEFT JOIN categories AS c
                     ON pc.category_id = c.category_id
+                    LEFT JOIN product_media AS pm
+                    on pm.product_id = p.product_id
                     WHERE p.product_id ='$productId' AND p.user_id ='$userId' AND p.store_id='$storeId'";
         
         $query = $this->db->query($sql);
@@ -169,6 +171,17 @@ Class Product extends CI_Model
         return  $totalRecordsCount;
     }
 
+    function get_all_categories($userId, $storeId)
+    {
+        $sql = "SELECT name,category_id,parent_id,(SELECT COUNT(category_id) FROM product_categories WHERE category_id=categories.category_id) AS total_products
+                FROM categories WHERE status >0 AND user_id='$userId' AND store_id='$storeId' ";
+        $query = $this->db->query($sql);
+        $result = $query->result_array();
+        $query->free_result();
+        return $result;
+    }
+
+
     function getProductQuery($params=array(), $userId, $storeId)
     {
        $offset              = @$params['offset'];
@@ -233,17 +246,25 @@ Class Product extends CI_Model
 
     function getProductCategory($productId, $userId, $storeId)
     {
-        $sql  ="    SELECT p.product_id, GROUP_CONCAT(c.name SEPARATOR ', ') AS category_name 
+        $sql  ="    SELECT p.product_id, GROUP_CONCAT(c.name SEPARATOR ', ') AS category_name, pm.file_name
                     FROM product_categories AS pc 
                     LEFT JOIN products AS p ON pc.product_id = p.product_id 
                     LEFT JOIN categories AS c ON pc.category_id = c.category_id 
+                    LEFT JOIN product_media AS pm ON pm.product_id = p.product_id 
                     WHERE p.user_id ='$userId' AND p.store_id='$storeId' AND p.product_id = '$productId'";
         
         $query = $this->db->query($sql);
         $result = $query->result_array();
-        $category_name = @$result[0]['category_name'];
+        $category_name = @$result[0];
         return $category_name;
     }
+
+    function delete_product_media($productId)
+    {
+        $this->db->where('product_id', $productId);
+        $this->db->delete('product_media');      
+    }
+
     /*function get_user_detail($user_id)
     {
         $sql = "select * from users where user_id=$user_id" ;

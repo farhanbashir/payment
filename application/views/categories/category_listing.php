@@ -26,10 +26,11 @@
         <table id="category-listing" class="table table-hover demo-table-search dataTable no-footer"  role="grid" aria-describedby="tableWithSearch_info">
           <thead>
             <tr role="row">
-              <th>ID</th>
-              <th>Categories</th>
-              <th>No. of products</th>
-              <th>Actions</th>
+              <th width="10%">ID</th>
+              <th width="15%">Categories</th>
+              <th width="15%">Parent Category</th>
+              <th width="10%">No. of products</th>
+              <th width="20%">Actions</th>
             </tr>
           </thead>
         </table>
@@ -61,6 +62,7 @@ $(document).ready(function()
     "aoColumns": [
     { "sType": "html", "sName": "category_id" },
     { "sType": "html", "sName": "name" },
+    { "sType": "html", "bSortable": false, "bSearchable": false },
     { "sType": "html", "bSortable": false, "bSearchable": false },
     { "sType": "html", "bSortable": false, "bSearchable": false },
     ]

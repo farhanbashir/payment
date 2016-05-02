@@ -74,7 +74,7 @@ Class Category extends CI_Model
     {
        
         $sql = "SELECT name,category_id,parent_id,(SELECT COUNT(category_id) FROM product_categories WHERE category_id=categories.category_id) AS total_products
-                FROM categories WHERE status >0 AND user_id='$userId' AND store_id='$storeId' ";
+                FROM categories WHERE status >0 AND user_id='$userId' AND store_id='$storeId' AND parent_id = 0 ";
         $query = $this->db->query($sql);
         $result = $query->result_array();
         $query->free_result();
@@ -169,12 +169,12 @@ Class Category extends CI_Model
 
         $arrayWhereClause = array();
 
-        $arrayWhereClause[] = " status >0 AND user_id='$userId' AND store_id='$storeId' ";
+        $arrayWhereClause[] = " t1.status >0 AND t1.user_id='$userId' AND t1.store_id='$storeId' ";
         
         if($searchKeyword)
         {
             $arrayWhereClause[] = " ( 
-                                        name LIKE '%$searchKeyword%'
+                                        t1.name LIKE '%$searchKeyword%'
                                     ) ";
         }
 
@@ -185,16 +185,21 @@ Class Category extends CI_Model
             $whereCondition = ' WHERE ' . implode(' AND ', $arrayWhereClause);
         }
 
-        $select = 'category_id,name,category_id,parent_id,(SELECT COUNT(category_id) FROM product_categories WHERE category_id=categories.category_id) AS total_products ';
+        $select = 't1.category_id,t1.name,t1.category_id,t1.parent_id,
+                    (SELECT COUNT(category_id) FROM product_categories 
+                    WHERE category_id=t1.category_id) AS total_products, 
+                    t2.name AS parent_category
+                    FROM categories AS t1
+                    LEFT JOIN categories AS t2
+                    ON t1.parent_id = t2.category_id ';
         if($isQueryForCount)
         {
-            $select = ' COUNT(user_id) AS totalRecordsCount ';
+            $select = ' COUNT(t1.user_id) AS totalRecordsCount FROM categories AS t1';
         }
         
         $sql = "SELECT 
                         $select 
-                    FROM 
-                            categories
+                    
                     ". $whereCondition. " 
                     ". $order. " 
                     ". $limit. " 
