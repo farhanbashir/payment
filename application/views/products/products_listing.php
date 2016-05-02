@@ -68,6 +68,7 @@ foreach ($products as $row)
               <th>Product</th>
               <th>Categories</th>
               <th>Price</th>
+              <th>Product Image</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -104,6 +105,7 @@ $(document).ready(function()
     { "sType": "html", "sName": "name" },
     { "sType": "html", "bSortable": false, "bSearchable": false },
     { "sType": "html", "sName": "price" },
+    { "sType": "html", "bSortable": false, "bSearchable": false },
     { "sType": "html", "bSortable": false, "bSearchable": false },
     ]
   } );

@@ -74,10 +74,7 @@ class Products extends CI_Controller {
 
             $tempArray   = array();
          
-            $tempArray[] = $productId;
-            $tempArray[] = $row['name'];            
-            $tempArray[] = $this->Product->getProductCategory($productId, $userId, $storeId);
-            $tempArray[] = CONST_CURRENCY_DISPLAY.$row['price'];
+           
             
             $editUrl     = site_url('admin/products/save/'.$productId);
             $deleteUrl   = site_url('admin/products/delete_product/'.$productId);
@@ -92,7 +89,21 @@ class Products extends CI_Controller {
                       </a>
                     </p>
 EOT;
-            $tempArray[] =$actionData ;
+            $arrCategoryAndImg = $this->Product->getProductCategory($productId, $userId, $storeId);
+            $productImage      = "";
+            
+            if($arrCategoryAndImg['file_name'])
+            {
+              $productImage =  '<img src="'.$arrCategoryAndImg["file_name"].'" width="150" alt="." />';
+            }
+
+            $tempArray[]       = $productId;
+            $tempArray[]       = $row['name'];            
+            $tempArray[]       = $arrCategoryAndImg['category_name'];
+            $tempArray[]       = CONST_CURRENCY_DISPLAY.$row['price'];
+            
+            $tempArray[]       = $productImage;
+            $tempArray[]       = $actionData ;
 
             $productsData[] = $tempArray;
           }
@@ -121,6 +132,7 @@ EOT;
       {
 
         $productInfo = $this->Product->getById($productId, $userId, $storeId);
+
         if($productInfo)
         { 
 
@@ -131,8 +143,9 @@ EOT;
           }
           $postedData['product_name'] =   $productInfo[0]['product_name'];
           $postedData['description']  =   $productInfo[0]['description'];
-          $postedData['price']  =   $productInfo[0]['price'];
-          $postedData['categories']  =   $categories;
+          $postedData['price']        =   $productInfo[0]['price'];
+          $postedData['old_image']    =   $productInfo[0]['file_name'];
+          $postedData['categories']   =   $categories;
           $formHeading = "Edit Product";
         }
         else
@@ -165,6 +178,7 @@ EOT;
         if(empty($categories))
         {
           $aErrorMessage[]= "Select atlease one category";
+
         }
         else
         {
@@ -174,6 +188,58 @@ EOT;
           }
 
         }
+
+        if(empty($aErrorMessage))
+        {
+          
+          if (isset($_FILES['image']) && !empty($_FILES['image']['name']))
+          {
+            $config['upload_path'] = './assets/img/products/';
+            
+            $config['allowed_types'] = 'gif|jpg|png';
+            
+            $this->load->library('upload');
+            
+            $load =$this->upload->initialize($config);
+
+            if ( ! $this->upload->do_upload("image"))
+            { 
+              $imageUploadError = array('error' => $this->upload->display_errors());
+              $aErrorMessage[]  = $imageUploadError['error'];
+            }
+            else
+            {
+              $file_data     = $this->upload->data();
+              
+
+              $file_name   = asset_url('img/products/'.$file_data['file_name']);
+              
+              $media_type   = $file_data['image_type'];
+              
+              $product_media = array();
+              
+              $product_media['file_name']   = $file_name;
+              $product_media['media_type']  = $media_type;
+              $product_media['status']      = CONST_STATUS_ID_ACTIVE;
+              $product_media['created']     = date("Y-m-d H:i:s");
+              $product_media['updated']     = date("Y-m-d H:i:s");
+              
+              if($productId)
+              {
+                $product_media['product_id']= $productId;
+                $this->Product->delete_product_media($productId);
+                $this->Product->add_product_media($product_media);
+              }
+
+              if($old_image)
+              { 
+                $old_image = str_replace(base_url(),'', $old_image);
+                @unlink($old_image);
+              }
+            }
+          }
+        }
+       
 
         if(is_array($aErrorMessage) && count($aErrorMessage))
         {
@@ -203,8 +269,14 @@ EOT;
           {
 
             $saveData['created'] = date("Y-m-d H:i:s");
-            $productId = $this->Product->add_product($saveData);
+            $productId           = $this->Product->add_product($saveData);
             $this->Product->add_product_categories($categories, $productId);
+
+            if(is_array($product_media) && !isset($product_media['product_id']))
+            {
+              $product_media['product_id']= $productId;
+              $this->product->add_product_media($product_media);
+            }
 
           }
           $this->session->set_flashdata('Message','Product has been successfully saved!');
@@ -214,7 +286,7 @@ EOT;
       }
 
       $data['postedData'] = $postedData;
-      $data['categories'] = $this->Category->get_all_categories($userId, $storeId);
+      $data['categories'] = $this->Product->get_all_categories($userId, $storeId);
       $data['formHeading'] = $formHeading;
       $content = $this->load->view('products/product_form', $data, true);
       $this->load->view('main', array('content' => $content));

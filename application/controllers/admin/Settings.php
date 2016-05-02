@@ -157,66 +157,65 @@ Class Settings extends CI_Controller
    			if (isset($_FILES['image']) && !empty($_FILES['image']['name']))
 	      	{
 		   		$config['upload_path'] = './'.CONST_IMAGE_UPLOAD_DIR;
-				$config['allowed_types'] = 'gif|jpg|png';
-				$this->load->library('upload');
-				$load =$this->upload->initialize($config);
+   				$config['allowed_types'] = 'gif|jpg|png';
+   				$this->load->library('upload');
+   				$load =$this->upload->initialize($config);
 
-				if ( ! $this->upload->do_upload("image"))
-				{	
-					$imageUploadError = array('error' => $this->upload->display_errors());
-					$aErrorMessage[]  = $imageUploadError['error'];
-				}
-				else
-				{
-					$file_name = $this->upload->data();
-					
-					$file_name = base_url().CONST_IMAGE_UPLOAD_DIR.$file_name['file_name'];
-					
-					$User_Store_Detail = $this->Profile->checkUserStoreDetails($userId);
-					
-					if($User_Store_Detail)
-					{	
-						$old_image = $User_Store_Detail['logo'];
+   				if ( ! $this->upload->do_upload("image"))
+   				{	
+   					$imageUploadError = array('error' => $this->upload->display_errors());
+   					$aErrorMessage[]  = $imageUploadError['error'];
+   				}
+   				else
+   				{
+   					$file_name = $this->upload->data();
+   					
+   					$file_name = base_url().CONST_IMAGE_UPLOAD_DIR.$file_name['file_name'];
+   					
+   					$User_Store_Detail = $this->Profile->checkUserStoreDetails($userId);
+   					
+   					if($User_Store_Detail)
+   					{	
+   						$old_image = $User_Store_Detail['logo'];
 
-						$this->Profile->edit_user_store($storeId, array('logo'=>$file_name));
-						$businessInfoData['old_image'] = $file_name;
-					}
-					
-					if($old_image)
-					{	
-						$old_image = str_replace(base_url(),'', $old_image);
-						@unlink($old_image);
-					}
-				}
-			}
-			if(is_array($aErrorMessage) && count($aErrorMessage))
-			{	
-				$showErrorMessage = getFormValidationErrorMessage($aErrorMessage);
-				$this->session->set_flashdata('errMsgBusinessInfo',$showErrorMessage);
-			}
-			else
-			{	
-				$saveBusinessInfoData = array();
-				$saveBusinessInfoData['name'] 	 	 = $business;
-				$saveBusinessInfoData['description'] = $description;
-				$saveBusinessInfoData['email'] 		 = $email;
-				$saveBusinessInfoData['phone'] 		 = $phone;
-				$saveBusinessInfoData['address'] 	 = $address;
-				$saveBusinessInfoData['facebook'] 	 = $facebook;
-				$saveBusinessInfoData['twitter'] 	 = $twitter;
-				$saveBusinessInfoData['website'] 	 = $website;
-				$saveBusinessInfoData['updated']	 = date("Y-m-d H:i:s"); 
+   						$this->Profile->edit_user_store($storeId, array('logo'=>$file_name));
+   						$businessInfoData['old_image'] = $file_name;
+   					}
+   					
+   					if($old_image)
+   					{	
+   						$old_image = str_replace(base_url(),'', $old_image);
+   						@unlink($old_image);
+   					}
+   				}
+   			}
+   			if(is_array($aErrorMessage) && count($aErrorMessage))
+   			{	
+   				$showErrorMessage = getFormValidationErrorMessage($aErrorMessage);
+   				$this->session->set_flashdata('errMsgBusinessInfo',$showErrorMessage);
+   			}
+   			else
+   			{	
+   				$saveBusinessInfoData = array();
+   				$saveBusinessInfoData['name'] 	 	 = $business;
+   				$saveBusinessInfoData['description'] = $description;
+   				$saveBusinessInfoData['email'] 		 = $email;
+   				$saveBusinessInfoData['phone'] 		 = $phone;
+   				$saveBusinessInfoData['address'] 	 = $address;
+   				$saveBusinessInfoData['facebook'] 	 = $facebook;
+   				$saveBusinessInfoData['twitter'] 	 = $twitter;
+   				$saveBusinessInfoData['website'] 	 = $website;
+   				$saveBusinessInfoData['updated']	 = date("Y-m-d H:i:s"); 
 
-				$User_Store_Detail = $this->Profile->checkUserStoreDetails($userId);
-			
-				if($User_Store_Detail)
-				{
-					$this->Profile->edit_user_store($storeId, $saveBusinessInfoData);
-					$this->session->set_flashdata('successMsgBusinessInfo','Business Information updated successfully');
-				}
+   				$User_Store_Detail = $this->Profile->checkUserStoreDetails($userId);
+   			
+   				if($User_Store_Detail)
+   				{
+   					$this->Profile->edit_user_store($storeId, $saveBusinessInfoData);
+   					$this->session->set_flashdata('successMsgBusinessInfo','Business Information updated successfully');
+   				}
 
-			}
-
+   			}
    		} #<!---Submitter::Business Info End--->
    		else
    		{
