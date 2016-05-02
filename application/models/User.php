@@ -270,7 +270,7 @@ Class User extends CI_Model
 	
 	function get_states($country_code=get_states)
     {
-        $sql = "select * from states where country_code='". $country_code ."' " ;
+        $sql = "select * from states where country_code='". $country_code ."' ORDER BY name ASC" ;
         $query = $this->db->query($sql);
         $result = $query->result_array();        
 		

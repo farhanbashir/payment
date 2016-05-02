@@ -42,9 +42,9 @@ class Api extends REST_Controller {
 
 	   if(!in_array($this->router->method, $this->config->item('allowed_calls_without_token')))
        {
-			$headerToken	= @$headers['Token'];
-			$headerUserId	= @$headers['Userid'];
-			$headerStoreId	= @$headers['Storeid'];
+			$headerToken	= @$headers['token'];
+			$headerUserId	= @$headers['userid'];
+			$headerStoreId	= @$headers['storeid'];
 			
             if($headerToken)
             {
@@ -1410,6 +1410,21 @@ class Api extends REST_Controller {
     function getProducts_post()
     {
         $products                = $this->product->get_all_products($this->store_id, $this->user_id);
+		
+		if(is_array($products) && count($products) > 0)
+		{
+			foreach($products as $_key => $_productInfo)
+			{
+				$productId = @$_productInfo['product_id'];
+				
+				if($productId)
+				{
+					$products[$_key]['categories']  = $this->product->getProductCategories($productId);
+					$products[$_key]['images']  = $this->product->getProductImages($productId);
+				}
+			}
+		}
+		
         $data["header"]["error"] = "0";
         $data['body']            = array("products"=>$products);
         $this->response($data, 200);
@@ -1426,6 +1441,20 @@ class Api extends REST_Controller {
         }
 
         $products    = $this->product->get_products_by_category($category_id);
+		
+		if(is_array($products) && count($products) > 0)
+		{
+			foreach($products as $_key => $_productInfo)
+			{
+				$productId = @$_productInfo['product_id'];
+				
+				if($productId)
+				{
+					$products[$_key]['categories']  = $this->product->getProductCategories($productId);
+					$products[$_key]['images']  = $this->product->getProductImages($productId);
+				}
+			}
+		}
         
         $data["header"]["error"] = "0";
         $data['body']            = array("products"=>$products);
@@ -1443,6 +1472,18 @@ class Api extends REST_Controller {
         }
 
         $product_detail         = $this->product->get_product_detail($product_id);
+		
+		if(is_array($product_detail) && count($product_detail) > 0)
+		{
+			$productId = @$product_detail['product_id'];
+				
+			if($productId)
+			{
+				$product_detail['categories']  = $this->product->getProductCategories($productId);
+				$product_detail['images']  = $this->product->getProductImages($productId);
+			}
+		}
+		
         $data["header"]["error"] = "0";
         $data['body']            = array("product_detail"=>$product_detail);
         $this->response($data, 200);   

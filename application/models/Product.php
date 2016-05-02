@@ -19,7 +19,8 @@ Class Product extends CI_Model
     }
 
     function get_all_products($storeId=0,$userId=0)
-    {       
+    {
+		/*
 		$sql = "SELECT pc.product_id,pc.category_id,p.price,p.name AS product_name, c.name AS category_name FROM 
                     product_categories AS pc
                     LEFT JOIN products AS p
@@ -27,6 +28,12 @@ Class Product extends CI_Model
                     LEFT JOIN categories AS c
                     ON pc.category_id = c.category_id
                     WHERE p.user_id ='$userId' AND p.store_id='$storeId'" ;
+		*/
+		
+		$sql = "SELECT p.* 
+				FROM products p
+				WHERE p.user_id ='$userId' AND p.store_id='$storeId'" ;
+		
         $query = $this->db->query($sql);
         $result = $query->result_array();
         $query->free_result();
@@ -244,6 +251,31 @@ Class Product extends CI_Model
         $category_name = @$result[0]['category_name'];
         return $category_name;
     }
+	
+	function getProductCategories($productId=0)
+    {
+		$sql = "SELECT c.category_id, c.name, c.parent_id  
+				FROM product_categories pc, categories c 
+				WHERE pc.category_id=c.category_id AND pc.product_id='". $productId ."' ";
+        
+        $query = $this->db->query($sql);
+        $result = $query->result_array();
+        $query->free_result();
+        return $result;
+    }
+	
+	function getProductImages($productId=0)
+    {
+		$sql = "SELECT file_name AS media_path, media_type
+				FROM product_media 
+				WHERE product_id='". $productId ."' ";
+        
+        $query = $this->db->query($sql);
+        $result = $query->result_array();
+        $query->free_result();
+        return $result;
+    }
+	
     /*function get_user_detail($user_id)
     {
         $sql = "select * from users where user_id=$user_id" ;
