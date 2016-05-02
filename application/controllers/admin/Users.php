@@ -64,10 +64,7 @@ class Users extends CI_Controller {
                 $tempArray[] = $row['email'];
                 $tempArray[] = date(CONST_DATE_TIME_DISPLAY,strtotime($row['created']));
                 $tempArray[] = '<p><span class="label label-success">Active</span></p>';
-                $tempArray[] = '<p><a href="Javascript: void();" class="btn btn-primary ">Edit</a>
-                                <a href="Javascript: void();" class="btn btn-danger">Delete</a>
-                                <br><br>
-                                <a href="'.site_url("admin/users/login_merchant/".$row["user_id"]).'" class="btn btn-warning">Log-In as this Merchant</a>
+                $tempArray[] = '<a href="'.site_url("admin/users/login_merchant/".$row["user_id"]).'" class="btn btn-warning">Log-In as this Merchant</a>
                             </p>';
 
                 $usersData[] = $tempArray;
