@@ -101,16 +101,17 @@ class Sales extends CI_Controller {
           {   
             $order_id    = $row['order_id'];
             $receipt     = $row['receipt'];
+			$app_type     = $row['app_type'];
 
             $paymentMethod = '';
-            $paymentMethod .='<p><strong>iPhone App</strong></p>';
+            $paymentMethod .= "<p><strong>App:</strong> ". getDeviceTypeNameById($app_type) ."</p>";
 
 
             $amount_cash = $row['amount_cash'];
 
             if($amount_cash > 0)
             {
-              $paymentMethod .= "<p><strong>Cash:</strong>".$amount_cash."</p>";
+              $paymentMethod .= "<p><strong>Cash:</strong> ".$amount_cash."</p>";
             }
 
             $amount_cc = $row['amount_cc'];
@@ -148,7 +149,7 @@ class Sales extends CI_Controller {
                             <strong>Zipcode:</strong>".trim($row['customer_zipcode'])."<br />
                           </p>";
 
-            $actionsUrls = '<p><a href="#'.$order_id.'" class="btn btn-primary" onclick="Javascript: return openPopupForOrderDetails("'. $order_id.'");">View Details</a>
+            $actionsUrls = '<p><a href="#'.$order_id.'" class="btn btn-primary" onclick="Javascript: return openPopupForOrderDetails('. $order_id.');">View Details</a>
                             <br /><br />';
             if($receipt)
             {

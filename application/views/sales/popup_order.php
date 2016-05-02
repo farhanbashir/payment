@@ -56,10 +56,14 @@
 							
 							<table  class="table table-hover table-condensed">								
 								
+								<tr>
+									<td><strong>App:</strong></td>
+									<td><?php echo getDeviceTypeNameById($paymentTransaction['app_type']); ?></td>
+								</tr>
 								
 								<tr>
 									<td><strong>Order Date:</strong></td>
-									<td><?php echo $paymentTransaction['created']; ?></td>
+									<td><?php echo date(CONST_DATE_TIME_DISPLAY, strtotime($orderInfo['created'])); ?></td>
 								</tr>
 								
 								<tr>
@@ -92,13 +96,29 @@
 										<?php
 									}
 									
-									$amount_cc = $paymentTransaction['amount_cc'];									
+									$amount_cc = $paymentTransaction['amount_cc'];	
+									$is_cc_swipe = $paymentTransaction['is_cc_swipe'];									
 									if($amount_cc > 0)
 									{
 										?>
 											<tr>
 												<td><strong>Paid by Credit Card:</strong></td>
 												<td><?php echo $amount_cc; ?></td>
+											</tr>
+											
+											<tr>
+												<td><strong>Credit Card Swipe:</strong></td>
+												<td>
+													<?php
+														$iconSwipe = '<i class="fs-14 fa fa-remove" style="color: red;"></i>';
+														if($is_cc_swipe)
+														{
+															$iconSwipe = '<i class="fs-14 fa fa-check" style="color: green;"></i>';
+														}
+														
+														echo $iconSwipe;
+													?>
+												</td>
 											</tr>
 											
 											<tr>
