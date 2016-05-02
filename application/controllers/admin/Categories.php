@@ -44,30 +44,43 @@ class Categories extends CI_Controller
         $categoryData = array();
 
         if(is_array($categoryList) && count($categoryList) > 0)
-        {
-          foreach ($categoryList as $row) 
-          {
-            $tempArray   = array();
+        { 
+            
+            foreach ($categoryList as $category) 
+            {   
+                 
+                $tempArray       = array();  
+                
+                $categoryId      = $category['category_id'];
+                $category_name   = $category['name'];
 
-            $tempArray[] = $row['category_id'];
-            $tempArray[] = $row['name'];
-            $tempArray[] = $row['total_products'];
-            $categoryId  = $row['category_id'];
-            $actionData = <<<EOT
+                $parentCategory = "";
+                
+                if($category['parent_category'])
+                {
+                    $parentCategory = $category['parent_category'];
+                }
+                $deleteUrl   = site_url('admin/categories/delete_category/'.$categoryId); 
+                $editUrl     = site_url('admin/categories/save/'.$categoryId); 
+                $actionData  = <<<EOT
                         <p>
-                        <a href="<?php echo site_url('admin/categories/save/'.$categoryId);?>">
-                          <button class="btn btn-primary btn-cons">Edit</button>
-                        </a>
-                        <a onclick="return confirm('Are you sure want to delete','<?php echo site_url('admin/categories/delete_category/'.$categoryId);?>')"href="<?php echo site_url('admin/categories/delete_category/'.$categoryId);?>">
-                          <button class="btn btn-danger btn-cons">Delete</button>
-                        </a>
-                      </p>
+                            <a href="$editUrl">
+                              <button class="btn btn-primary btn-cons">Edit</button>
+                            </a>
+                            <a onclick="return confirm('Are you sure want to delete','$deleteUrl')"href="$deleteUrl">
+                              <button class="btn btn-danger btn-cons">Delete</button>
+                            </a>
+                        </p>
 EOT;
-            $tempArray[] =$actionData;
-
-            $categoryData[] = $tempArray;
-          }
+                $tempArray[] = $categoryId;
+                $tempArray[] = $category_name;
+                $tempArray[] = $parentCategory;
+                $tempArray[] = $category['total_products'];
+                $tempArray[] =$actionData;
+                $categoryData[] = $tempArray;
+            }
         }
+       
         $data = array(
           "draw"            =>isset ( $draw ) ? intval( $draw ) : 0,
           "recordsTotal"    => $recordsTotal,
