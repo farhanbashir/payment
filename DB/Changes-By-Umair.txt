@@ -189,3 +189,11 @@ UPDATE `user_merchant_info` SET cx_mode=2;
 ALTER TABLE `orders` ADD `customer_name` VARCHAR(250) NULL DEFAULT NULL AFTER `customer_id`;
 
 ALTER TABLE `customers` ADD `name` VARCHAR(250) NULL DEFAULT NULL ;
+
+
+*April 29, 2016:
+=================
+ALTER TABLE `transactions` ADD `app_type` TINYINT(1) NULL DEFAULT NULL COMMENT '1=iphone,2=android' AFTER `cx_transaction_id`;
+UPDATE `transactions` SET app_type='1';
+
+UPDATE `transactions` SET is_cc_swipe='1'

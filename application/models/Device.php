@@ -18,7 +18,7 @@ Class Device extends CI_Model
 
     function validToken($user_id, $token)
     {
-        $this -> db -> select('uid');
+        $this -> db -> select('*');
         $this -> db -> from('devices');
         $this -> db -> where('user_id', $user_id);
         $this -> db -> where('token', $token);
@@ -29,7 +29,9 @@ Class Device extends CI_Model
 
         if($query -> num_rows() == 1)
         {
-            return true;
+			$result = $query->result_array();
+			$query->free_result();
+			return $result[0];
         }
         else
         {

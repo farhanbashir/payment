@@ -33,9 +33,10 @@ class Api extends REST_Controller {
 		$this->load->model('customer','',TRUE);
 		$this->load->model('logs','',TRUE);
     	
-        $this->user_id  = '';
-        $this->token    = '';
-        $this->store_id = '';
+        $this->user_id  	= 0;
+        $this->token    	= 0;
+        $this->store_id 	= 0;
+		$this->device_type	= 0;
 
         $headers = getallheaders();
 
@@ -49,7 +50,9 @@ class Api extends REST_Controller {
             {
                 if($headerUserId)
                 {
-                    if(!$this->device->validToken($headerUserId,$headerToken))
+					$deviceInfo = $this->device->validToken($headerUserId,$headerToken);
+					
+                    if(!$deviceInfo)
                     {
                         $data["header"]["error"] = "1";
                         $data["header"]["message"] = "Please provide valid token";
@@ -68,6 +71,7 @@ class Api extends REST_Controller {
                             $this->user_id  = $headerUserId;
                             $this->token    = $headerToken;
                             $this->store_id = $headerStoreId;
+							$this->device_type = @$deviceInfo['type'];
                         }    
                     }  
                 }   
@@ -1397,7 +1401,7 @@ class Api extends REST_Controller {
 
     function getCategories_post()
     {
-        $categories              = $this->category->get_all_categories(); //TODO: Revert back to get_all_categories($this->store_id);
+        $categories              = $this->category->get_all_categories($this->user_id, $this->store_id);
         $data["header"]["error"] = "0";
         $data['body']            = array("categories"=>$categories);
         $this->response($data, 200);
@@ -1405,7 +1409,7 @@ class Api extends REST_Controller {
 
     function getProducts_post()
     {
-        $products                = $this->product->get_all_products(); //TODO: Revert back to get_all_products($this->store_id);
+        $products                = $this->product->get_all_products($this->store_id, $this->user_id);
         $data["header"]["error"] = "0";
         $data['body']            = array("products"=>$products);
         $this->response($data, 200);
@@ -1730,7 +1734,8 @@ class Api extends REST_Controller {
 												"cc_expiry_year"	=> $cc_expiry_year,
 												"cc_expiry_month"	=> $cc_expiry_month,
 												"cc_code"			=> $cc_code,
-												'cx_transaction_id' => $cx_transaction_id
+												'cx_transaction_id' => $cx_transaction_id,
+												'app_type'			=> $this->device_type
 											);
 
 					$this->order->add_transaction($transaction_data);
