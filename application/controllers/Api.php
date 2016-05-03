@@ -42,9 +42,9 @@ class Api extends REST_Controller {
 
 	   if(!in_array($this->router->method, $this->config->item('allowed_calls_without_token')))
        {
-			$headerToken	= @$headers['token'];
-			$headerUserId	= @$headers['userid'];
-			$headerStoreId	= @$headers['storeid'];
+			$headerToken	= @$headers['Token'];
+			$headerUserId	= @$headers['Userid'];
+			$headerStoreId	= @$headers['Storeid'];
 			
             if($headerToken)
             {
@@ -1585,6 +1585,7 @@ class Api extends REST_Controller {
 		
 		$apiStatus = true;
 		$cx_transaction_id = 0;
+		$cx_descriptor = '';
 		$random_order_id = 0;
 		if($pay_by_credit_card_amount > 0) //pay by credit card!
 		{
@@ -1664,7 +1665,8 @@ class Api extends REST_Controller {
 					
 					$apiData = $apiResponse['data'];
 					
-					$cx_transaction_id = @$apiData['transaction_id'];
+					$cx_transaction_id 	= @$apiData['transaction_id'];
+					$cx_descriptor 		= @$apiData['descriptor'];
 				}
 			}
 		}
@@ -1776,6 +1778,7 @@ class Api extends REST_Controller {
 												"cc_expiry_month"	=> $cc_expiry_month,
 												"cc_code"			=> $cc_code,
 												'cx_transaction_id' => $cx_transaction_id,
+												'cx_descriptor'		=> $cx_descriptor, 
 												'app_type'			=> $this->device_type
 											);
 
@@ -1840,7 +1843,7 @@ class Api extends REST_Controller {
 					}
 
 					$data["header"]["error"] = "0";
-					$data['body']            = array("order_id"=>$order_id);
+					$data['body']            = array("order_id"=>$order_id, "descriptor" => $cx_descriptor);
 					$this->response($data, 200);
 				}
 				else

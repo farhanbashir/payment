@@ -17,21 +17,21 @@
             <div id="custom-datatable_wrapper" class="dataTables_wrapper form-inline no-footer">
                 <table id="bankStatus-listing" class="table table-hover demo-table-search dataTable no-footer" role="grid" aria-describedby="custom-datatable_info" cellspacing="0" width="100%">
                  <div class="cs-wrapper">
-                    <select name="sort-by" id="sort-by" class="cs-select cs-skin-slide">
+                    <select name="filter-status" id="filter-status" class="cs-select cs-skin-slide">
                         <option value="">All</option>
-                        <option value="1">Verified</option>
-                        <option value="2">Not Verified</option>
-                        <option value="no detail">No Detail</option>
+                        <option value="<?php echo CONST_BANK_STATUS_VERIFIED; ?>">Verified</option>
+                        <option value="<?php echo CONST_BANK_STATUS_NOT_VERIFIED; ?>">Not Verified</option>
+                        <option value="<?php echo CONST_TXT_BANK_STATUS_NO_DETAIL; ?>">No Bank Details</option>
                     </select>
                 </div>
                 <thead>
                     <tr>
-                        <th style="width:10%">ID</th>
-                        <th style="width:15%">Name</th>
-                        <th style="width:25%">Email</th>
-                        <th style="width:25%">Bank Info</th>
-                        <th style="width:15%">Last Check</th>
-                        <th style="width:10%">Status</th>
+                        <th width="15%">Merchant ID</th>
+                        <th width="20%">Name</th>
+                        <th width="20%">Email</th>
+                        <th width="20%">Bank Info</th>
+                        <th width="15%">Last Checked</th>
+                        <th width="10%">Status</th>
                     </tr>
                 </thead>
             </table>
@@ -58,14 +58,14 @@ $(document).ready(function()
         "ajax": {
             "url": "<?php echo site_url('admin/users/ajaxMerchantBankStatus');?>",
             "data": function ( d ) {
-                d.where_status = $('#sort-by').val();
+                d.filter_status = $('#filter-status').val();
             }
         },
         "bLengthChange": false,
         "oLanguage": 
         {
-            "sEmptyTable"   : "No Merchant Bank Status Found",
-            "sZeroRecords"  : "No Merchant Bank Status Found"
+            "sEmptyTable"   : "No Merchant Found",
+            "sZeroRecords"  : "No Merchant Found"
         },
 
         "order": [[ 0, "desc" ]],
@@ -81,7 +81,7 @@ $(document).ready(function()
     } );
 
 
-    $('#sort-by').change(function()
+    $('#filter-status').change(function()
     {   
         var loadTable = $('#bankStatus-listing').DataTable();
        

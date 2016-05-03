@@ -53,7 +53,7 @@
 							<a href="<?php echo site_url('admin/users/bankstatus') ?>">
 							  <span class="title">Bank Status</span>
 							</a>
-							<span class="<?php echo ($this->uri->segment(2) == 'users')&&($this->uri->segment(3) == 'bankstatus') ? 'bg-success' : '';?> icon-thumbnail"><i class="fa fa-university"></i></span>
+							<span class="<?php echo ($this->uri->segment(2) == 'users')&&($this->uri->segment(3) == 'bankstatus') ? 'bg-success' : '';?> icon-thumbnail"><i class="fa fa-bookmark"></i></span>
 						</li>
 
 					<?php

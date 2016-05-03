@@ -196,4 +196,12 @@ ALTER TABLE `customers` ADD `name` VARCHAR(250) NULL DEFAULT NULL ;
 ALTER TABLE `transactions` ADD `app_type` TINYINT(1) NULL DEFAULT NULL COMMENT '1=iphone,2=android' AFTER `cx_transaction_id`;
 UPDATE `transactions` SET app_type='1';
 
-UPDATE `transactions` SET is_cc_swipe='1'
+UPDATE `transactions` SET is_cc_swipe='1';
+
+*May 02, 2016:
+=================
+ALTER TABLE `transactions` ADD `cx_descriptor` TEXT NULL AFTER `cx_transaction_id`;
+
+*May 03, 2016:
+=================
+ALTER TABLE `user_banks` CHANGE `swift_code` `swift_code` VARCHAR(250) NULL DEFAULT NULL;

@@ -21,26 +21,26 @@ class Users extends CI_Controller {
      * @see http://codeigniter.com/user_guide/general/urls.html
      */
     
-    function __construct() {
+    function __construct()
+	{
         parent::__construct();
         $this->load->model('user', '', TRUE);
         
-        if (!$this->session->userdata('logged_in')) {
+        if (!$this->session->userdata('logged_in'))
+		{
             redirect(base_url());
         }
     }
 
     public function index() 
     {
-       
-        $data = array();
+		$data = array();
         $content = $this->load->view('users/user_listing.php', $data, true);
         $this->load->view('main', array('content' => $content));
     }
 
     function ajaxMerchantsListing()
-    {
-      
+    { 
         $_getParams = $_GET;
         $params     = _processDataTableRequest($_getParams);
         $draw       = $params['draw'];
@@ -57,22 +57,29 @@ class Users extends CI_Controller {
             foreach ($users_list as $row) 
             {
                 $tempArray   = array();
+				
+				$user_id = $row['user_id'];
+				
+				$tplLoginButton = '<a href="'.site_url("admin/users/login_merchant/".$user_id).'" class="btn btn-warning">Log-In as this Merchant</a>';
+				if(getLoggedInUserId() == $user_id)
+				{
+					$tplLoginButton = '<span class="btn btn-primary">Logged-In as this Merchant</span>';
+				}	
 
-                $tempArray[] = $row['user_id'];
+                $tempArray[] = $user_id;
                 $tempArray[] = $row['first_name'];
                 $tempArray[] = $row['last_name'];
                 $tempArray[] = $row['email'];
-                $tempArray[] = date(CONST_DATE_TIME_DISPLAY,strtotime($row['created']));
-                $tempArray[] = '<p><span class="label label-success">Active</span></p>';
-                $tempArray[] = '<a href="'.site_url("admin/users/login_merchant/".$row["user_id"]).'" class="btn btn-warning">Log-In as this Merchant</a>
-                            </p>';
+                $tempArray[] = date(CONST_DATE_TIME_DISPLAY, strtotime($row['created']));
+                $tempArray[] = '<span class="label label-success">Active</span>';
+                $tempArray[] = $tplLoginButton;
 
                 $usersData[] = $tempArray;
             }
         }
 
         $data = array(
-            "draw"            =>isset ( $draw ) ? intval( $draw ) : 0,
+            "draw"            => isset ( $draw ) ? intval( $draw ) : 0,
             "recordsTotal"    => $recordsTotal,
             "recordsFiltered" => $recordsFiltered,
             "data"            => $usersData
@@ -84,7 +91,7 @@ class Users extends CI_Controller {
     function bankstatus()
     {
         $data = array();
-        $content = $this->load->view('users/bankStatus_listing.php', $data, true);
+        $content = $this->load->view('users/bank_status_listing.php', $data, true);
         $this->load->view('main', array('content' => $content));
     }
 
@@ -92,15 +99,17 @@ class Users extends CI_Controller {
     {
         $_getParams = $_GET;
 
-        $whereStatus = $_GET['where_status'];
+        $filterStatus = $_GET['filter_status'];
         
         $params     = _processDataTableRequest($_getParams);
         $draw       = $params['draw'];
+		
+		$params['filter_status'] = $filterStatus;
 
-        $MerchantBankStatus_list = $this->user->getMerchantBankStatus($params,$whereStatus);
+        $MerchantBankStatus_list = $this->user->getMerchantBankStatus($params);
         
-        $recordsFiltered = $this->user->getMerchantBankStatusCount($params,$whereStatus); 
-        $recordsTotal = $this->user->getMerchantBankStatusCountWithoutFilter($params=array(),$whereStatus);
+        $recordsFiltered = $this->user->getMerchantBankStatusCount($params); 
+        $recordsTotal = $this->user->getMerchantBankStatusCountWithoutFilter();
 
         $MerchantBankStatusData = array();
 
@@ -110,28 +119,33 @@ class Users extends CI_Controller {
             {
                 $tempArray   = array();
 
-                $status ='<p><span class="label label-danger">No Detail</span></p>';
+                $status ='<span class="label label-danger">No Bank Details</span>';
                 
-                if($row['status']==CONST_BANK_STATUS_VERIFIED)
+                if($row['status'] == CONST_BANK_STATUS_VERIFIED)
                 {
-                    $status ='<p><span class="label label-success">Verified</span></p>';
+                    $status ='<span class="label label-success">Verified</span>';
                 }
-
-                if($row['status']==CONST_BANK_STATUS_NOT_VERIFIED)
+				else if($row['status'] == CONST_BANK_STATUS_NOT_VERIFIED)
                 {
-                    $status ='<p><span class="label label-warning">Not Verified</span></p>';
-                }
-                $date = $row['created'];
-                if($row['updated']!='')
+                    $status ='<span class="label label-warning">Not Verified</span>';
+                }				
+                
+				$lastChecked = '-';
+				if($row['updated'])
                 {
-                    $date = $row['updated'];
+                    $lastChecked = date(CONST_DATE_TIME_DISPLAY, strtotime($row['updated']));
                 }
+				else if($row['created'])
+				{
+					$lastChecked = date(CONST_DATE_TIME_DISPLAY, strtotime($row['created']));
+				}
+				
                 $tempArray[] = $row['user_id'];
                 $tempArray[] = $row['name'];
                 $tempArray[] = $row['email'];
-                $tempArray[] = $row['bank_name']."<br>".$row['account_title']."<br>".$row['account_number']."<br>".$row['swift_code'];
-                $tempArray[] = date(CONST_DATE_TIME_DISPLAY,strtotime($date));
-                $tempArray[] =  $status;
+                $tempArray[] = $row['bank_name']."<br />".$row['account_title']."<br />".$row['account_number']."<br />".$row['swift_code'];
+                $tempArray[] = $lastChecked;
+                $tempArray[] = $status;
 
                 $MerchantBankStatusData[] = $tempArray;
             }
@@ -145,103 +159,7 @@ class Users extends CI_Controller {
         );
      
         echo json_encode($data);
-    }
-
-    public function accounts() {
-        $data = array();
-        // $data['total_users'] = $this->user->get_total_users();
-        // $data['total_stores'] = $this->store->get_total_stores();
-        // $data['latest_five_users'] = $this->user->get_latest_five_users();
-        // $data['latest_five_stores'] = $this->store->get_latest_five_stores();
-
-        $content = $this->load->view('profile/index.php', $data, true);
-        $this->load->view('main', array('content' => $content));
-    }
-
-    public function view($id) {
-        $user = $this->user->get_user_detail($id);
-        $data['user'] = $user;
-        
-        $content = $this->load->view('users/view.php', $data, true);
-        $this->load->view('welcome_message', array('content' => $content));
-    }
-
-    public function edit($id) {
-        $user = $this->user->get_user_detail($id);
-        $data['user'] = $user;
-        $content = $this->load->view('users/edit.php', $data, true);
-        $this->load->view('welcome_message', array('content' => $content));
-    }
-
-    public function update() 
-    {
-        $username = $this->input->post('username');
-        $new_password = $this->input->post('password');
-        $email = $username;
-        $first_name = $this->input->post('first_name');
-        $last_name = $this->input->post('last_name');
-        $user_id = $this->input->post('user_id');
-        $data = array("username"=>$username,"first_name"=>$first_name,"last_name"=>$last_name,"email"=>$email);
-        if($new_password !== '')
-        {
-            $data['new_password'] = md5($new_password);
-        }    
-        $temp_image_url = "";
-        $temp_image_url = uploadFile($this->config->item('user_image_base'), asset_url('img/users'));
-
-        if($temp_image_url !== "")
-        {
-            $data['image'] = $temp_image_url;
-        }
-
-        $this->user->edit_user($user_id, $data);
-        
-        redirect(site_url('admin/users/edit/' . $user_id));
-    }
-
-    public function addnew() {
-        $content = $this->load->view('users/new.php', $data = NULL, true);
-        $this->load->view('welcome_message', array('content' => $content));
-    }
-
-    public function submit() {
-        
-        $username = $this->input->post('username');
-        $email = $username;
-        $first_name = $this->input->post('first_name');
-        $last_name = $this->input->post('last_name');
-        $password = $this->input->post('password');
-        $confirm_password = $this->input->post('confirm_password');
-        $data = array("username"=>$username,"password"=>md5($password),"first_name"=>$first_name,"last_name"=>$last_name,"email"=>$email);
-        
-        $temp_image_url = "";
-        $temp_image_url = uploadFile($this->config->item('user_image_base'), asset_url('img/users'));
-
-        if($temp_image_url !== "")
-        {
-            $data['image'] = $temp_image_url;
-        }
-
-        $user_id = $this->user->add_user($data);
-        
-        redirect(site_url('admin/users/view/' . $user_id));
-    }
-
-    public function delete($id, $status, $view = NULL) {
-        $flag = $this->user->edit_user($id, array("is_active"=>$status));
-//        $this->image->delete_content_images($id);
-//        if (empty($view)) {
-            redirect(site_url('admin/users/index'));
-//        } else {
-//            redirect(site_url('admin/' . $this->type . '/view/' . $id));
-//        }
-    }
-
-    public function confirm_delete($user_id)
-    {
-        $this->user->delete_user($user_id);
-        redirect(site_url('admin/users/index'));
-    }
+    }   
 	
 	public function login_merchant($user_id=0)
     {

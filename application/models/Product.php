@@ -41,8 +41,7 @@ Class Product extends CI_Model
     }
 
     function get_order_products($order_id)
-    {   
-
+    {
         $sql = "select ol.product_id,p.name,ol.quantity, ol.product_price from order_line_items ol 
                 inner join products p on ol.product_id=p.product_id
                 where ol.order_id=$order_id";
@@ -79,13 +78,15 @@ Class Product extends CI_Model
     {
         $this->db->where('product_id', $productId);
         $this->db->delete('products');
-        $this->db->where('product_id', $productId);
+        
+		$this->db->where('product_id', $productId);
         $this->db->delete('product_categories');
 
     }
 
     function getById($productId=0, $userId=0, $storeId=0)
     {
+		/*
 		$sql = "    SELECT pc.product_id,pc.category_id,p.price,p.name AS product_name,p.description, c.name AS category_name, pm.file_name FROM 
                     product_categories AS pc
                     LEFT JOIN products AS p
@@ -95,11 +96,27 @@ Class Product extends CI_Model
                     LEFT JOIN product_media AS pm
                     on pm.product_id = p.product_id
                     WHERE p.product_id ='$productId' AND p.user_id ='$userId' AND p.store_id='$storeId'";
+		*/
+		
+		$sql = "SELECT * 
+				FROM products p 
+				WHERE p.product_id ='$productId'
+  				  AND p.user_id ='$userId' 
+				  AND p.store_id='$storeId' 
+				LIMIT 1";
         
         $query = $this->db->query($sql);
         $result = $query->result_array();
-        $query->free_result();
-        return $result;
+		
+		if($result)
+		{
+			$query->free_result();
+			return $result[0];
+		}
+		else			
+		{
+			return false;
+		}
     }
 
     function update_product_categories($arrCategoryIds,$product_id)
@@ -127,8 +144,6 @@ Class Product extends CI_Model
         
     }
 
-
-
     function add_product_media($data)
     {
         $this->db->insert('product_media',$data);
@@ -142,21 +157,21 @@ Class Product extends CI_Model
         return ($this->db->affected_rows() != 1) ? false : true;
     }
 
-    function getProducts($params=array(),$userId, $storeId)
+    function getProducts($params=array(), $userId=0, $storeId=0)
     {   
         $params['queryForCount'] = false;
 
-        $sql = $this->getProductQuery($params,$userId,$storeId);
+        $sql = $this->getProductQuery($params, $userId, $storeId);
 
         $query = $this->db->query($sql);
         return $query->result_array();
     }
 
-    function getProductsCount($params=array(),$userId, $storeId)
+    function getProductsCount($params=array(), $userId=0, $storeId=0)
     {   
         $params['queryForCount'] = true;
 
-        $sql = $this->getProductQuery($params,$userId,$storeId);
+        $sql = $this->getProductQuery($params, $userId, $storeId);
 
         $query = $this->db->query($sql);
         $result = $query->result_array();
@@ -165,11 +180,11 @@ Class Product extends CI_Model
         return  $totalRecordsCount;
     }
 
-    function getProductsCountWithoutFilter($params=array(),$userId, $storeId)
+    function getProductsCountWithoutFilter($params=array(), $userId=0, $storeId=0)
     {   
         $params['queryForCount'] = true;
 
-        $sql = $this->getProductQuery($params,$userId,$storeId);
+        $sql = $this->getProductQuery($params, $userId, $storeId);
 
         $query = $this->db->query($sql);
         $result = $query->result_array();
@@ -177,17 +192,6 @@ Class Product extends CI_Model
 
         return  $totalRecordsCount;
     }
-
-    function get_all_categories($userId, $storeId)
-    {
-        $sql = "SELECT name,category_id,parent_id,(SELECT COUNT(category_id) FROM product_categories WHERE category_id=categories.category_id) AS total_products
-                FROM categories WHERE status >0 AND user_id='$userId' AND store_id='$storeId' ";
-        $query = $this->db->query($sql);
-        $result = $query->result_array();
-        $query->free_result();
-        return $result;
-    }
-
 
     function getProductQuery($params=array(), $userId, $storeId)
     {
@@ -195,8 +199,7 @@ Class Product extends CI_Model
        $searchKeyword       = @$params['search_keyword'];
        $sortColumn          = @$params['sort_column'];
        $sortOrderDirection  = @$params['sort_direction'];
-       $isQueryForCount     = @$params['queryForCount'];
-      
+       $isQueryForCount     = @$params['queryForCount'];      
 
        $order = '';
        $limit = '';
@@ -250,8 +253,20 @@ Class Product extends CI_Model
         
         return $sql;
     }
+	
+	function get_all_categories($userId, $storeId)
+    {
+        $sql = "SELECT 
+						name, category_id, parent_id,(SELECT COUNT(category_id) FROM product_categories WHERE category_id=categories.category_id) AS total_products
+                FROM categories 
+				WHERE status >0 AND user_id='$userId' AND store_id='$storeId' ";
+        $query = $this->db->query($sql);
+        $result = $query->result_array();
+        $query->free_result();
+        return $result;
+    }
 
-    function getProductCategory($productId, $userId, $storeId)
+    function getProductCategory_NOT_IN_USE($productId, $userId, $storeId)
     {
         $sql  ="    SELECT p.product_id, GROUP_CONCAT(c.name SEPARATOR ', ') AS category_name, pm.file_name
                     FROM product_categories AS pc 

@@ -26,11 +26,11 @@
         <table id="category-listing" class="table table-hover demo-table-search dataTable no-footer"  role="grid" aria-describedby="tableWithSearch_info">
           <thead>
             <tr role="row">
-              <th width="10%">ID</th>
-              <th width="15%">Categories</th>
-              <th width="15%">Parent Category</th>
-              <th width="10%">No. of products</th>
-              <th width="20%">Actions</th>
+              <th width="5%">ID</th>
+              <th width="25%">Categories</th>
+              <th width="25%">Parent Category</th>
+              <th width="20%">No. of products</th>
+              <th width="25%">Actions</th>
             </tr>
           </thead>
         </table>

@@ -20,13 +20,13 @@
                 <table id="merchants-listing" class="table table-hover demo-table-search dataTable no-footer" role="grid" aria-describedby="custom-datatable_info" cellspacing="0" width="100%">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>First name</th>
-                            <th>Last name</th>
-                            <th>Email</th>
-                            <th>Created</th>
-                            <th>Status</th>
-                            <th>Action</th>
+                            <th width="5%">ID</th>
+                            <th width="15%">First Name</th>
+                            <th width="15%">Last Name</th>
+                            <th width="20%">Email</th>
+                            <th width="15%">Created</th>
+                            <th width="10%">Status</th>
+                            <th width="20%">Action</th>
                         </tr>
                     </thead>
                 </table>

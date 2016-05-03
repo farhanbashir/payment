@@ -64,12 +64,12 @@ foreach ($products as $row)
 
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Product</th>
-              <th>Categories</th>
-              <th>Price</th>
-              <th>Product Image</th>
-              <th>Action</th>
+              <th width="5%">ID</th>
+              <th width="25%">Product</th>
+              <th width="20%">Categories</th>
+              <th width="10%">Price</th>
+              <th width="10%">Image</th>
+              <th width="30%">Action</th>
             </tr>
           </thead>
         </table>
@@ -94,8 +94,8 @@ $(document).ready(function()
     "bLengthChange": false,
     "oLanguage": 
     {
-      "sEmptyTable"   : "No Product Found",
-      "sZeroRecords"  : "No Product Found"
+      "sEmptyTable"   : "No Products Found",
+      "sZeroRecords"  : "No Products Found"
     },
 
     "order": [[ 0, "desc" ]],

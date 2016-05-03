@@ -146,7 +146,7 @@ Class Order extends CI_Model
 	
 	function get_order_transactions($order_id)
     {
-		 $sql = "select t.type, t.amount_cc, t.amount_cash, t.is_cc_swipe, t.cc_number, cx_transaction_id, t.created from transactions t 
+		 $sql = "select t.type, t.amount_cc, t.amount_cash, t.is_cc_swipe, t.cc_number, cx_transaction_id, cx_descriptor, t.created from transactions t 
 inner join orders o on t.order_id=o.order_id
 where t.order_id=$order_id";
 
@@ -161,7 +161,7 @@ where t.order_id=$order_id";
 		$sql = "SELECT 
 						t.transaction_id, t.amount_cc, t.amount_cash, t.is_cc_swipe, 
 						t.cc_name, t.cc_number, t.cc_expiry_year, t.cc_expiry_month, t.cc_code, 
-						cx_transaction_id, t.app_type, t.created 
+						cx_transaction_id, cx_descriptor, t.app_type, t.created 
 				FROM transactions t 
 				INNER JOIN orders o ON t.order_id=o.order_id
 				WHERE t.order_id='". $order_id ."' 
