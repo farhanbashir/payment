@@ -5,7 +5,7 @@ Class Settings extends CI_Controller
 	{
         parent::__construct();
         $this->load->model('User');
-         $this->load->model('Profile');
+        $this->load->model('Profile');
         if (!$this->session->userdata('logged_in'))
         {
             redirect(base_url());
@@ -13,8 +13,7 @@ Class Settings extends CI_Controller
     }
 
    	function index()
-   	{	
-   		
+   	{   		
    		$userId 			= getLoggedInUserId();
    		$storeId 			= getLoggedInStoreId(); 
    		$data 				= array();
@@ -39,24 +38,24 @@ Class Settings extends CI_Controller
    			
    			if(!$first_name)
    			{
-   				$aErrorMessage[] = "First name required";
+   				$aErrorMessage[] = "First name is required";
    			}
 
    			if(!$last_name)
    			{
-   				$aErrorMessage[] = "Last name required";
+   				$aErrorMessage[] = "Last name is required";
    			}
 
    			if(!$email)
    			{
-   				$aErrorMessage[] = "Email required";
+   				$aErrorMessage[] = "Email is required";
    			}
 
    			if($email)
    			{
    				if (!filter_var($email, FILTER_VALIDATE_EMAIL))
    				{
-				  $aErrorMessage[] = "Please provide valid email address"; 
+					$aErrorMessage[] = "Please provide valid email address"; 
 				}
    			}
 
@@ -70,8 +69,7 @@ Class Settings extends CI_Controller
 
    			if(!$security_answer)
    			{
-   				$aErrorMessage[]="Security answer required";
-   				
+   				$aErrorMessage[]="Security answer required";   				
    			}
 
    			if(is_array($aErrorMessage) && count($aErrorMessage))
@@ -83,10 +81,10 @@ Class Settings extends CI_Controller
 			{
 				$saveBasicInfoData = array(
 
-					'first_name'	=> $first_name,
-					'last_name'		=> $last_name,
-					'email'			=> $email,
-					'updated'		=> date("Y-m-d H:i:s"),
+						'first_name'	=> $first_name,
+						'last_name'		=> $last_name,
+						'email'			=> $email,
+						'updated'		=> date("Y-m-d H:i:s"),
 					);
 				if($password)
 				{
@@ -245,27 +243,27 @@ Class Settings extends CI_Controller
    			
    			if(!$bank_name)
    			{
-   				$aErrorMessage[] = "Bank Name Required";
+   				$aErrorMessage[] = "Bank Name is Required";
    			}
 
    			if(!$bank_address)
    			{
-   				$aErrorMessage[] = "Bank Address required";
+   				$aErrorMessage[] = "Bank Address is required";
    			}
 
    			if(!$swift_code)
    			{
-   				$aErrorMessage[] = "Swift Code required";
+   				$aErrorMessage[] = "Swift Code is required";
    			}
 
    			if(!$account_title)
    			{
-   				$aErrorMessage[] = "Account Title required";
+   				$aErrorMessage[] = "Account Title is required";
    			}
 
    			if(!$account_number)
    			{
-   				$aErrorMessage[] = " Account number required";
+   				$aErrorMessage[] = " Account number is required";
    			}
 
    			if(is_array($aErrorMessage) && count($aErrorMessage))
@@ -300,7 +298,35 @@ Class Settings extends CI_Controller
 					$saveBankInfoData['status']  = CONST_BANK_STATUS_NOT_VERIFIED;
 					$this->Profile->add_user_bank($saveBankInfoData);
 				}
-
+				
+				$postParams = array();
+				$postParams['bank_name'] 			= $bank_name;
+				$postParams['bank_address'] 		= $bank_address;
+				$postParams['bank_swift_code'] 		= $swift_code;
+				$postParams['bank_account_title'] 	= $account_title;
+				$postParams['bank_account_number'] 	= $account_number;
+				
+				$apiStatus = false;
+				$apiData = array();
+				$apiResponse = editMerchantDetails($userId, $postParams);
+				
+				if($apiResponse)
+				{
+					if(isset($apiResponse['error']))
+					{
+						$data["header"]["error"] = "1";
+						$data["header"]["message"] = $apiResponse['error'];
+						$this->response($data, 200);
+					}
+					else if(isset($apiResponse['success']))
+					{
+						$apiStatus = true;
+						
+						$apiData = $apiResponse['data'];
+					}
+				}
+				//Note: We are just updading business information to CardXecure system.
+				
 				$this->session->set_flashdata('successMsgBankInfo','Bank Information updated successfully');
 			}
 
@@ -313,6 +339,9 @@ Class Settings extends CI_Controller
    			$bankInfoData['account_title'] 	= $UsersDetails['account_title'];
    			$bankInfoData['account_number'] = $UsersDetails['account_number'];
    		}
+		
+		$bankInfoData['bank_status'] 	= $UsersDetails['bank_status'];
+		
    		#<!-------Bank Information:: Section ENd-------->
    		#<------------------------------------------->
 

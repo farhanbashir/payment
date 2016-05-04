@@ -4,6 +4,7 @@ $bank_address ="";
 $swift_code ="";
 $account_number ="";
 $account_title ="";
+$bank_status = CONST_BANK_STATUS_NOT_VERIFIED;
 
 if(!empty($bankInfoData))
 {
@@ -12,12 +13,38 @@ if(!empty($bankInfoData))
 	$swift_code = $bankInfoData['swift_code'];
 	$account_number = $bankInfoData['account_number'];
 	$account_title = $bankInfoData['account_title'];
+	
+	$bank_status = $bankInfoData['bank_status'];
+}
+
+$isBankAlreadyVerified = false;
+if($bank_status == CONST_BANK_STATUS_VERIFIED)
+{
+	$isBankAlreadyVerified = true;
+}
+
+$bankStatusMessage = '';
+if($isBankAlreadyVerified)
+{
+	$bankStatusMessage = "No need to change your bank details as its already verified!";
 }
 ?>
 
 <div class="panel-body">
 	<h2>Bank Information</h2>
 	<div class="col-md-6" style="padding-left: 0px;">
+		
+		<?php
+			if($bankStatusMessage)
+			{
+				?>
+					<div class="alert alert-success">
+					  <strong>Notification!</strong>&nbsp;&nbsp;<?php echo $bankStatusMessage;?>
+					</div>
+				<?php
+			}
+		?>
+		
 		<?php if($this->session->flashdata('successMsgBankInfo')!='')
 	    {?>   
 	        <div class="alert alert-success">
@@ -53,8 +80,16 @@ if(!empty($bankInfoData))
 				<label>Account Number / IBAN</label>
 				<input  name="account_number" value="<?php echo $account_number;?>" type="text" class="form-control" >
 			</div>
-			<br /><br />
-			<button name="btn-bank-info" value="submit" type="submit" class="btn btn-primary btn-cons">Save</button>
+			<?php
+				if(!$isBankAlreadyVerified)
+				{
+					?>
+						<br /><br />
+						<button name="btn-bank-info" value="submit" type="submit" class="btn btn-primary btn-cons">Save</button>
+					<?php
+				}
+			?>
+			
 		</form>
 	</div>
 </div>

@@ -1,24 +1,23 @@
 <?php 
-      $tab1 = "active";
-      $tab2 = "";
-      $tab3 = "";
-      $tab4 = "";
-      if($this->session->flashdata('errMsgBusinessInfo')!='' || $this->session->flashdata('successMsgBusinessInfo')!='' )
-      {
-          $tab1 = "";
-          $tab2 = "active";
-          
-      }
-      if($this->session->flashdata('errMsgBankInfo')!='' || $this->session->flashdata('successMsgBankInfo')!='' )
-      {
-          $tab1 = "";
-          $tab3 = "active";
-      }
-      if($this->session->flashdata('successMsgReceiptInfo')!='' || $this->session->flashdata('successMsgReceiptInfo')!='' )
-      {
-          $tab1 = "";
-          $tab4 = "active";
-      }
+	$tab1 = "active";
+	$tab2 = "";
+	$tab3 = "";
+	$tab4 = "";
+	if($this->session->flashdata('errMsgBusinessInfo')!='' || $this->session->flashdata('successMsgBusinessInfo')!='' )
+	{
+		$tab1 = "";
+		$tab2 = "active";
+	}
+	if($this->session->flashdata('errMsgBankInfo')!='' || $this->session->flashdata('successMsgBankInfo')!='' )
+	{
+		$tab1 = "";
+		$tab3 = "active";
+	}
+	if($this->session->flashdata('successMsgReceiptInfo')!='' || $this->session->flashdata('successMsgReceiptInfo')!='' )
+	{
+		$tab1 = "";
+		$tab4 = "active";
+	}
 ?>
 
 <div class="content ">

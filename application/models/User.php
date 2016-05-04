@@ -335,8 +335,7 @@ Class User extends CI_Model
        $searchKeyword       = @$params['search_keyword'];
        $sortColumn          = @$params['sort_column'];
        $sortOrderDirection  = @$params['sort_direction'];
-       $isQueryForCount     = @$params['queryForCount'];
-      
+       $isQueryForCount     = @$params['queryForCount'];      
 
        $order = '';
        $limit = '';
@@ -392,21 +391,21 @@ Class User extends CI_Model
         return $sql;
     }
 
-    function getMerchantBankStatus($params=array(),$whereStatus)
+    function getMerchantBankStatus($params=array())
     {   
         $params['queryForCount'] = false;
 
-        $sql = $this->getMerchantBankStatusQuery($params,$whereStatus);
+        $sql = $this->getMerchantBankStatusQuery($params);
 
         $query = $this->db->query($sql);
         return $query->result_array();
     }
 
-    function getMerchantBankStatusCount($params=array(),$whereStatus)
+    function getMerchantBankStatusCount($params=array())
     {   
         $params['queryForCount'] = true;
 
-        $sql = $this->getMerchantBankStatusQuery($params,$whereStatus);
+        $sql = $this->getMerchantBankStatusQuery($params);
 
         $query = $this->db->query($sql);
         $result = $query->result_array();
@@ -415,11 +414,11 @@ Class User extends CI_Model
         return  $totalRecordsCount;
     }
 
-    function getMerchantBankStatusCountWithoutFilter($params=array(),$whereStatus)
+    function getMerchantBankStatusCountWithoutFilter($params=array())
     {   
         $params['queryForCount'] = true;
 
-        $sql = $this->getUsersQuery($params,$whereStatus);
+        $sql = $this->getMerchantBankStatusQuery($params);
     
         $query = $this->db->query($sql);
         $result = $query->result_array();
@@ -428,30 +427,15 @@ Class User extends CI_Model
         return  $totalRecordsCount;
     }
 
-    function getMerchantBankStatusQuery($params=array(),$whereStatus)
+    function getMerchantBankStatusQuery($params=array())
     {
        $offset              = @$params['offset'];
        $searchKeyword       = @$params['search_keyword'];
        $sortColumn          = @$params['sort_column'];
        $sortOrderDirection  = @$params['sort_direction'];
        $isQueryForCount     = @$params['queryForCount'];
-      
-        if($whereStatus==CONST_TXT_BANK_STATUS_NO_DETAIL)
-        {
-            $whereStatus = "AND u.user_id NOT IN (SELECT user_id FROM user_banks)";
-        }
-        elseif($whereStatus==CONST_BANK_STATUS_VERIFIED)
-        {
-            $whereStatus = "AND ub.status = '1' ";
-        }
-        elseif($whereStatus==CONST_BANK_STATUS_NOT_VERIFIED)
-        {
-            $whereStatus = "AND ub.status = '2' ";
-        }
-        else
-        {
-            $whereStatus ="";
-        }
+	   
+	   $filterStatus		= @$params['filter_status'];
 
        $order = '';
        $limit = '';
@@ -468,7 +452,20 @@ Class User extends CI_Model
 
         $arrayWhereClause = array();
 
-        $arrayWhereClause[] = " (role_id = '". CONST_ROLE_ID_BUSINESS_ADMIN ."')" .$whereStatus;
+        $arrayWhereClause[] = " (role_id = '". CONST_ROLE_ID_BUSINESS_ADMIN ."') ";
+		
+		if($filterStatus == CONST_TXT_BANK_STATUS_NO_DETAIL)
+        {
+            $arrayWhereClause[] = " ( u.user_id NOT IN ( SELECT user_id FROM user_banks ) )";
+        }
+        elseif($filterStatus == CONST_BANK_STATUS_VERIFIED)
+        {
+            $arrayWhereClause[] = " ( ub.status = '". CONST_BANK_STATUS_VERIFIED ."' ) ";
+        }
+        elseif($filterStatus == CONST_BANK_STATUS_NOT_VERIFIED)
+        {
+            $arrayWhereClause[] = " ( ub.status = '". CONST_BANK_STATUS_NOT_VERIFIED ."' ) ";
+        }
         
         if($searchKeyword)
         {
@@ -496,12 +493,13 @@ Class User extends CI_Model
         }
 
         $select = " SELECT
-                        u.user_id, u.email, CONCAT(u.first_name,' ',u.last_name) AS name, u.updated,
-                        ub.bank_name, ub.bank_address, ub.swift_code, ub.account_title, ub.account_number, ub.status, u.created
+                        u.user_id, u.email, CONCAT(u.first_name,' ',u.last_name) AS name,
+                        ub.bank_name, ub.bank_address, ub.swift_code, ub.account_title, ub.account_number, ub.status, ub.updated, ub.created 
                         FROM users AS u
                         LEFT JOIN user_banks AS ub 
                         ON u.user_id = ub.user_id";
-        if($isQueryForCount)
+       
+ 	    if($isQueryForCount)
         {
             $select = " SELECT COUNT(u.user_id) AS totalRecordsCount 
                         FROM users AS u

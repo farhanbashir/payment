@@ -21,12 +21,10 @@ class Users extends CI_Controller {
      * @see http://codeigniter.com/user_guide/general/urls.html
      */
     
-    function __construct() 
-    {
+    function __construct() {
         parent::__construct();
-
         $this->load->model('user', '', TRUE);
-     
+        
         if (!$this->session->userdata('logged_in')) {
             redirect(base_url());
         }

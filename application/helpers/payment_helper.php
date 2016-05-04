@@ -33,7 +33,7 @@ define('CONST_BANK_STATUS_NOT_VERIFIED',	2);
 
 define('CONST_TXT_BANK_STATUS_VERIFIED',	'verified');
 define('CONST_TXT_BANK_STATUS_NOT_VERIFIED','not verified');
-define('CONST_TXT_BANK_STATUS_NO_DETAIL','no detail');
+define('CONST_TXT_BANK_STATUS_NO_DETAIL',	'no detail');
 
 //Merchant Mode Ids
 define('CONST_MERCHANT_MODE_LIVE',			1);
@@ -203,6 +203,7 @@ function editMerchantDetails($userId=0, $_postParams=array())
 	*/
 	
 	$CI =& get_instance();
+	$CI->load->model('profile');
 	$merchantInfo = $CI->profile->checkUserMerchantDetails($userId);
 	
 	$postParams					= array();
@@ -323,6 +324,7 @@ function getMerchantPaymentMode($userId=0, $_postParams=array())
 	*/
 	
 	$CI =& get_instance();
+	$CI->load->model('profile');
 	$merchantInfo = $CI->profile->checkUserMerchantDetails($userId);
 
 	$postParams					= array();
@@ -396,6 +398,7 @@ function changeMerchantPaymentMode($userId=0, $_postParams=array())
 	*/
 	
 	$CI =& get_instance();
+	$CI->load->model('profile');
 	$merchantInfo = $CI->profile->checkUserMerchantDetails($userId);
 
 	$postParams					= array();
@@ -464,6 +467,7 @@ function getMerchantBankAccountStatus($userId=0, $_postParams=array())
 	*/
 	
 	$CI =& get_instance();
+	$CI->load->model('profile');
 	$merchantInfo = $CI->profile->checkUserMerchantDetails($userId);
 
 	$postParams					= array();
@@ -559,6 +563,7 @@ function chargePaymentFromCreditCard($userId=0, $_postParams=array())
 	*/
 	
 	$CI =& get_instance();
+	$CI->load->model('profile');
 	$merchantInfo = $CI->profile->checkUserMerchantDetails($userId);
 	
 	if(!$_postParams['customer_fname'])
@@ -656,7 +661,9 @@ function chargePaymentFromCreditCard($userId=0, $_postParams=array())
 			
 			$apiData = array(
 								'transaction_id'	=> @$apiResponse['data']['transactionid'],
-								'amount'			=> @$apiResponse['data']['amount']
+								'amount'			=> @$apiResponse['data']['amount'],
+								'descriptor'		=> @$apiResponse['data']['descriptor']
+								
 				);
 		}
 	}
@@ -700,6 +707,7 @@ function refundPayment($userId=0, $_postParams=array())
 	*/
 	
 	$CI =& get_instance();
+	$CI->load->model('profile');
 	$merchantInfo = $CI->profile->checkUserMerchantDetails($userId);
 	
 	$postParams = array();
@@ -980,6 +988,7 @@ function _createMerchantLog($userId=0, $callFor, $urlToRequest, $params)
 	$logData['response_time'] 	= '';
 	$logData['ip_address'] 		= $CI->input->ip_address();
 	
+	$CI->load->model('logs');
 	$log_id = $CI->logs->add_merchant_log($logData);
 	
 	return $log_id;
@@ -999,6 +1008,7 @@ function _updateMerchantLogResponse($log_id=0, $response='')
 	$logData['response_time'] 	= date('Y-m-d H:i:s');
 	$logData['total_seconds'] 	= $end_time-$merchan_service_start_time; //in seconds
 	
+	$CI->load->model('logs');
 	$CI->logs->edit_merchant_log($log_id, $logData);
 }
 
@@ -1049,6 +1059,9 @@ function generateReceiptByOrderId($order_id=0, $user_id=0)
 	if($order_id)
 	{
 		$CI =& get_instance();
+		
+		$CI->load->model('order');
+		$CI->load->model('profile');
 	
 		$orderInfo			= $CI->order->get_order_detail($order_id);
 		$paymentTransaction	= $CI->order->get_payment_transaction_by_order($order_id);
@@ -1066,6 +1079,7 @@ function generateReceiptByOrderId($order_id=0, $user_id=0)
 		$receiptTextColor	= @$storeDetails['receipt_text_color'];
 		
 		//transaction details
+		$paymentNotice		= @$paymentTransaction['cx_descriptor']; //-->CONST_CC_PAYMENT_SUCCESS_NOTICE;
 		$invoiceId			= @$paymentTransaction['transaction_id'];
 		$cashAmount			= @$paymentTransaction['amount_cash'];
 		$ccAmount			= @$paymentTransaction['amount_cc'];
@@ -1078,21 +1092,19 @@ function generateReceiptByOrderId($order_id=0, $user_id=0)
 		$customerEmail		= @$orderInfo['customer_email'];
 		$orderDate			= date(CONST_DATE_FORMAT, strtotime(@$orderInfo['created']));
 		$orderTime			= date(CONST_TIME_FORMAT, strtotime(@$orderInfo['created']));
-		$orderReceipt		= @$orderInfo['receipt'];
-		
+		$orderReceipt		= @$orderInfo['receipt'];		
 		
 		//user details
 		$userFirstName		= @$userDetails['first_name'];
 		$userEmail			= @$userDetails['email'];
 		
 		$paymentCurrency	= CONST_DEFAULT_CURRENCY;
-		$paymentNotice		= CONST_CC_PAYMENT_SUCCESS_NOTICE;
+		
 
 		if($orderReceipt) //means Receipt already generated and already emailed to customer. So, no need to do it again!
 		{
 			return $receiptCreated;
 		}
-		
 
 		if(!$storeName)
 		{
