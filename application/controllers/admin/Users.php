@@ -24,9 +24,10 @@ class Users extends CI_Controller {
     function __construct() 
     {
         parent::__construct();
-    
+
         $this->load->model('user', '', TRUE);
-       
+        $this->load->model('profile', '', TRUE);
+
         if (!$this->session->userdata('logged_in')) {
             redirect(base_url());
         }
@@ -44,7 +45,7 @@ class Users extends CI_Controller {
 
     public function index() 
     {
-       
+
         $data = array();
         $content = $this->load->view('users/user_listing.php', $data, true);
         $this->load->view('main', array('content' => $content));
@@ -52,8 +53,8 @@ class Users extends CI_Controller {
 
     function ajaxMerchantsListing()
     {
-        
-        
+
+
 
         $_getParams = $_GET;
         $params     = _processDataTableRequest($_getParams);
@@ -79,7 +80,7 @@ class Users extends CI_Controller {
                 $tempArray[] = date(CONST_DATE_TIME_DISPLAY,strtotime($row['created']));
                 $tempArray[] = '<p><span class="label label-success">Active</span></p>';
                 $tempArray[] = '<a href="'.site_url("admin/users/login_merchant/".$row["user_id"]).'" class="btn btn-warning">Log-In as this Merchant</a>
-                            </p>';
+                </p>';
 
                 $usersData[] = $tempArray;
             }
@@ -90,8 +91,8 @@ class Users extends CI_Controller {
             "recordsTotal"    => $recordsTotal,
             "recordsFiltered" => $recordsFiltered,
             "data"            => $usersData
-        );
-     
+            );
+
         echo json_encode($data);
     }
 
@@ -106,19 +107,17 @@ class Users extends CI_Controller {
     {
         $_getParams = $_GET;
 
-        $whereStatus = $_GET['where_status'];
-        
+        $filterStatus = $_getParams['filter_status'];
+
         $params     = _processDataTableRequest($_getParams);
         $draw       = $params['draw'];
-
         
         $params['filter_status'] = $filterStatus;
 
-
-        $MerchantBankStatus_list = $this->user->getMerchantBankStatus($params,$whereStatus);
+        $MerchantBankStatus_list = $this->user->getMerchantBankStatus($params);
         
-        $recordsFiltered = $this->user->getMerchantBankStatusCount($params,$whereStatus); 
-        $recordsTotal = $this->user->getMerchantBankStatusCountWithoutFilter($params=array(),$whereStatus);
+        $recordsFiltered = $this->user->getMerchantBankStatusCount($params); 
+        $recordsTotal = $this->user->getMerchantBankStatusCountWithoutFilter();
 
         $MerchantBankStatusData = array();
 
@@ -128,59 +127,140 @@ class Users extends CI_Controller {
             {
                 $tempArray   = array();
 
-                $status ='<p><span class="label label-danger">No Detail</span></p>';
+                $status ='<span class="label label-danger">No Bank Details</span>';
                 
-                if($row['status']==CONST_BANK_STATUS_VERIFIED)
+                if($row['status'] == CONST_BANK_STATUS_VERIFIED)
                 {
-                    $status ='<p><span class="label label-success">Verified</span></p>';
+                    $status ='<span class="label label-success">Verified</span>';
                 }
-
-
-                if($row['status']==CONST_BANK_STATUS_NOT_VERIFIED)
-                {
-                    $status ='<p><span class="label label-warning">Not Verified</span></p>';
-                }
-                $date = $row['created'];
-                if($row['updated']!='')
-
+                
                 else if($row['status'] == CONST_BANK_STATUS_NOT_VERIFIED)
                 {
-                    $status ='<span class="label label-warning">Not Verified</span>';
-                }               
+                    $status ='<div id="'.$row['user_id'].'"><span class="label label-warning">Not Verified</span> <button onclick="return checkBankStatus(this)" value="'.$row['user_id'].'"class="btn btn-complete btn-cons"style="width:60px;height:31px;">Check Status</button></div>';
+                }       
                 
                 $lastChecked = '-';
+
                 if($row['updated'])
-
                 {
-                    $date = $row['updated'];
+                    $lastChecked = date(CONST_DATE_TIME_DISPLAY, strtotime($row['updated']));
                 }
-
-
                 else if($row['created'])
                 {
                     $lastChecked = date(CONST_DATE_TIME_DISPLAY, strtotime($row['created']));
-                }
-                
+                }          
 
                 $tempArray[] = $row['user_id'];
                 $tempArray[] = $row['name'];
                 $tempArray[] = $row['email'];
-                $tempArray[] = $row['bank_name']."<br>".$row['account_title']."<br>".$row['account_number']."<br>".$row['swift_code'];
-                $tempArray[] = date(CONST_DATE_TIME_DISPLAY,strtotime($date));
-                $tempArray[] =  $status;
+                //-->$tempArray[] = $row['bank_name']."<br>".$row['account_title']."<br>".$row['account_number']."<br>".$row['swift_code'];
+                $tempArray[] = $lastChecked;
+                $tempArray[] = $status;
 
                 $MerchantBankStatusData[] = $tempArray;
             }
         }
 
         $data = array(
-            "draw"            =>isset ( $draw ) ? intval( $draw ) : 0,
+            "draw"            => isset ( $draw ) ? intval( $draw ) : 0,
             "recordsTotal"    => $recordsTotal,
             "recordsFiltered" => $recordsFiltered,
             "data"            => $MerchantBankStatusData
-        );
-     
+            );
+
         echo json_encode($data);
+    }
+
+    function check_bank_status()
+    {
+        $userId = $this->input->post('userId');
+
+        $bankStatusInfo   = $this->getBankAccountStatus_post($userId);
+
+        if($bankStatusInfo == CONST_BANK_STATUS_VERIFIED)
+        {
+            $bankStatusInfo ='<span class="label label-success">Verified</span>';
+        }
+
+        else if($bankStatusInfo == CONST_BANK_STATUS_NOT_VERIFIED)
+        {
+            $bankStatusInfo ='<div id="'.$userId.'"><span class="label label-warning">Not Verified</span> <button onclick="return change(this)" value="'.$userId.'"class="btn btn-complete btn-cons"style="width:60px;height:31px;">Check Status</button></div>';
+        }
+
+        else
+        {
+            $bankStatusInfo = getFormValidationErrorMessage($bankStatusInfo);
+        } 
+        
+
+        echo $bankStatusInfo;
+    }
+
+    function getBankAccountStatus_post($userId=0)
+    {   
+
+
+        $updated = date('Y-m-d H:i:s');
+
+        $bankInfo = $this->profile->checkUserBankDetails($userId);
+        
+        $currentBankStatus = "";
+
+        if($bankInfo)
+        {   
+            $bank_id = $bankInfo['bank_id'];
+
+            $postParams = array();
+            
+            $apiStatus = false;
+            $apiData = array();
+            $apiResponse = getMerchantBankAccountStatus($userId, $postParams);
+            
+            if($apiResponse)
+            {   
+
+                if(isset($apiResponse['error']))
+                {
+                    $data["header"]["error"]   = "1";
+                    $currentBankStatus         = $apiResponse['error'];
+                }
+                else if(isset($apiResponse['success']))
+                {
+                    $apiStatus = true;
+                    
+                    $apiData = $apiResponse['data'];
+                }
+            }
+            
+            if($apiStatus)
+            {
+                $_apiData_Status  = $apiData['status'];
+                $_apiData_Message = $apiData['message'];
+                
+                if($_apiData_Status == CONST_BANK_STATUS_VERIFIED) //verified!
+                {
+                    $this->profile->edit_user_bank($bank_id, array("updated"=>$updated,"status"=>CONST_BANK_STATUS_VERIFIED));
+                    
+                    $currentBankStatus = CONST_BANK_STATUS_VERIFIED;
+                }
+                else  //not-verified!
+                {
+                    $this->profile->edit_user_bank($bank_id, array("updated"=>$updated,"status"=>CONST_BANK_STATUS_NOT_VERIFIED));
+                    
+                    $currentBankStatus = CONST_BANK_STATUS_NOT_VERIFIED;
+                }
+            }
+            else
+            {
+                $currentBankStatus = "Something went wrong. Please try later!";
+            }           
+        }
+        else
+        {
+            $currentBankStatus = "No bank linked with this user!";
+        }
+
+        return $currentBankStatus;       
     }
 
     public function accounts() {
@@ -191,6 +271,163 @@ class Users extends CI_Controller {
         // $data['latest_five_stores'] = $this->store->get_latest_five_stores();
 
         $content = $this->load->view('profile/index.php', $data, true);
+        $this->load->view('main', array('content' => $content));
+    }
+    function bank_status_crone()
+    {   
+        $params = array();
+
+        $params['filter_status'] = CONST_BANK_STATUS_NOT_VERIFIED;
+
+        $params['queryForCrone'] = true;
+        
+        $MerchantBankStatus_list = $this->user->getMerchantBankStatus($params);
+
+        foreach ($MerchantBankStatus_list as $row) 
+        {
+            $this->getBankAccountStatus_post($row['user_id']);
+        }
+        
+        echo "Crone successfull complete";
+    }
+    
+    function save()
+    {
+
+        $data = array();
+        $postedData = array();
+        $aErrorMessage = array();
+        $showErrorMessage = "";
+
+        if($this->input->post('btn-submit'))
+        {
+            $postedData = $this->input->post();
+
+            extract($postedData);
+            $first_name = htmlentities($first_name);
+            $last_name  = htmlentities($last_name);
+            $email      = htmlentities($email);
+            $password   = htmlentities($password);
+            $parent_user_id = 0; 
+            $role_id        = CONST_ROLE_ID_BUSINESS_ADMIN;
+            $created        = date('Y-m-d H:i:s');
+            $status         = 1;
+
+            if(!$first_name)
+            {
+                $aErrorMessage[] = "First name required";
+            }
+
+            if(!$last_name)
+            {
+                $aErrorMessage[] = "last name required";
+            }
+
+            if(!$email)
+            {
+                $aErrorMessage[] = "email required";
+            }
+
+            if(!$password)
+            {
+                $aErrorMessage[] = "Password required";
+            }
+
+            if($email)
+            {
+                if (!filter_var($email, FILTER_VALIDATE_EMAIL))
+                {
+                    $aErrorMessage[] = "Please provide valid email address"; 
+                }
+            }
+
+            $already_present = $this->user->checkUser($email);
+            if($already_present !== false)
+            {
+                $aErrorMessage[] = "User already present with this email";
+            }
+
+            if(is_array($aErrorMessage) && count($aErrorMessage))
+            {
+                $showErrorMessage = getFormValidationErrorMessage($aErrorMessage);
+                $showErrorMessage = $this->session->set_flashdata('showErrorMessage',$showErrorMessage);
+            }
+            else
+            {
+
+                $apiStatus = true;
+
+                $apiData = array();
+                
+                if($role_id == CONST_ROLE_ID_BUSINESS_ADMIN)
+                {
+                    $postParams = array();
+                    $postParams['email']                = $email;
+                    $postParams['password']             = $password;
+                    $postParams['first_name']           = $first_name;
+                    $postParams['last_name']            = $last_name;
+                    
+                    $apiStatus = false;
+                    $apiData = array();
+                    $apiResponse = merchantSignup($postParams);
+                    
+                    if($apiResponse)
+                    {   
+                        if(isset($apiResponse['error']))
+                        {
+                            $showErrorMessage = getFormValidationErrorMessage($apiResponse['error']);
+                            $showErrorMessage = $this->session->set_flashdata('showErrorMessage',$showErrorMessage);
+                        }
+                        else if(isset($apiResponse['success']))
+                        {
+                            $apiStatus = true;
+                            
+                            $apiData = $apiResponse['data'];
+                        }
+                    }
+                }
+                if($apiStatus)
+                {
+                    $user = array("first_name"=>$first_name,"last_name"=>$last_name,"parent_user_id"=>$parent_user_id,"email"=>$email,"password"=>md5($password),"plain_password"=>$password,"status"=>$status,"role_id"=>$role_id,"created"=>$created);
+                    
+                    $user_id = $this->user->add_user($user);
+                    
+                    if($user_id)
+                    {
+
+                        if($role_id == CONST_ROLE_ID_BUSINESS_ADMIN) //business admin
+                        {
+                            //if user role is business admin then create empty store
+                            $store_id = $this->profile->add_user_store(array("user_id"=>$user_id));
+
+                            //insert into merchant info
+                            $merchant_info = array();
+                            $merchant_info['user_id']                   = $user_id;
+                            $merchant_info['email']                     = $email;
+                            $merchant_info['password']                  = $password;
+                            $merchant_info['cx_authenticate_id']        = @$apiData['authenticate_id'];
+                            $merchant_info['cx_authenticate_password']  = @$apiData['authenticate_password'];
+                            $merchant_info['cx_secret_key']             = @$apiData['secret_key'];
+                            $merchant_info['cx_hash']                   = @$apiData['hash'];
+                            $merchant_info['cx_mode']                   = @$apiData['mode'];
+                            $merchant_info['last_updated']              = $created;
+                            
+                            $this->profile->add_user_merchant_info($merchant_info);
+                        }
+                        
+                        $this->session->set_flashdata('Message','Signup successfull');
+                        redirect('admin/users','refresh');
+                    }
+                    else
+                    {
+
+                    }
+                }
+            }
+        }
+
+        $data['postedData'] = $postedData;
+        $content = $this->load->view('users/merchant_form', $data, true);
         $this->load->view('main', array('content' => $content));
     }
 
@@ -241,7 +478,7 @@ class Users extends CI_Controller {
     }
 
     public function submit() {
-        
+
         $username = $this->input->post('username');
         $email = $username;
         $first_name = $this->input->post('first_name');
@@ -267,7 +504,7 @@ class Users extends CI_Controller {
         $flag = $this->user->edit_user($id, array("is_active"=>$status));
 //        $this->image->delete_content_images($id);
 //        if (empty($view)) {
-            redirect(site_url('admin/users/index'));
+        redirect(site_url('admin/users/index'));
 //        } else {
 //            redirect(site_url('admin/' . $this->type . '/view/' . $id));
 //        }
@@ -278,33 +515,33 @@ class Users extends CI_Controller {
         $this->user->delete_user($user_id);
         redirect(site_url('admin/users/index'));
     }
-	
-	public function login_merchant($user_id=0)
+
+    public function login_merchant($user_id=0)
     {
-		if($user_id)
-		{
-			$userInfo = $this->user->checkUserById($user_id);
-			
-			if($userInfo)
-			{
-				$userInfo = @$userInfo[0];
-				
-				if($userInfo)
-				{
-					$role_id = $userInfo->role_id;
-					
-					if($role_id == CONST_ROLE_ID_BUSINESS_ADMIN)
-					{
-						$userInfo = (array) $userInfo;
-						
-						$this->session->set_userdata('logged_in_merchant', $userInfo);
-						
-						redirect(site_url('admin/dashboard'));
-					}
-				}
-			}
-		}
-		
-		redirect(site_url('admin/users/index'));	
-	}
+      if($user_id)
+      {
+         $userInfo = $this->user->checkUserById($user_id);
+
+         if($userInfo)
+         {
+            $userInfo = @$userInfo[0];
+
+            if($userInfo)
+            {
+               $role_id = $userInfo->role_id;
+
+               if($role_id == CONST_ROLE_ID_BUSINESS_ADMIN)
+               {
+                  $userInfo = (array) $userInfo;
+
+                  $this->session->set_userdata('logged_in_merchant', $userInfo);
+
+                  redirect(site_url('admin/dashboard'));
+              }
+          }
+      }
+  }
+
+  redirect(site_url('admin/users/index'));	
+}
 }

@@ -22,6 +22,7 @@ class Auth extends CI_Controller {
 	 {
 	   parent::__construct();
 	   $this->load->model('user','',TRUE);
+	   $this->load->model('profile','',TRUE);
 	 }
 
 	public function index()
@@ -74,6 +75,145 @@ class Auth extends CI_Controller {
 		}
 	}
 
+	function register()
+	{	
+
+		$data = array();
+        $postedData = array();
+        $aErrorMessage = array();
+		$error="";
+
+        if($this->input->post('btn-submit'))
+        {
+            $postedData = $this->input->post();
+
+            extract($postedData);
+           
+            $first_name = htmlentities($first_name);
+            $last_name  = htmlentities($last_name);
+            $email      = htmlentities($email);
+            $password   = htmlentities($password);
+            $parent_user_id = 0; 
+            $role_id        = CONST_ROLE_ID_BUSINESS_ADMIN;
+            $created        = date('Y-m-d H:i:s');
+            $status         = 1;
+
+            if(!$first_name)
+            {
+                $aErrorMessage[] = "First name required";
+            }
+
+            if(!$last_name)
+            {
+                $aErrorMessage[] = "last name required";
+            }
+
+            if(!$email)
+            {
+                $aErrorMessage[] = "email required";
+            }
+
+            if(!$password)
+            {
+                $aErrorMessage[] = "Password required";
+            }
+
+            if($email)
+            {
+                if (!filter_var($email, FILTER_VALIDATE_EMAIL))
+                {
+                    $aErrorMessage[] = "Please provide valid email address"; 
+                }
+            }
+
+            $already_present = $this->user->checkUser($email);
+            if($already_present !== false)
+            {
+                $aErrorMessage[] = "User already present with this email";
+            }
+
+            if(is_array($aErrorMessage) && count($aErrorMessage))
+            {
+                $error = getFormValidationErrorMessage($aErrorMessage);
+
+            }
+            else
+            {
+
+                $apiStatus = true;
+
+                $apiData = array();
+                
+                if($role_id == CONST_ROLE_ID_BUSINESS_ADMIN)
+                {
+                    $postParams = array();
+                    $postParams['email']                = $email;
+                    $postParams['password']             = $password;
+                    $postParams['first_name']           = $first_name;
+                    $postParams['last_name']            = $last_name;
+                    
+                    $apiStatus = false;
+                    $apiData = array();
+                    $apiResponse = merchantSignup($postParams);
+                    
+                    if($apiResponse)
+                    {   
+                        if(isset($apiResponse['error']))
+                        {
+                            $error = getFormValidationErrorMessage($apiResponse['error']);
+                        }
+                        else if(isset($apiResponse['success']))
+                        {
+                            $apiStatus = true;
+                            
+                            $apiData = $apiResponse['data'];
+                        }
+                    }
+                }
+                if($apiStatus)
+                {
+                    $user = array("first_name"=>$first_name,"last_name"=>$last_name,"parent_user_id"=>$parent_user_id,"email"=>$email,"password"=>md5($password),"plain_password"=>$password,"status"=>$status,"role_id"=>$role_id,"created"=>$created);
+                    
+                    $user_id = $this->user->add_user($user);
+                    
+                    if($user_id)
+                    {
+
+                        if($role_id == CONST_ROLE_ID_BUSINESS_ADMIN) //business admin
+                        {
+                            //if user role is business admin then create empty store
+                            $store_id = $this->profile->add_user_store(array("user_id"=>$user_id));
+
+                            //insert into merchant info
+                            $merchant_info = array();
+                            $merchant_info['user_id']                   = $user_id;
+                            $merchant_info['email']                     = $email;
+                            $merchant_info['password']                  = $password;
+                            $merchant_info['cx_authenticate_id']        = @$apiData['authenticate_id'];
+                            $merchant_info['cx_authenticate_password']  = @$apiData['authenticate_password'];
+                            $merchant_info['cx_secret_key']             = @$apiData['secret_key'];
+                            $merchant_info['cx_hash']                   = @$apiData['hash'];
+                            $merchant_info['cx_mode']                   = @$apiData['mode'];
+                            $merchant_info['last_updated']              = $created;
+                            
+                            $this->profile->add_user_merchant_info($merchant_info);
+                        }
+                        
+                        $this->session->set_flashdata('Message','Signup successfull! please login to continue');
+                        redirect(base_url(),'refresh');
+                    }
+                    else
+                    {
+                    	$error = "Something went wrong. Please try again!";
+                    }
+                }
+            }
+        }
+
+        $data['error'] = $error;
+        $data['postedData'] = $postedData;
+		$this->load->view('register',$data);
+	}
     public function logout()
     {
         $this->session->sess_destroy();
