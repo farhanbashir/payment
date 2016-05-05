@@ -184,7 +184,7 @@ class Users extends CI_Controller {
 
         else if($bankStatusInfo == CONST_BANK_STATUS_NOT_VERIFIED)
         {
-            $bankStatusInfo ='<div id="'.$userId.'"><span class="label label-warning">Not Verified</span> <button onclick="return change(this)" value="'.$userId.'"class="btn btn-complete btn-cons"style="width:60px;height:31px;">Check Status</button></div>';
+            $bankStatusInfo ='<span class="label label-warning">Not Verified</span> <button onclick="return checkBankStatus(this)" value="'.$userId.'"class="btn btn-complete btn-cons"style="width:60px;height:31px;">Check Status</button>';
         }
 
         else
@@ -216,12 +216,12 @@ class Users extends CI_Controller {
             $apiData = array();
             $apiResponse = getMerchantBankAccountStatus($userId, $postParams);
             
+           
             if($apiResponse)
             {   
 
                 if(isset($apiResponse['error']))
                 {
-                    $data["header"]["error"]   = "1";
                     $currentBankStatus         = $apiResponse['error'];
                 }
                 else if(isset($apiResponse['success']))
