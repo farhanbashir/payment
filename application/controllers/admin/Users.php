@@ -21,12 +21,24 @@ class Users extends CI_Controller {
      * @see http://codeigniter.com/user_guide/general/urls.html
      */
     
-    function __construct() {
+    function __construct() 
+    {
         parent::__construct();
+    
         $this->load->model('user', '', TRUE);
-        
+       
         if (!$this->session->userdata('logged_in')) {
             redirect(base_url());
+        }
+        
+        global $allowOnlyForSuperAdmin;
+
+        if($this->session->userdata('logged_in')['role_id']!=CONST_ROLE_ID_SUPER_ADMIN) 
+        {
+            if(in_array($this->uri->uri_string(), $allowOnlyForSuperAdmin))
+            {   
+                redirect(base_url());
+            }
         }
     }
 
@@ -40,7 +52,9 @@ class Users extends CI_Controller {
 
     function ajaxMerchantsListing()
     {
-      
+        
+        
+
         $_getParams = $_GET;
         $params     = _processDataTableRequest($_getParams);
         $draw       = $params['draw'];
@@ -84,7 +98,7 @@ class Users extends CI_Controller {
     function bankstatus()
     {
         $data = array();
-        $content = $this->load->view('users/bankStatus_listing.php', $data, true);
+        $content = $this->load->view('users/bank_status_listing.php', $data, true);
         $this->load->view('main', array('content' => $content));
     }
 

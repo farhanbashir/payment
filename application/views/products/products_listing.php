@@ -44,13 +44,12 @@ foreach ($products as $row)
         <div class="btn-group pull-right m-b-10">
 
         </div>
-        <?php if($this->session->flashdata('Message')!='')
-        {?>   
-        <div class="alert alert-success">
-          <strong>Success!</strong>&nbsp;&nbsp;<?php echo $this->session->flashdata('Message');?>
-        </div>
         <?php 
-      }?>
+          if($this->session->flashdata('Message')!='')
+          { 
+              echo getHTMLForSuccessMessage($this->session->flashdata('Message'));
+          }
+        ?>
       <div class="pull-right" style="display: none;">
         <div class="col-xs-12">
           <input type="text" id="search-table" class="form-control pull-right" placeholder="Search">

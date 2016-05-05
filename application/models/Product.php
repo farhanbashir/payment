@@ -75,10 +75,9 @@ Class Product extends CI_Model
     }
 
     function delete_product($productId)
-    {
-        $this->db->where('product_id', $productId);
-        $this->db->delete('products');
-        
+    {   
+        $sql = "UPDATE products SET status ='".CONST_STATUS_ID_DELETE."',updated = NOW() WHERE product_id='$productId'";
+        $this->db->query($sql);
 		$this->db->where('product_id', $productId);
         $this->db->delete('product_categories');
 
@@ -216,7 +215,7 @@ Class Product extends CI_Model
 
         $arrayWhereClause = array();
 
-        $arrayWhereClause[] = " user_id ='$userId' AND store_id='$storeId' ";
+        $arrayWhereClause[] = " user_id ='$userId' AND store_id='$storeId' AND status >0 ";
         
         if($searchKeyword)
         {

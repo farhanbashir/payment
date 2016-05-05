@@ -27,20 +27,17 @@ if(!empty($businessInfoData))
 <div class="panel-body">
 	<h2>Business Information</h2>
 	<div class="col-md-6" style="padding-left: 0px;">
-		<?php if($this->session->flashdata('errMsgBusinessInfo')!='')
-	    {?>   
-	        <div class="alert alert-danger">
-	          <strong>Alert!</strong>&nbsp;&nbsp;<?php echo $this->session->flashdata('errMsgBusinessInfo');?>
-	        </div>
-	        <?php 
-	    }?>
-	    <?php if($this->session->flashdata('successMsgBusinessInfo')!='')
-	    {?>   
-	        <div class="alert alert-success">
-	          <strong>Success!</strong>&nbsp;&nbsp;<?php echo $this->session->flashdata('successMsgBusinessInfo');?>
-	        </div>
-	        <?php 
-	    }?>
+		<?php
+		if($this->session->flashdata('successMsgBusinessInfo')!='')
+		{   
+			echo getHTMLForSuccessMessage($this->session->flashdata('successMsgBusinessInfo'));
+		}
+		
+		if($this->session->flashdata('errMsgBusinessInfo')!='')
+		{
+			echo getHTMLForErrorMessage($this->session->flashdata('errMsgBusinessInfo'));
+		}
+		?>
 		<form role="form" method ="post"action="" enctype="multipart/form-data" accept-charset="utf-8">
 			<div class="form-group">
 				<label>Logo</label>

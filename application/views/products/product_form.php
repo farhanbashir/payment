@@ -32,13 +32,10 @@ if(isset($postedData) && !empty($postedData))
 	<div class="panel panel-default">
 		<div class="panel-body">
 			<?php 
-		        if($this->session->flashdata('showErrorMessage')!='')
-	          	{?>   
-	        	    <div class="alert alert-danger">
-		              <strong>Alert!</strong>&nbsp;&nbsp;<?php echo $this->session->flashdata('showErrorMessage');?>
-		            </div>
-	        	    <?php 
-	        	}
+	          	if($this->session->flashdata('showErrorMessage')!='')
+          		{
+		            echo getHTMLForErrorMessage($this->session->flashdata('showErrorMessage'));
+		        }
 		    ?>
 			<h1>
 				<?php echo $formHeading;?>

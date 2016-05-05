@@ -15,12 +15,9 @@
         <div class="clearfix"></div>
       </div>
       <?php if($this->session->flashdata('Message')!='')
-      {?>   
-      <div class="alert alert-success">
-        <strong>Success!</strong>&nbsp;&nbsp;<?php echo $this->session->flashdata('Message');?>
-      </div>
-      <?php 
-    }?>
+      { 
+          echo getHTMLForSuccessMessage($this->session->flashdata('Message'));
+      }?>
     <div class="panel-body">
       <div id="tableWithSearch_wrapper" class="dataTables_wrapper form-inline no-footer">
         <table id="category-listing" class="table table-hover demo-table-search dataTable no-footer"  role="grid" aria-describedby="tableWithSearch_info">

@@ -49,10 +49,11 @@ Class Category extends CI_Model
 
     function delete_category($categoryId)
     {   
-        $sql = "UPDATE categories SET status ='".CONST_STATUS_ID_DELETE."' WHERE category_id='$categoryId'";
+        $sql = "UPDATE categories SET status ='".CONST_STATUS_ID_DELETE."',updated = NOW() WHERE category_id='$categoryId' OR parent_id='$categoryId'";
         $this->db->query($sql);
-        $sql = "UPDATE categories SET status ='".CONST_STATUS_ID_DELETE."' WHERE parent_id='$categoryId'";
+        $sql = "DELETE FROM product_categories WHERE category_id='$categoryId'";
         $this->db->query($sql);
+        
     }
 
     function delete_all_categories_for_product($product_id)
