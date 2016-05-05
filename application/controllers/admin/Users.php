@@ -110,6 +110,11 @@ class Users extends CI_Controller {
         
         $params     = _processDataTableRequest($_getParams);
         $draw       = $params['draw'];
+<<<<<<< HEAD
+=======
+        
+        $params['filter_status'] = $filterStatus;
+>>>>>>> 87add659a2d6779a44ac2afa6b324c4cb5e0cf9d
 
         $MerchantBankStatus_list = $this->user->getMerchantBankStatus($params,$whereStatus);
         
@@ -130,6 +135,7 @@ class Users extends CI_Controller {
                 {
                     $status ='<p><span class="label label-success">Verified</span></p>';
                 }
+<<<<<<< HEAD
 
                 if($row['status']==CONST_BANK_STATUS_NOT_VERIFIED)
                 {
@@ -137,9 +143,26 @@ class Users extends CI_Controller {
                 }
                 $date = $row['created'];
                 if($row['updated']!='')
+=======
+                else if($row['status'] == CONST_BANK_STATUS_NOT_VERIFIED)
+                {
+                    $status ='<span class="label label-warning">Not Verified</span>';
+                }               
+                
+                $lastChecked = '-';
+                if($row['updated'])
+>>>>>>> 87add659a2d6779a44ac2afa6b324c4cb5e0cf9d
                 {
                     $date = $row['updated'];
                 }
+<<<<<<< HEAD
+=======
+                else if($row['created'])
+                {
+                    $lastChecked = date(CONST_DATE_TIME_DISPLAY, strtotime($row['created']));
+                }
+                
+>>>>>>> 87add659a2d6779a44ac2afa6b324c4cb5e0cf9d
                 $tempArray[] = $row['user_id'];
                 $tempArray[] = $row['name'];
                 $tempArray[] = $row['email'];
