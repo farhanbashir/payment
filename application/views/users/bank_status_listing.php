@@ -7,6 +7,7 @@
 <script src="<?php echo asset_url('plugins/jquery/jquery-1.11.1.min.js');?>" type="text/javascript"></script>
 <div class="content ">
   <!-- START CONTAINER FLUID -->
+
   <div class="container-fluid container-fixed-lg bg-white">
     <div class="panel panel-transparent">
         <div class="panel-heading">
@@ -29,9 +30,9 @@
                         <th width="15%">Merchant ID</th>
                         <th width="20%">Name</th>
                         <th width="20%">Email</th>
-                        <th width="20%">Bank Info</th>
+                        <!--<th width="20%">Bank Info</th>-->
                         <th width="15%">Last Checked</th>
-                        <th width="10%">Status</th>
+                        <th width="30%">Status</th>
                     </tr>
                 </thead>
             </table>
@@ -76,7 +77,6 @@ $(document).ready(function()
         { "sType": "html", "sName": "u.email" },
         { "sType": "html", "bSortable": false, "bSearchable": false },
         { "sType": "html", "bSortable": false, "bSearchable": false },
-        { "sType": "html", "bSortable": false, "bSearchable": false },
         ]
     } );
 
@@ -88,5 +88,29 @@ $(document).ready(function()
         loadTable.draw();  
     });
 
+    
+
 } ); 
+function checkBankStatus(Merchant) // no ';' here
+{   
+    $("#"+Merchant.value).empty();
+    $( "#"+Merchant.value ).append( "<img src='<?php echo asset_url('img/loader.gif');?>'width=50;height=20;>" );
+
+    $.ajax(
+    {
+        type: "POST",
+        url: "<?php echo site_url('admin/users/check_bank_status');?>",
+        data:{
+          'userId': Merchant.value,
+        },
+
+        success: function(data)
+        { 
+            $("#"+Merchant.value).empty();  
+            $("#"+Merchant.value).append(data);
+        }
+    });
+}
 </script>
+
+<img src="">
