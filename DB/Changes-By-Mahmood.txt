@@ -1,0 +1,14 @@
+*May 05, 2016:
+=================
+
+DROP TABLE IF EXISTS `cron_status`;
+
+CREATE TABLE `cron_status` (
+  `cron_id` int(11) NOT NULL AUTO_INCREMENT,
+  `cron_name` varchar(50) DEFAULT NULL,
+  `last_run` datetime DEFAULT NULL,
+  PRIMARY KEY (`cron_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+
+
+insert  into `cron_status`(`cron_id`,`cron_name`,`last_run`) values (1,'Check Bank Status','2016-05-06 12:20:02');

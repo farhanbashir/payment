@@ -283,7 +283,7 @@ class Users extends CI_Controller {
         $params['queryForCrone'] = true;
         
         $MerchantBankStatus_list = $this->user->getMerchantBankStatus($params);
-
+        
         $verifiedBankStatus     = 0;
         $notVerifiedBankStatus  = 0;
         foreach ($MerchantBankStatus_list as $row) 
