@@ -427,6 +427,12 @@ Class User extends CI_Model
         return  $totalRecordsCount;
     }
 
+    function editCronStatus()
+    {
+        $sql = "UPDATE cron_status SET last_run = NOW() WHERE cron_id ='".CONST_CRON_ID_FOR_CHECK_BANK_STATUS."'";
+        $this->db->query($sql);
+    }
+
     function getMerchantBankStatusQuery($params=array())
     {
        $offset              = @$params['offset'];
