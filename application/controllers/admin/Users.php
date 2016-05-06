@@ -273,7 +273,8 @@ class Users extends CI_Controller {
         $content = $this->load->view('profile/index.php', $data, true);
         $this->load->view('main', array('content' => $content));
     }
-    function bank_status_crone()
+
+    function bank_status_cron()
     {   
         $params = array();
 
@@ -283,12 +284,37 @@ class Users extends CI_Controller {
         
         $MerchantBankStatus_list = $this->user->getMerchantBankStatus($params);
 
+        $verifiedBankStatus     = 0;
+        $notVerifiedBankStatus  = 0;
         foreach ($MerchantBankStatus_list as $row) 
         {
-            $this->getBankAccountStatus_post($row['user_id']);
+            $bankStatusInfo = $this->getBankAccountStatus_post($row['user_id']);
+
+            if($bankStatusInfo==CONST_BANK_STATUS_VERIFIED)
+            {
+                $verifiedBankStatus = $verifiedBankStatus+1;
+            }
+            else
+            {
+                $notVerifiedBankStatus = $notVerifiedBankStatus+1;
+            }
         }
         
-        echo "Crone successfull complete";
+        $this->load->library('email');
+        $this->email->set_mailtype("html");
+        $this->email->from("icannpay@info.com");
+        $this->email->to(EMAIL_ADDRESS_TO_SEND_CRON_UPDATES);
+        $this->email->subject("Merchant Bank Status Information");
+        $message = "Crone successfully run. Following are the list of verified and non verified Merchants";
+        $message .= 'Verified Merchants : '.$verifiedBankStatus;
+        $message .= 'Non-Verified Merchants : '.$notVerifiedBankStatus;
+        $message .=   '<br><br>' .
+        'Thanks,<br>'.
+        'ICannPay';
+        $this->email->message($message);
+        $this->email->send();
+
+        $this->user->editCronStatus();
     }
     
     function save()

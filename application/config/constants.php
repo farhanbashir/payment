@@ -100,3 +100,5 @@ $allowOnlyForSuperAdmin[] = 'admin/users/bankstatus';
 $allowOnlyForSuperAdmin[] = 'admin/users/ajaxMerchantsListing';
 $allowOnlyForSuperAdmin[] = 'admin/users/ajaxMerchantBankStatus';
 
+define('EMAIL_ADDRESS_TO_SEND_CRON_UPDATES', 'mahmood@technyxsystems.com');
+define('CONST_CRON_ID_FOR_CHECK_BANK_STATUS', 1);
