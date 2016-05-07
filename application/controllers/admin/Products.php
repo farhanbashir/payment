@@ -26,8 +26,9 @@ class Products extends CI_Controller {
         /*$this->load->model('user', '', TRUE);
         $this->load->model('store', '', TRUE);*/
         $this->load->model('product');
-        $this->load->model('Category');
-        if (!$this->session->userdata('logged_in')) {
+        $this->load->model('category');
+        if (!$this->session->userdata('logged_in')) 
+        {
           redirect(base_url());
         }
 
@@ -39,9 +40,10 @@ class Products extends CI_Controller {
         $storeId = getLoggedInStoreId();
 		
         $data = array();
-		
-        $data = array();
-        $content = $this->load->view('products/products_listing.php', $data, true);
+		$data['categories'] = $this->product->get_all_categories($userId, $storeId);
+
+        $content  = $this->load->view('products/products_listing.php', $data, true);
+        
         $this->load->view('main', array('content' => $content));
 	}
 	
@@ -50,18 +52,39 @@ class Products extends CI_Controller {
         
         $userId  = getLoggedInUserId();
         $storeId = getLoggedInStoreId();
-
+        
+       
+        
         $_getParams = $_GET;
-        $params     = _processDataTableRequest($_getParams);
-        $draw       = $params['draw'];
+        
+        $params     				= _processDataTableRequest($_getParams);
+
+        $filterCategory = $_getParams['filter_category'];
+        $params['filter_category']  = '';
+        $draw       				= $params['draw'];
+
+        if($filterCategory)
+        {
+        	$filterCategories = $this->product->getAllCategoriesByCategoryId($filterCategory);
+        	if($filterCategories)
+        	{	
+        		$_filterCategories = array();
+        	
+        		foreach ($filterCategories as $row)
+        		{	
+        			$_filterCategories[] = $row['category_id'];		
+        		}
+        		$params['filter_category'] = $_filterCategories;
+        	}	
+		}
 
         $productsList = $this->product->getProducts($params, $userId, $storeId);
 
         $recordsFiltered = $this->product->getProductsCount($params, $userId, $storeId); 
         $recordsTotal = $this->product->getProductsCountWithoutFilter(array(), $userId, $storeId);
-
+        
         $productsData = array();
-
+        
         if(is_array($productsList) && count($productsList) > 0)
         {
 			foreach ($productsList as $row) 
@@ -88,10 +111,28 @@ EOT;
 				
 				$arrProductCategories = array();
 				if(is_array($productCategories) && count($productCategories) > 0)
-				{
+				{	
+					$count=0;
+						
 					foreach($productCategories as $_productCategoryInfo)
-					{
-						$arrProductCategories[] = $_productCategoryInfo['name'];
+					{	
+
+						if(is_array($_filterCategories) && count($_filterCategories) > 0)
+						{	
+							
+							for ($i=0; $i <count($_filterCategories) ; $i++) 
+							{ 
+								if($_productCategoryInfo['category_id']==$_filterCategories[$i])
+								{
+									$arrProductCategories[] = $_productCategoryInfo['name'];
+								}
+							}
+						}
+						else
+						{
+							$arrProductCategories[] = $_productCategoryInfo['name'];
+						}
+						
 					}
 				}
 				

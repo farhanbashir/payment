@@ -1,31 +1,5 @@
-<?php
-/*$Arry_products = array();
-$product_id='';
-$count = 0;
-foreach ($products as $row) 
-{ 
-  
-  if($product_id!=$row['product_id'])
-  {
-    $array = array(
+<?php 
 
-      'product_id' => $row['product_id'],
-      'product_name'=> $row['product_name'],
-      'category_id' => $row['category_id'],
-      'price' => $row['price'],
-      'category_name'=>$row['category_name'],
-      );
-    $Arry_products[] = $array;
-    $count = $count+1;
-  }
-  else
-  {
-    $Arry_products[$count-1]['category_name'] = $Arry_products[$count-1]['category_name'].", ".$row['category_name'];
-  }
-  
-  $product_id=$row['product_id'];
-  
-}*/
 
 ?>
 <script src="<?php echo asset_url('plugins/jquery/jquery-1.11.1.min.js');?>" type="text/javascript"></script>
@@ -45,38 +19,51 @@ foreach ($products as $row)
 
         </div>
         <?php 
-          if($this->session->flashdata('Message')!='')
-          { 
-              echo getHTMLForSuccessMessage($this->session->flashdata('Message'));
-          }
+        if($this->session->flashdata('Message')!='')
+        { 
+          echo getHTMLForSuccessMessage($this->session->flashdata('Message'));
+        }
         ?>
-      <div class="pull-right" style="display: none;">
-        <div class="col-xs-12">
-          <input type="text" id="search-table" class="form-control pull-right" placeholder="Search">
+        <div class="pull-right" style="display: none;">
+          <div class="col-xs-12">
+            <input type="text" id="search-table" class="form-control pull-right" placeholder="Search">
+          </div>
         </div>
+        <div class="clearfix"></div>
       </div>
-      <div class="clearfix"></div>
-    </div>
-    <div class="panel-body">
-      <div id="" class="dataTables_wrapper form-inline no-footer">
-        <table class="table table-hover demo-table-search_UJ dataTable no-footer" id="product-listing" role="grid" aria-describedby="tableWithSearch_info">
+      <div class="panel-body">
+        <div id="" class="dataTables_wrapper form-inline no-footer">
+          <table class="table table-hover demo-table-search_UJ dataTable no-footer" id="product-listing" role="grid" aria-describedby="tableWithSearch_info">
+            <div class="cs-wrapper">
+              <select name="filter-category" id="filter-category" class="cs-select cs-skin-slide">
+                <option value="">All</option>
+                <?php 
+                  foreach ($categories as $row) 
+                  {
+                    ?>
+                      <option value="<?php echo $row['category_id']; ?>"><?php echo $row['name']; ?></option>
+                    <?php
+                  }
 
-          <thead>
-            <tr>
-              <th width="5%">ID</th>
-              <th width="25%">Product</th>
-              <th width="20%">Categories</th>
-              <th width="10%">Price</th>
-              <th width="10%">Image</th>
-              <th width="30%">Action</th>
-            </tr>
-          </thead>
-        </table>
+                ?>
+              </select>
+            </div>
+            <thead>
+              <tr>
+                <th width="5%">ID</th>
+                <th width="25%">Product</th>
+                <th width="20%">Categories</th>
+                <th width="10%">Price</th>
+                <th width="10%">Image</th>
+                <th width="30%">Action</th>
+              </tr>
+            </thead>
+          </table>
+        </div>
       </div>
     </div>
   </div>
-</div>
-<!-- END PANEL -->
+  <!-- END PANEL -->
 </div>
 
 <!-- END CONTAINER FLUID -->
@@ -89,7 +76,11 @@ $(document).ready(function()
   {
     "processing":true,
     "serverSide": true,
-    "ajax": "<?php echo site_url('admin/products/ajaxProductsListing');?>",
+    "ajax": {
+            "url": "<?php echo site_url('admin/products/ajaxProductsListing');?>",
+            "data": function ( d ) {
+                d.filter_category = $('#filter-category').val();
+            }},
     "bLengthChange": false,
     "oLanguage": 
     {
@@ -100,14 +91,23 @@ $(document).ready(function()
     "order": [[ 0, "desc" ]],
     "aoColumns": [
 
-    { "sType": "html", "sName": "product_id" },
-    { "sType": "html", "sName": "name" },
+    { "sType": "html", "sName": "p.product_id" },
+    { "sType": "html", "sName": "p.name" },
     { "sType": "html", "bSortable": false, "bSearchable": false },
     { "sType": "html", "sName": "price" },
     { "sType": "html", "bSortable": false, "bSearchable": false },
     { "sType": "html", "bSortable": false, "bSearchable": false },
     ]
   } );
+
+  $('#filter-category').change(function()
+  {   
+      var loadTable = $('#product-listing').DataTable();
+      
+      loadTable.draw();  
+  });
+
 } );
+
 
 </script>
