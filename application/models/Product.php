@@ -83,6 +83,16 @@ Class Product extends CI_Model
 
     }
 
+    function getAllCategoriesByCategoryId($categoryId)
+    {
+        $sql    = "SELECT * FROM categories WHERE category_id = '$categoryId' OR parent_id ='$categoryId'";
+        $query  = $this->db->query($sql);
+        $result = $query->result_array();
+
+        $query->free_result();
+        return $result;
+    }
+
     function getById($productId=0, $userId=0, $storeId=0)
     {
 		/*
@@ -199,7 +209,7 @@ Class Product extends CI_Model
        $sortColumn          = @$params['sort_column'];
        $sortOrderDirection  = @$params['sort_direction'];
        $isQueryForCount     = @$params['queryForCount'];      
-
+       $filterCategory      = @$params['filter_category'];
        $order = '';
        $limit = '';
 
@@ -215,14 +225,17 @@ Class Product extends CI_Model
 
         $arrayWhereClause = array();
 
-        $arrayWhereClause[] = " user_id ='$userId' AND store_id='$storeId' AND status >0 ";
-        
+        $arrayWhereClause[] = " p.user_id ='$userId' AND p.store_id='$storeId' AND p.status >0 ";
+        if($filterCategory)
+        {
+            $arrayWhereClause[] = "(pc.category_id IN (".implode(',', $filterCategory)."))";
+        }
         if($searchKeyword)
         {
             $arrayWhereClause[] = " ( 
-                                        name LIKE '%$searchKeyword%'
+                                        p.name LIKE '%$searchKeyword%'
                                             OR 
-                                        price LIKE '%$searchKeyword%'
+                                        p.price LIKE '%$searchKeyword%'
                                     ) ";
         }
        
@@ -236,20 +249,21 @@ Class Product extends CI_Model
         $select = '*';
         if($isQueryForCount)
         {
-            $select     = 'COUNT(product_id) AS totalRecordsCount';
+            $select     = 'COUNT(p.product_id) AS totalRecordsCount';
             
         }
         
         $sql = "SELECT 
                         $select 
                     FROM
-                        products
+                        products AS p
+                        LEFT JOIN product_categories AS pc
+                        on p.product_id = pc.product_id 
                     ". $whereCondition. " 
                     ". $order. " 
                     ". $limit. " 
                     
                     "; 
-        
         return $sql;
     }
 	
