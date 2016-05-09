@@ -65,8 +65,8 @@ $(document).ready(function()
         "bLengthChange": false,
         "oLanguage": 
         {
-            "sEmptyTable"   : "No Merchant Found",
-            "sZeroRecords"  : "No Merchant Found"
+            "sEmptyTable"   : "No Details Found",
+            "sZeroRecords"  : "No Details Found"
         },
 
         "order": [[ 0, "desc" ]],

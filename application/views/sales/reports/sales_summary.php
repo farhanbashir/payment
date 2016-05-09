@@ -85,10 +85,10 @@ else
 						{?>
 					<tr role="row" class="odd">
 						<td class="v-align-middle sorting_1">
-							<p><?php echo date('F , d, Y',strtotime($row['sale_date']));?></p>
+							<p><?php echo date('F d, Y', strtotime($row['sale_date']));?></p>
 						</td>
 						<td class="v-align-middle">
-							<p><?php echo CONST_CURRENCY_DISPLAY. $row['total_sale']+$row['total_refund'].".00";?></p>
+							<p><?php echo CONST_CURRENCY_DISPLAY. ($row['total_sale']+$row['total_refund']);?></p>
 						</td>
 						<td class="v-align-middle">
 							<p><?php echo CONST_CURRENCY_DISPLAY.$row['total_sale']?></p>

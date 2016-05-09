@@ -83,7 +83,7 @@ else
 					{?>
 						<tr role="row" class="odd">
 							<td class="v-align-middle sorting_1">
-								<p><?php echo date('F , d, Y',strtotime($row['order_date']));?></p>
+								<p><?php echo date('F d, Y',strtotime($row['order_date']));?></p>
 							</td>
 							<td class="v-align-middle">
 								<p><?php echo $row['total_order']?></p>
