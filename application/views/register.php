@@ -1,3 +1,10 @@
+<?php 
+$first_name = "";
+$last_name 	= "";
+$email 		= "";
+$password 	= "";
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -67,7 +74,7 @@
 				</a>
 				
 				<?php
-					if($error)
+					if($error!='')
 					{
 						?>
 							<p>
@@ -79,42 +86,40 @@
 						<?php
 					}
 				?>
-				
+
 				<!-- START Login Form -->
-				<form id="form-login" class="p-t-15" role="form" action="<?php echo site_url('auth/login'); ?>"  method="post" autocomplete="off">
-					<?php if($this->session->flashdata('Message')!='')
-			        { 
-			            echo getHTMLForSuccessMessage($this->session->flashdata('Message'));
-			        }
-			        ?>
+				<form id="form-register" class="p-t-15" role="form" action="<?php echo site_url('auth/register'); ?>"  method="post">
+					
+					<div class="form-group ">
+						<label>First Name</label>
+						<div class="controls">
+							<input type="text" class="form-control" name="first_name" value="<?php echo $last_name; ?>" required>
+						</div>
+					</div>
+
+					<div class="form-group ">
+						<label>Last Name</label>
+						<div class="controls">
+							<input type="text" class="form-control" name="last_name" value="<?php echo $last_name; ?>" required="required">
+						</div>
+					</div>
+
 					<div class="form-group ">
 						<label>Email Address</label>
 						<div class="controls">
-							<input type="email" name="username" class="form-control" value="<?php echo $username; ?>" required>
+							<input type="email" name="email" class="form-control" autocomplete="off" value="<?php echo $email; ?>" required>
 						</div>
 					</div>					
 					
 					<div class="form-group ">
 						<label>Password</label>
 						<div class="controls">
-							<input type="password" class="form-control" name="password" required>
+							<input type="password" class="form-control" name="password" autocomplete="off" value="<?php echo $password; ?>" required>
 						</div>
 					</div>
 					
-					<div class="row">
-						<div class="col-md-6 no-padding">
-							<div class="checkbox check-primary">
-								<input type="checkbox" value="1" id="checkbox1">
-								<label for="checkbox1">Keep Me Signed in</label>
-							</div>
-						</div>
-						<div class="col-md-6 text-right">
-							<a href="Javascript: void();" class="text-info small">Forget Password? </a>
-						</div>
-					</div>					
 					
-					<button class="btn btn-primary btn-cons m-t-10" type="submit">Log In</button>
-					<a href="<?php echo site_url('auth/register');?>"><button class="btn btn-primary btn-cons m-t-10" type="button">Register</button></a>
+					<button class="btn btn-primary btn-cons m-t-10" name="btn-submit" value="submit" type="submit">Register</button>
 				</form>
 				<!--END Login Form-->
 			</div>
@@ -146,7 +151,7 @@
     <script>
 		$(function()
 		{
-		  $('#form-login').validate()
+		  $('#form-register').validate()
 		})
     </script>
 </body>

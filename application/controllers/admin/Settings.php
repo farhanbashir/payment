@@ -4,8 +4,8 @@ Class Settings extends CI_Controller
 	function __construct()
 	{
         parent::__construct();
-        $this->load->model('User');
-        $this->load->model('Profile');
+        $this->load->model('user');
+        $this->load->model('profile');
         if (!$this->session->userdata('logged_in'))
         {
             redirect(base_url());
@@ -23,8 +23,8 @@ Class Settings extends CI_Controller
    		$receiptInfoData 	= array();
    		$aErrorMessage 		= array();
 		$showErrorMessage 	= "";
-		$UsersDetails 		= $this->Profile->get_user_detail($userId);
-		$userStoreDetails 	= $this->Profile->get_store_detail($storeId);
+		$UsersDetails 		= $this->profile->get_user_detail($userId);
+		$userStoreDetails 	= $this->profile->get_store_detail($storeId);
 
 
    		#<!-------Basic Info:: Section Start-------->
@@ -96,15 +96,15 @@ Class Settings extends CI_Controller
 					'security_answer'		=> $security_answer,
 
 					);
-				$this->User->edit_user($userId,$saveBasicInfoData);
+				$this->user->edit_user($userId,$saveBasicInfoData);
 				
 				
-				$user_detail = $this->Profile->checkUserDetails($userId);
+				$user_detail = $this->profile->checkUserDetails($userId);
 
 				if($user_detail)
 				{
 					$securityInfoData['updated'] = date("Y-m-d H:i:s");
-					$this->Profile->edit_user_detail($userId,$securityInfoData);
+					$this->profile->edit_user_detail($userId,$securityInfoData);
 				}
 
 				else
@@ -112,7 +112,7 @@ Class Settings extends CI_Controller
 					$securityInfoData['created'] = date("Y-m-d H:i:s");
 					$securityInfoData['user_id'] = $userId;
 					$securityInfoData['status'] = CONST_STATUS_ID_ACTIVE;
-					$this->Profile->add_user_detail($securityInfoData);
+					$this->profile->add_user_detail($securityInfoData);
 				}
 				$this->session->set_flashdata('successMsgBasicInfo','Basic Information updated successfully');
 			}
@@ -170,13 +170,13 @@ Class Settings extends CI_Controller
    					
    					$file_name = base_url().CONST_IMAGE_UPLOAD_DIR.$file_name['file_name'];
    					
-   					$User_Store_Detail = $this->Profile->checkUserStoreDetails($userId);
+   					$User_Store_Detail = $this->profile->checkUserStoreDetails($userId);
    					
    					if($User_Store_Detail)
    					{	
    						$old_image = $User_Store_Detail['logo'];
 
-   						$this->Profile->edit_user_store($storeId, array('logo'=>$file_name));
+   						$this->profile->edit_user_store($storeId, array('logo'=>$file_name));
    						$businessInfoData['old_image'] = $file_name;
    					}
    					
@@ -205,11 +205,11 @@ Class Settings extends CI_Controller
    				$saveBusinessInfoData['website'] 	 = $website;
    				$saveBusinessInfoData['updated']	 = date("Y-m-d H:i:s"); 
 
-   				$User_Store_Detail = $this->Profile->checkUserStoreDetails($userId);
+   				$User_Store_Detail = $this->profile->checkUserStoreDetails($userId);
    			
    				if($User_Store_Detail)
    				{
-   					$this->Profile->edit_user_store($storeId, $saveBusinessInfoData);
+   					$this->profile->edit_user_store($storeId, $saveBusinessInfoData);
    					$this->session->set_flashdata('successMsgBusinessInfo','Business Information updated successfully');
    				}
 
@@ -281,7 +281,7 @@ Class Settings extends CI_Controller
 				$saveBankInfoData['account_title'] = $account_title;
 				$saveBankInfoData['account_number'] = $account_number;
 
-				$bankInfo = $this->Profile->checkUserBankDetails($userId);
+				$bankInfo = $this->profile->checkUserBankDetails($userId);
 
 				if($bankInfo)
 				{
@@ -289,14 +289,14 @@ Class Settings extends CI_Controller
 			
 					$saveBankInfoData['updated'] = date("Y-m-d H:i:s");
 
-					$this->Profile->edit_user_bank($bank_id,$saveBankInfoData);
+					$this->profile->edit_user_bank($bank_id,$saveBankInfoData);
 				}
 				else
 				{
 					$saveBankInfoData['created'] = date("Y-m-d H:i:s");
 					$saveBankInfoData['user_id'] = $userId;
 					$saveBankInfoData['status']  = CONST_BANK_STATUS_NOT_VERIFIED;
-					$this->Profile->add_user_bank($saveBankInfoData);
+					$this->profile->add_user_bank($saveBankInfoData);
 				}
 				
 				$postParams = array();
@@ -364,10 +364,10 @@ Class Settings extends CI_Controller
    			$saveReceiptInfoData['receipt_text_color']  = $text_color;
    			$saveReceiptInfoData['updated'] 			= date("Y-m-d H:i:s");
 
-   			$User_Store_Detail = $this->Profile->checkUserStoreDetails($userId);
+   			$User_Store_Detail = $this->profile->checkUserStoreDetails($userId);
    			if($User_Store_Detail)
    			{
-   				$this->Profile->edit_user_store($storeId, $saveReceiptInfoData);
+   				$this->profile->edit_user_store($storeId, $saveReceiptInfoData);
    				$this->session->set_flashdata('successMsgReceiptInfo','Receipt Design Information updated successfully');
    			}
    		}
@@ -383,7 +383,7 @@ Class Settings extends CI_Controller
    		$data['businessInfoData'] 	= $businessInfoData;
    		$data['bankInfoData'] 		= $bankInfoData;
    		$data['receiptInfoData'] 	= $receiptInfoData;
-   		$data['security_questions'] = $this->Profile->get_questions();
+   		$data['security_questions'] = $this->profile->get_questions();
 
    		$content = $this->load->view('profile/index.php', $data, true);
         $this->load->view('main', array('content' => $content));

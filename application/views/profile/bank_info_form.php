@@ -35,30 +35,21 @@ if($isBankAlreadyVerified)
 	<div class="col-md-6" style="padding-left: 0px;">
 		
 		<?php
-			if($bankStatusMessage)
-			{
-				?>
-					<div class="alert alert-success">
-					  <strong>Notification!</strong>&nbsp;&nbsp;<?php echo $bankStatusMessage;?>
-					</div>
-				<?php
-			}
-		?>
+		if($bankStatusMessage)
+		{ 
+			echo getHTMLForNotificationMessage($bankStatusMessage);
+		}
 		
-		<?php if($this->session->flashdata('successMsgBankInfo')!='')
-	    {?>   
-	        <div class="alert alert-success">
-	          <strong>Success!</strong>&nbsp;&nbsp;<?php echo $this->session->flashdata('successMsgBankInfo');?>
-	        </div>
-	        <?php 
-	    }?>
-	    <?php if($this->session->flashdata('errMsgBankInfo')!='')
-	    {?>   
-	        <div class="alert alert-danger">
-	          <strong>Alert!</strong>&nbsp;&nbsp;<?php echo $this->session->flashdata('errMsgBankInfo');?>
-	        </div>
-	        <?php 
-	    }?>
+		if($this->session->flashdata('successMsgBankInfo')!='')
+		{   
+			echo getHTMLForSuccessMessage($this->session->flashdata('successMsgBankInfo'));
+		}
+
+		if($this->session->flashdata('errMsgBankInfo')!='')
+		{
+			echo getHTMLForErrorMessage($this->session->flashdata('errMsgBankInfo'));
+		}
+		?>
 		<form role="form" action="" method="post">
 			<div class="form-group">
 				<label>Bank Name</label>
@@ -81,13 +72,13 @@ if($isBankAlreadyVerified)
 				<input  name="account_number" value="<?php echo $account_number;?>" type="text" class="form-control" >
 			</div>
 			<?php
-				if(!$isBankAlreadyVerified)
-				{
-					?>
-						<br /><br />
-						<button name="btn-bank-info" value="submit" type="submit" class="btn btn-primary btn-cons">Save</button>
-					<?php
-				}
+			if(!$isBankAlreadyVerified)
+			{
+				?>
+				<br /><br />
+				<button name="btn-bank-info" value="submit" type="submit" class="btn btn-primary btn-cons">Save</button>
+				<?php
+			}
 			?>
 			
 		</form>

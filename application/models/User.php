@@ -427,6 +427,12 @@ Class User extends CI_Model
         return  $totalRecordsCount;
     }
 
+    function editCronStatus()
+    {
+        $sql = "UPDATE cron_status SET last_run = NOW() WHERE cron_id ='".CONST_CRON_ID_FOR_CHECK_BANK_STATUS."'";
+        $this->db->query($sql);
+    }
+
     function getMerchantBankStatusQuery($params=array())
     {
        $offset              = @$params['offset'];
@@ -437,6 +443,9 @@ Class User extends CI_Model
 	   
 	   $filterStatus		= @$params['filter_status'];
 
+       $isQueryForCrone     = @$params['queryForCrone'];
+      
+       
        $order = '';
        $limit = '';
 
@@ -447,13 +456,24 @@ Class User extends CI_Model
                 $order = "ORDER BY ".$sortColumn." ".$sortOrderDirection;
             }
 
-            $limit = "LIMIT ".intval($offset).", ".intval(CONST_PAGINATION_LIMIT);
+            if($isQueryForCrone)
+            {
+                $limit = '';
+            }
+            
+            else
+            {
+                 $limit = "LIMIT ".intval($offset).", ".intval(CONST_PAGINATION_LIMIT);
+            }
+
         }
 
         $arrayWhereClause = array();
 
         $arrayWhereClause[] = " (role_id = '". CONST_ROLE_ID_BUSINESS_ADMIN ."') ";
 		
+
+
 		if($filterStatus == CONST_TXT_BANK_STATUS_NO_DETAIL)
         {
             $arrayWhereClause[] = " ( u.user_id NOT IN ( SELECT user_id FROM user_banks ) )";

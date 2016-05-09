@@ -4,11 +4,12 @@ class Categories extends CI_Controller
 	function __construct()
 	{
         parent::__construct();
-        $this->load->model('Category');
+        $this->load->model('category');
         if (!$this->session->userdata('logged_in')) 
         {
             redirect(base_url());
         }
+        
     }
 
     function index()
@@ -35,11 +36,11 @@ class Categories extends CI_Controller
         $_getParams = $_GET;
         $params     = _processDataTableRequest($_getParams);
         $draw       = $params['draw'];
+		
+        $categoryList = $this->category->getCategory($params, $userId, $storeId);
 
-        $categoryList = $this->Category->getCategory($params, $userId, $storeId);
-
-        $recordsFiltered = $this->Category->getCategoryCount($params,$userId, $storeId); 
-        $recordsTotal = $this->Category->getCategoryCountWithoutFilter($params=array(),$userId, $storeId);
+        $recordsFiltered = $this->category->getCategoryCount($params,$userId, $storeId); 
+        $recordsTotal = $this->category->getCategoryCountWithoutFilter($params=array(),$userId, $storeId);
 
         $categoryData = array();
 		
@@ -106,7 +107,7 @@ EOT;
 
         if($categoryId)
         {
-            $categoryInfo = $this->Category->getById($categoryId, $userId, $storeId);
+            $categoryInfo = $this->category->getById($categoryId, $userId, $storeId);
             
             if($categoryInfo)
             {
@@ -154,7 +155,7 @@ EOT;
                 {
                     $saveData['updated'] = date("Y-m-d H:i:s");   
                     
-                    $this->Category->update_category($saveData, $categoryId);
+                    $this->category->update_category($saveData, $categoryId);
                 }
 
                 else
@@ -162,7 +163,7 @@ EOT;
 
                     $saveData['created'] = date("Y-m-d H:i:s");
 
-                    $this->Category->add_category($saveData);                
+                    $this->category->add_category($saveData);                
                 }
 
                 $this->session->set_flashdata('Message','Category has been successfully saved!');
@@ -176,7 +177,7 @@ EOT;
         $data['postedData'] = $postedData;
 
         $data['button_title'] = "Save";
-        $data['categories'] = $this->Category->get_all_categories($userId, $storeId);
+        $data['categories'] = $this->category->get_all_categories($userId, $storeId);
 
         $content = $this->load->view('categories/category_form', $data, true);
         $this->load->view('main', array('content' => $content));
@@ -192,10 +193,10 @@ EOT;
 
         $userId  = getLoggedInUserId();
         $storeId = getLoggedInStoreId();
-        $categoryInfo = $this->Category->getById($categoryId, $userId, $storeId);
+        $categoryInfo = $this->category->getById($categoryId, $userId, $storeId);
         if($categoryInfo)
         {
-            $this->Category->delete_category($categoryId);
+            $this->category->delete_category($categoryId);
             $this->session->set_flashdata('Message','Category Delete successfully');
         }
         redirect('admin/categories','refresh');

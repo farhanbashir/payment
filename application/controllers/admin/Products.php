@@ -25,11 +25,13 @@ class Products extends CI_Controller {
       parent::__construct();
         /*$this->load->model('user', '', TRUE);
         $this->load->model('store', '', TRUE);*/
-        $this->load->model('Product');
-        $this->load->model('Category');
-        if (!$this->session->userdata('logged_in')) {
+        $this->load->model('product');
+        $this->load->model('category');
+        if (!$this->session->userdata('logged_in')) 
+        {
           redirect(base_url());
         }
+
     }
 	
     public function index()
@@ -38,28 +40,51 @@ class Products extends CI_Controller {
         $storeId = getLoggedInStoreId();
 		
         $data = array();
-		
-        $data = array();
-        $content = $this->load->view('products/products_listing.php', $data, true);
+		$data['categories'] = $this->product->get_all_categories($userId, $storeId);
+
+        $content  = $this->load->view('products/products_listing.php', $data, true);
+        
         $this->load->view('main', array('content' => $content));
 	}
 	
 	function ajaxProductsListing()
-	{
+	{	
+        
         $userId  = getLoggedInUserId();
         $storeId = getLoggedInStoreId();
-
+        
+       
+        
         $_getParams = $_GET;
-        $params     = _processDataTableRequest($_getParams);
-        $draw       = $params['draw'];
+        
+        $params     				= _processDataTableRequest($_getParams);
 
-        $productsList = $this->Product->getProducts($params, $userId, $storeId);
+        $filterCategory = $_getParams['filter_category'];
+        $params['filter_category']  = '';
+        $draw       				= $params['draw'];
 
-        $recordsFiltered = $this->Product->getProductsCount($params, $userId, $storeId); 
-        $recordsTotal = $this->Product->getProductsCountWithoutFilter(array(), $userId, $storeId);
+        if($filterCategory)
+        {
+        	$filterCategories = $this->product->getAllCategoriesByCategoryId($filterCategory);
+        	if($filterCategories)
+        	{	
+        		$_filterCategories = array();
+        	
+        		foreach ($filterCategories as $row)
+        		{	
+        			$_filterCategories[] = $row['category_id'];		
+        		}
+        		$params['filter_category'] = $_filterCategories;
+        	}	
+		}
 
+        $productsList = $this->product->getProducts($params, $userId, $storeId);
+
+        $recordsFiltered = $this->product->getProductsCount($params, $userId, $storeId); 
+        $recordsTotal = $this->product->getProductsCountWithoutFilter(array(), $userId, $storeId);
+        
         $productsData = array();
-
+        
         if(is_array($productsList) && count($productsList) > 0)
         {
 			foreach ($productsList as $row) 
@@ -82,14 +107,32 @@ class Products extends CI_Controller {
 					</a>
 EOT;
 				// Product Categoires!
-				$productCategories = $this->Product->getProductCategories($productId);
+				$productCategories = $this->product->getProductCategories($productId);
 				
 				$arrProductCategories = array();
 				if(is_array($productCategories) && count($productCategories) > 0)
-				{
+				{	
+					$count=0;
+						
 					foreach($productCategories as $_productCategoryInfo)
-					{
-						$arrProductCategories[] = $_productCategoryInfo['name'];
+					{	
+
+						if(is_array($_filterCategories) && count($_filterCategories) > 0)
+						{	
+							
+							for ($i=0; $i <count($_filterCategories) ; $i++) 
+							{ 
+								if($_productCategoryInfo['category_id']==$_filterCategories[$i])
+								{
+									$arrProductCategories[] = $_productCategoryInfo['name'];
+								}
+							}
+						}
+						else
+						{
+							$arrProductCategories[] = $_productCategoryInfo['name'];
+						}
+						
 					}
 				}
 				
@@ -101,7 +144,7 @@ EOT;
 				
 				// Product Images!
 				$strProductImage = '';
-				$productImages = $this->Product->getProductImages($productId);
+				$productImages = $this->product->getProductImages($productId);
 				
 				if(is_array($productImages) && count($productImages) > 0)
 				{
@@ -154,7 +197,7 @@ EOT;
 
 		if($productId)
 		{
-			$productInfo = $this->Product->getById($productId, $userId, $storeId);
+			$productInfo = $this->product->getById($productId, $userId, $storeId);
 
 			if($productInfo)
 			{
@@ -162,7 +205,7 @@ EOT;
 				
 				// Product Categoires!
 				$categories = array();
-				$productCategories = $this->Product->getProductCategories($productId);
+				$productCategories = $this->product->getProductCategories($productId);
 				
 				$arrProductCategories = array();
 				if(is_array($productCategories) && count($productCategories) > 0)
@@ -181,7 +224,7 @@ EOT;
 				
 				// Product Images!
 				$strProductImage = '';
-				$productImages = $this->Product->getProductImages($productId);
+				$productImages = $this->product->getProductImages($productId);
 				
 				if(is_array($productImages) && count($productImages) > 0)
 				{
@@ -305,15 +348,15 @@ EOT;
 				{
 					$saveData['updated'] = date("Y-m-d H:i:s");
 
-					$this->Product->edit_product($productId, $saveData);
-					$this->Product->update_product_categories($categories,$productId);
+					$this->product->edit_product($productId, $saveData);
+					$this->product->update_product_categories($categories,$productId);
 				}
 				else
 				{
 					$saveData['created'] = date("Y-m-d H:i:s");
-					$productId           = $this->Product->add_product($saveData);
+					$productId           = $this->product->add_product($saveData);
 					
-					$this->Product->add_product_categories($categories, $productId);
+					$this->product->add_product_categories($categories, $productId);
 				}
 				
 				if($productId)
@@ -321,8 +364,8 @@ EOT;
 					if(is_array($product_media) && count($product_media) > 0)
 					{
 						$product_media['product_id']= $productId;
-						$this->Product->delete_product_media($productId);
-						$this->Product->add_product_media($product_media);
+						$this->product->delete_product_media($productId);
+						$this->product->add_product_media($product_media);
 					}
 				}
 				
@@ -332,8 +375,7 @@ EOT;
 		}
 		#Submitter - END
 		
-		$all_categories = $this->Product->get_all_categories($userId, $storeId);
-		
+		$all_categories = $this->product->get_all_categories($userId, $storeId);		
 		$all_categories = categoryTree($all_categories);
 
 		$data['postedData'] = $postedData;
@@ -353,10 +395,10 @@ EOT;
 		$storeId = getLoggedInStoreId();
 		$userId = getLoggedInUserId();
 		
-		$productInfo = $this->Product->getById($product_id, $userId, $storeId);
+		$productInfo = $this->product->getById($product_id, $userId, $storeId);
 		if($productInfo)
 		{ 
-			$this->Product->delete_product($product_id);
+			$this->product->delete_product($product_id);
 			$this->session->set_flashdata('Message','Product has been delete successfully');
 		}
 		

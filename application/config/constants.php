@@ -90,3 +90,15 @@ define('CONST_STATUS_ID_DELETE', -1);
 define('CONST_PAGINATION_LIMIT', 10);
 define('CONST_DATE_TIME_DISPLAY', 'F d, Y');
 define('CONST_CURRENCY_DISPLAY', '$');
+
+global $allowOnlyForSuperAdmin;
+
+$allowOnlyForSuperAdmin   = array();
+$allowOnlyForSuperAdmin[] = 'admin/users';
+$allowOnlyForSuperAdmin[] = 'admin/users/index';
+$allowOnlyForSuperAdmin[] = 'admin/users/bankstatus';
+$allowOnlyForSuperAdmin[] = 'admin/users/ajaxMerchantsListing';
+$allowOnlyForSuperAdmin[] = 'admin/users/ajaxMerchantBankStatus';
+
+define('EMAIL_ADDRESS_TO_SEND_CRON_UPDATES', 'mahmood@technyxsystems.com');
+define('CONST_CRON_ID_FOR_CHECK_BANK_STATUS', 1);

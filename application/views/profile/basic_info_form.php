@@ -17,20 +17,17 @@ if(!empty($basicInfoData))
 <div class="panel-body">
 	<h2>Personal Information</h2>
 	<div class="col-md-6" style="padding-left: 0px;">
-		<?php if($this->session->flashdata('errMsgBasicInfo')!='')
-	    {?>   
-	        <div class="alert alert-danger">
-	          <strong>Alert!</strong>&nbsp;&nbsp;<?php echo $this->session->flashdata('errMsgBasicInfo');?>
-	        </div>
-	        <?php 
-	    }?>
-	    <?php if($this->session->flashdata('successMsgBasicInfo')!='')
-	    {?>   
-	        <div class="alert alert-success">
-	          <strong>Success!</strong>&nbsp;&nbsp;<?php echo $this->session->flashdata('successMsgBasicInfo');?>
-	        </div>
-	        <?php 
-	    }?>
+		<?php
+		if($this->session->flashdata('successMsgBasicInfo')!='')
+		{   
+			echo getHTMLForSuccessMessage($this->session->flashdata('successMsgBasicInfo'));
+		}
+		
+		if($this->session->flashdata('errMsgBasicInfo')!='')
+		{
+			echo getHTMLForErrorMessage($this->session->flashdata('errMsgBasicInfo'));
+		}
+		?>
 		<form role="form" method ="post"action="">
 			<div class="form-group">
 				<label>First Name</label>
