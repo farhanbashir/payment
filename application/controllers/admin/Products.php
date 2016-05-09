@@ -331,9 +331,13 @@ EOT;
 			}
 		}
 		#Submitter - END
+		
+		$all_categories = $this->Product->get_all_categories($userId, $storeId);
+		
+		$all_categories = categoryTree($all_categories);
 
 		$data['postedData'] = $postedData;
-		$data['categories'] = $this->Product->get_all_categories($userId, $storeId);
+		$data['categories'] = $all_categories;
 		$data['formHeading'] = $formHeading;
 		$content = $this->load->view('products/product_form', $data, true);
 		$this->load->view('main', array('content' => $content));

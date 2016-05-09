@@ -1253,41 +1253,57 @@ class Api extends REST_Controller {
             $data["header"]["message"] = "Provide product name";
             $this->response($data, 200);
         }
-        if(!$description)
+        
+		if(!$description)
         {
             $data["header"]["error"] = "1";
             $data["header"]["message"] = "Provide product description";
             $this->response($data, 200);
         }
-        if(!isset($price))
+        
+		if(!isset($price))
         {
             $data["header"]["error"] = "1";
             $data["header"]["message"] = "Provide product price";
             $this->response($data, 200);
         }
-        if(!isset($store_id))
+		
+        if(!$store_id)
         {
             $data["header"]["error"] = "1";
             $data["header"]["message"] = "Provide store";
             $this->response($data, 200);
         }
-        if(!isset($category_ids))
+        
+		$categories = array();
+		if(!$category_ids)
         {
             $data["header"]["error"] = "1";
             $data["header"]["message"] = "Provide product category";
             $this->response($data, 200);
         }
+		else
+		{
+			$categories = json_decode($category_ids,true);
+			if(!$categories)
+			{
+				$data["header"]["error"] = "1";
+				$data["header"]["message"] = "Please provide data";
+				$this->response($data, 200);
+			}
+		}
 
         $product_id = $this->product->add_product(array("user_id"=>$this->user_id,"store_id"=>$store_id,"name"=>$name,"description"=>$description,"price"=>$price,"created"=>$created,"updated"=>$updated,"status"=>$status));
-        //category work here
-        $categories = json_decode($category_ids,true);
-        foreach($categories  as $category)
-        {
-            $this->category->add_product_category(array("product_id"=>$product_id,"category_id"=>$category));    
-        }    
         
+		if(is_array($categories) && count($categories) > 0)
+		{
+			foreach($categories  as $category)
+			{
+				$this->category->add_product_category(array("product_id"=>$product_id,"category_id"=>$category));
+			}
+		}        
         
-        $temp_image_data = $this->__uploadFile($this->config->item('user_image_base'), asset_url('img/products'));
+        $temp_image_data = $this->__uploadFile($this->config->item('product_image_base'), asset_url('img/products'));
 
         if(count($temp_image_data) > 0)
         {
@@ -1311,6 +1327,7 @@ class Api extends REST_Controller {
         $price        = $this->post('price');
         $store_id     = $this->store_id;
         $category_ids = $this->post('category_ids');
+		$created      = date('Y-m-d H:i:s');
         $updated      = date('Y-m-d H:i:s');
         $status       = 1;
 
@@ -1332,45 +1349,63 @@ class Api extends REST_Controller {
             $data["header"]["message"] = "Provide product description";
             $this->response($data, 200);
         }
-        if(!isset($product_id))
+        
+		if(!($product_id))
         {
             $data["header"]["error"] = "1";
             $data["header"]["message"] = "Provide product price";
             $this->response($data, 200);
         }
-        if(!isset($store_id))
+		
+        if(!($store_id))
         {
             $data["header"]["error"] = "1";
             $data["header"]["message"] = "Provide store";
             $this->response($data, 200);
         }
-        if(!isset($category_ids))
+        
+		$categories = array();
+		if(!$category_ids)
         {
             $data["header"]["error"] = "1";
             $data["header"]["message"] = "Provide product category";
             $this->response($data, 200);
         }
+		else
+		{
+			$categories = json_decode($category_ids,true);
+			if(!$categories)
+			{
+				$data["header"]["error"] = "1";
+				$data["header"]["message"] = "Please provide data";
+				$this->response($data, 200);
+			}
+		}
 
         if($this->product->edit_product($product_id, array("user_id"=>$this->user_id,"store_id"=>$store_id,"name"=>$name,"description"=>$description,"price"=>$price,"updated"=>$updated,"status"=>$status)))
         {
             //category work here
             $this->category->delete_all_categories_for_product($product_id);
-            $categories = json_decode($category_ids,true);
-            foreach($categories  as $category)
-            {
-                $this->category->add_product_category(array("product_id"=>$product_id,"category_id"=>$category));   
-            }    
+			
+			if(is_array($categories) && count($categories) > 0)
+			{
+				foreach($categories  as $category)
+				{
+					$this->category->add_product_category(array("product_id"=>$product_id,"category_id"=>$category));   
+				} 
+			}            
             
-            
-            $temp_image_data = $this->__uploadFile($this->config->item('user_image_base'), asset_url('img/products'));
+            $temp_image_data = $this->__uploadFile($this->config->item('product_image_base'), asset_url('img/products'));
 
             if(count($temp_image_data) > 0)
             {
-                $product_media = array("product_id"=>$product_id,"file_name"=>$temp_image_data['path'],"media_type"=>$temp_image_data['ext'],"updated"=>$updated,"status"=>$status);
-
-                $this->product->edit_product_media($product_id, $product_media);
+                $product_media = array("product_id"=>$product_id,"file_name"=>$temp_image_data['path'],"media_type"=>$temp_image_data['ext'],"created"=>$created,"updated"=>$updated,"status"=>$status);
+				
+				//-->$this->product->edit_product_media($product_id, $product_media); 				
+				
+				$this->product->delete_product_media($product_id);
+				$this->product->add_product_media($product_media);
             }
-
 
             $data["header"]["error"]   = "0";
             $data["header"]["message"] = "Success";

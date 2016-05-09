@@ -36,19 +36,20 @@ class Categories extends CI_Controller
         $params     = _processDataTableRequest($_getParams);
         $draw       = $params['draw'];
 
-        $categoryList = $this->Category->getCategory($params,$userId, $storeId);
+        $categoryList = $this->Category->getCategory($params, $userId, $storeId);
 
         $recordsFiltered = $this->Category->getCategoryCount($params,$userId, $storeId); 
         $recordsTotal = $this->Category->getCategoryCountWithoutFilter($params=array(),$userId, $storeId);
 
         $categoryData = array();
+		
+		$categoryList = categoryTree($categoryList);
 
         if(is_array($categoryList) && count($categoryList) > 0)
         { 
             
             foreach ($categoryList as $category) 
-            {   
-                 
+            {                 
                 $tempArray       = array();  
                 
                 $categoryId      = $category['category_id'];
@@ -72,9 +73,9 @@ class Categories extends CI_Controller
                             </a>
                         </p>
 EOT;
-                $tempArray[] = $categoryId;
+                //-->$tempArray[] = $categoryId;
                 $tempArray[] = $category_name;
-                $tempArray[] = $parentCategory;
+                //-->$tempArray[] = $parentCategory;
                 $tempArray[] = $category['total_products'];
                 $tempArray[] =$actionData;
                 $categoryData[] = $tempArray;

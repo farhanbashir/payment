@@ -164,7 +164,7 @@ Class Category extends CI_Model
                 $order = "ORDER BY ".$sortColumn." ".$sortOrderDirection;
             }
 
-            $limit = "LIMIT ".intval($offset).", ".intval(CONST_PAGINATION_LIMIT);
+            //-->$limit = "LIMIT ".intval($offset).", ".intval(CONST_PAGINATION_LIMIT); //UJ: We are displaying all categories due to tree view!
         }
 
         $arrayWhereClause = array();
@@ -197,7 +197,7 @@ Class Category extends CI_Model
             $select = ' COUNT(t1.user_id) AS totalRecordsCount FROM categories AS t1';
         }
         
-        $sql = "SELECT 
+		$sql = "SELECT 
                         $select 
                     
                     ". $whereCondition. " 

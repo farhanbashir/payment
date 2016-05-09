@@ -1079,7 +1079,15 @@ function generateReceiptByOrderId($order_id=0, $user_id=0)
 		$receiptTextColor	= @$storeDetails['receipt_text_color'];
 		
 		//transaction details
-		$paymentNotice		= @$paymentTransaction['cx_descriptor']; //-->CONST_CC_PAYMENT_SUCCESS_NOTICE;
+		$paymentNoticeText				= CONST_CC_PAYMENT_SUCCESS_NOTICE;
+		$paymentNoticeDescriptorText 	= @$paymentTransaction['cx_descriptor'];
+		
+		$paymentNotice = '';		
+		if($paymentNoticeDescriptorText)
+		{
+			$paymentNotice = str_replace('descriptor', $paymentNoticeDescriptorText, $paymentNoticeText);
+		}		
+		
 		$invoiceId			= @$paymentTransaction['transaction_id'];
 		$cashAmount			= @$paymentTransaction['amount_cash'];
 		$ccAmount			= @$paymentTransaction['amount_cc'];
@@ -1209,7 +1217,7 @@ EOT;
 		
 					<tr>
 						<td align="center" style="font-family: 'Courier New'; font-size: 11px;">
-							<strong>VERIIED BY SIGNATURE</strong>
+							<strong>VERIFIED BY SIGNATURE</strong>
 						</td>
 					</tr>
 					<tr>

@@ -26,11 +26,11 @@
         <table id="category-listing" class="table table-hover demo-table-search dataTable no-footer"  role="grid" aria-describedby="tableWithSearch_info">
           <thead>
             <tr role="row">
-              <th width="5%">ID</th>
+              <!-- <th width="5%">ID</th> -->
               <th width="25%">Categories</th>
-              <th width="25%">Parent Category</th>
+              <!--<th width="25%">Parent Category</th>-->
               <th width="20%">No. of products</th>
-              <th width="25%">Actions</th>
+              <th width="45%">Actions</th>
             </tr>
           </thead>
         </table>
@@ -52,17 +52,16 @@ $(document).ready(function()
     "serverSide": true,
     "ajax": "<?php echo site_url('admin/categories/ajaxCategoryListing');?>",
     "bLengthChange": false,
+	"bFilter": false,
     "oLanguage": 
     {
-      "sEmptyTable" : "No Category Found",
-      "sZeroRecords": "No Category Found"
+      "sEmptyTable" : "No Categories Found",
+      "sZeroRecords": "No Categories Found"
     },
   
-    "order": [[ 0, "desc" ]],
+    "order": [[ 0, "asc" ]],
     "aoColumns": [
-    { "sType": "html", "sName": "category_id" },
-    { "sType": "html", "sName": "name" },
-    { "sType": "html", "bSortable": false, "bSearchable": false },
+    { "sType": "html", "sName": "name", "bSortable": false, "bSearchable": false },
     { "sType": "html", "bSortable": false, "bSearchable": false },
     { "sType": "html", "bSortable": false, "bSearchable": false },
     ]

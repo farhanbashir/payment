@@ -59,3 +59,61 @@ function getLoggedInRoleId()
   
   return $ci->session->userdata['logged_in']['role_id'];
 }
+
+function categoryTree($data=array(), $parent_id=0, $current_level=0, &$return_arr=array())
+{
+	if(is_array($data) && count($data) > 0)
+	{
+		foreach ($data as $row)
+		{	
+			if ($row['parent_id'] == $parent_id)
+			{				
+				$row['name'] = str_repeat('— ', $current_level) . $row['name'];		
+				
+				$return_arr[] = $row;
+				
+				$next_level = $current_level+1;
+				
+				categoryTree($data, $row['category_id'], $next_level, $return_arr);
+			}
+		}
+	}
+	
+	return $return_arr;
+}
+
+function categoryTree2($data, $index=false, $parent_id=0, $level=0, $maxLevel=0, &$arrReturn=array())
+{
+	if(!$index)
+	{
+		if(is_array($data) && count($data) > 0)
+		{
+			foreach($data as $row)
+			{
+				$id = $row["category_id"];
+				$parent_id = $row["parent_id"] === NULL ? "NULL" : $row["parent_id"];
+				$index[$parent_id][] = $id;
+			}
+		}
+	}
+	
+    $parent_id = $parent_id === NULL ? "NULL" : $parent_id;
+    if (isset($index[$parent_id])) {
+        foreach ($index[$parent_id] as $id)
+		{   
+			$name = str_repeat('— ', $level) . @$data[$id]["name"];
+			
+			$arrReturn[] = array(
+							'category_id' => $id,
+							'name' => $name,			
+			);
+			
+			$nextLevel = $level + 1;
+			
+            categoryTree2($data, $index, $id, $nextLevel, $maxLevel, $arrReturn);
+			
+        }
+    }
+	
+	return $arrReturn;
+}
