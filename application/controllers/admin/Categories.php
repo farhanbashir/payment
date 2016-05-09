@@ -47,8 +47,7 @@ class Categories extends CI_Controller
 		$categoryList = categoryTree($categoryList);
 
         if(is_array($categoryList) && count($categoryList) > 0)
-        { 
-            
+        {            
             foreach ($categoryList as $category) 
             {                 
                 $tempArray       = array();  
@@ -78,7 +77,7 @@ EOT;
                 $tempArray[] = $category_name;
                 //-->$tempArray[] = $parentCategory;
                 $tempArray[] = $category['total_products'];
-                $tempArray[] =$actionData;
+                $tempArray[] = $actionData;
                 $categoryData[] = $tempArray;
             }
         }
@@ -88,13 +87,13 @@ EOT;
           "recordsTotal"    => $recordsTotal,
           "recordsFiltered" => $recordsFiltered,
           "data"            => $categoryData
-          );
+		);
 
         echo json_encode($data);
     } 
 
     function save($categoryId=0)
-    {	
+    {
         $data = array();
         $postedData = array();
         $aErrorMessage = array();

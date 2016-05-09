@@ -33,7 +33,12 @@ class Auth extends CI_Controller {
 		}
 		else
 		{
-            $this->load->view('login', array("error" =>'', "username" => ''));
+			$data = array();
+			$data['error'] = '';
+			$data['username'] = '';
+			
+			$content = $this->load->view('login', $data, true);
+			$this->load->view('main-front', array('content' => $content));
 		}
 	}
 
@@ -69,17 +74,23 @@ class Auth extends CI_Controller {
 	   }
 	   else
 	   {
-			$this->load->view('login',array("error" =>"Invalid username or password", "username" => $username));
+			$data = array();
+			$data['error'] = 'Invalid username or password';
+			$data['username'] = $username;
+			
+			$content = $this->load->view('login', $data, true);
+			$this->load->view('main-front', array('content' => $content));
+			
 			$this->form_validation->set_message('check_database', 'Invalid username or password');
 			return false;
 		}
 	}
 
 	function register()
-	{	
-
+	{
 		$data = array();
         $postedData = array();
+		
         $aErrorMessage = array();
 		$error="";
 
@@ -199,7 +210,7 @@ class Auth extends CI_Controller {
                             $this->profile->add_user_merchant_info($merchant_info);
                         }
                         
-                        $this->session->set_flashdata('Message','Signup successfull! please login to continue');
+                        $this->session->set_flashdata('Message','Signup Successfull. Please login to continue');
                         redirect(base_url(),'refresh');
                     }
                     else
@@ -212,7 +223,9 @@ class Auth extends CI_Controller {
 
         $data['error'] = $error;
         $data['postedData'] = $postedData;
-		$this->load->view('register',$data);
+		
+		$content = $this->load->view('register', $data, true);
+		$this->load->view('main-front', array('content' => $content));
 	}
     public function logout()
     {
@@ -224,8 +237,6 @@ class Auth extends CI_Controller {
     {
     	$this->load->view('forgot_password');
     }
-
-
 }
 
 /* End of file welcome.php */

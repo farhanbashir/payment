@@ -49,10 +49,13 @@
 					<?php
 						if($_logged_in_merchant_user_id)
 						{
-							?><small> &rarr; <strong>Merchant:</strong> <?php echo $_logged_in_merchant_name; ?> (<?php echo $_logged_in_merchant_email; ?>)</small>
-              <?php
+							?><small> &rarr; <strong>Merchant:</strong> <?php echo $_logged_in_merchant_name; ?> (<?php echo $_logged_in_merchant_email; ?>)</small><?php
 						}
 					?>
+					
+					<span class="small">
+						| <a href='<?php echo site_url('auth/logout') ?>' class="small" style="color: #3a8fc8">Logout</a>
+					</span>
 				</div>
 			</div>
 		</div>
@@ -77,7 +80,7 @@
                 <li><a href="#"><i class="pg-signals"></i> Help</a>
                 </li> -->
                 <li class="bg-master-lighter">
-                  <a href="<?php echo base_url();?>/index.php/auth/logout" class="clearfix">
+                  <a href="<?php echo site_url('auth/logout') ?>" class="clearfix">
                     <span class="pull-left">Logout</span>
                     <span class="pull-right"><i class="pg-power"></i></span>
                   </a>

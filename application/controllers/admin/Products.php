@@ -40,7 +40,11 @@ class Products extends CI_Controller {
         $storeId = getLoggedInStoreId();
 		
         $data = array();
-		$data['categories'] = $this->product->get_all_categories($userId, $storeId);
+		
+		$all_categories = $this->product->get_all_categories($userId, $storeId);		
+		$all_categories = categoryTree($all_categories);
+		
+		$data['categories'] = $all_categories;
 
         $content  = $this->load->view('products/products_listing.php', $data, true);
         
@@ -48,12 +52,9 @@ class Products extends CI_Controller {
 	}
 	
 	function ajaxProductsListing()
-	{	
-        
+	{
         $userId  = getLoggedInUserId();
         $storeId = getLoggedInStoreId();
-        
-       
         
         $_getParams = $_GET;
         
@@ -63,17 +64,17 @@ class Products extends CI_Controller {
         $params['filter_category']  = '';
         $draw       				= $params['draw'];
 
+		$_filterCategories = array();
         if($filterCategory)
         {
         	$filterCategories = $this->product->getAllCategoriesByCategoryId($filterCategory);
         	if($filterCategories)
-        	{	
-        		$_filterCategories = array();
-        	
+        	{
         		foreach ($filterCategories as $row)
         		{	
         			$_filterCategories[] = $row['category_id'];		
         		}
+				
         		$params['filter_category'] = $_filterCategories;
         	}	
 		}
@@ -115,24 +116,8 @@ EOT;
 					$count=0;
 						
 					foreach($productCategories as $_productCategoryInfo)
-					{	
-
-						if(is_array($_filterCategories) && count($_filterCategories) > 0)
-						{	
-							
-							for ($i=0; $i <count($_filterCategories) ; $i++) 
-							{ 
-								if($_productCategoryInfo['category_id']==$_filterCategories[$i])
-								{
-									$arrProductCategories[] = $_productCategoryInfo['name'];
-								}
-							}
-						}
-						else
-						{
-							$arrProductCategories[] = $_productCategoryInfo['name'];
-						}
-						
+					{
+						$arrProductCategories[] = $_productCategoryInfo['name'];
 					}
 				}
 				

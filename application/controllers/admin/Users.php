@@ -136,7 +136,7 @@ class Users extends CI_Controller {
                 
                 else if($row['status'] == CONST_BANK_STATUS_NOT_VERIFIED)
                 {
-                    $status ='<div id="'.$row['user_id'].'"><span class="label label-warning">Not Verified</span> <button onclick="return checkBankStatus(this)" value="'.$row['user_id'].'"class="btn btn-complete btn-cons"style="width:60px;height:31px;">Check Status</button></div>';
+                    $status ='<div id="'.$row['user_id'].'"><span class="label label-warning">Not Verified</span> <button onclick="return checkBankStatus(this)" value="'.$row['user_id'].'" class="btn btn-complete btn-cons">Check Status</button></div>';
                 }       
                 
                 $lastChecked = '-';
@@ -346,26 +346,27 @@ class Users extends CI_Controller {
 
             if(!$last_name)
             {
-                $aErrorMessage[] = "last name required";
+                $aErrorMessage[] = "Last name required";
             }
 
             if(!$email)
             {
-                $aErrorMessage[] = "email required";
+                $aErrorMessage[] = "Email required";
             }
-
-            if(!$password)
-            {
-                $aErrorMessage[] = "Password required";
-            }
-
-            if($email)
+			
+			if($email)
             {
                 if (!filter_var($email, FILTER_VALIDATE_EMAIL))
                 {
                     $aErrorMessage[] = "Please provide valid email address"; 
                 }
             }
+
+            if(!$password)
+            {
+                $aErrorMessage[] = "Password is required";
+            }
+            
 
             $already_present = $this->user->checkUser($email);
             if($already_present !== false)
@@ -380,7 +381,6 @@ class Users extends CI_Controller {
             }
             else
             {
-
                 $apiStatus = true;
 
                 $apiData = array();
@@ -544,30 +544,30 @@ class Users extends CI_Controller {
 
     public function login_merchant($user_id=0)
     {
-      if($user_id)
-      {
-         $userInfo = $this->user->checkUserById($user_id);
+		  if($user_id)
+		  {
+			 $userInfo = $this->user->checkUserById($user_id);
 
-         if($userInfo)
-         {
-            $userInfo = @$userInfo[0];
+			 if($userInfo)
+			 {
+				$userInfo = @$userInfo[0];
 
-            if($userInfo)
-            {
-               $role_id = $userInfo->role_id;
+				if($userInfo)
+				{
+				   $role_id = $userInfo->role_id;
 
-               if($role_id == CONST_ROLE_ID_BUSINESS_ADMIN)
-               {
-                  $userInfo = (array) $userInfo;
+				   if($role_id == CONST_ROLE_ID_BUSINESS_ADMIN)
+				   {
+					  $userInfo = (array) $userInfo;
 
-                  $this->session->set_userdata('logged_in_merchant', $userInfo);
+					  $this->session->set_userdata('logged_in_merchant', $userInfo);
 
-                  redirect(site_url('admin/dashboard'));
-              }
-          }
-      }
-  }
+					  redirect(site_url('admin/dashboard'));
+				  }
+			  }
+		  }
+	  }
 
-  redirect(site_url('admin/users/index'));	
-}
+	  redirect(site_url('admin/users/index'));	
+	}
 }
