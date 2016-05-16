@@ -24,7 +24,17 @@
         <div class=" pull-left sm-table hidden-xs hidden-sm">
           <div class="header-inner">
             <div class="brand inline">
-              <img src="<?php echo asset_url('img/logo.png');?>" alt="logo" data-src="<?php echo asset_url('img/logo.png');?>" data-src-retina="<?php echo asset_url('img/logo_2x.png');?>" height="22" />
+              <script>
+                function toggleMenuBar(){
+                  $('body').toggleClass('menu-pin');
+                }
+              </script>
+              <a href="#" class="icon-toggle-menu" onclick="toggleMenuBar()">
+                <i></i>
+                <i></i>
+                <i></i>
+              </a>
+              <img src="<?php echo asset_url('img/icon-visa-mastercard.png');?>" alt="Visa MasterCard" data-src="<?php echo asset_url('img/icon-visa-mastercard.png');?>" height="21" />
             </div>
             <!-- START NOTIFICATION LIST -->
             <?php //$this->load->view('notifications'); ?>

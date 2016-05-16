@@ -72,10 +72,19 @@ Class Category extends CI_Model
     }
 
     function get_all_categories($userId, $storeId)
-    {
-       
+    {       
         $sql = "SELECT name,category_id,parent_id,(SELECT COUNT(category_id) FROM product_categories WHERE category_id=categories.category_id) AS total_products
                 FROM categories WHERE status >0 AND user_id='$userId' AND store_id='$storeId' AND parent_id = 0 ";
+        $query = $this->db->query($sql);
+        $result = $query->result_array();
+        $query->free_result();
+        return $result;
+    }
+	
+	function get_all_categories_for_app_listing($userId, $storeId)
+    {       
+        $sql = "SELECT name,category_id,parent_id,(SELECT COUNT(category_id) FROM product_categories WHERE category_id=categories.category_id) AS total_products
+                FROM categories WHERE status >0 AND user_id='$userId' AND store_id='$storeId' ";
         $query = $this->db->query($sql);
         $result = $query->result_array();
         $query->free_result();

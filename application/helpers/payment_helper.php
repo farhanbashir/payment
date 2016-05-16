@@ -2,7 +2,7 @@
 //For payments processing - We are using CardXecure
 define('CONST_PAYMENT_MODE', 				'test'); //test | live
 define('CONST_PAYMENT_API_KEY',				'28966ac8a0af1447d6f5bfba0e1428fc');
-define('CONST_PAYMENT_TEST_URL',			'https://pay.icannpay.com/dev/index.php/');
+define('CONST_PAYMENT_TEST_URL',			'https://pay.icannpay.com/dev/'); //-->https://pay.icannpay.com/dev/index.php/
 define('CONST_PAYMENT_LIVE_URL',			'https://icannpay.com/index.php/'); //-->https://icannpay.com/index.php/
 define('CONST_CC_PAYMENT_SUCCESS_NOTICE',	'<strong>IMPORTANT:</strong> This purchase will appear as <strong>"descriptor"</strong> on your credit card statement or online transaction detail. As with any international transaction of this nature, the final posted transaction on your statement or transaction detail may vary depending on your credit card issuer. It is not uncommon for some credit card issuers to impose a small currency conversion fee.');
 

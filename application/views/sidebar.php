@@ -27,6 +27,13 @@
       <!-- BEGIN SIDEBAR MENU HEADER-->
       <div class="sidebar-header">
         <img src="<?php echo asset_url('img/logo_white.png');?>" alt="logo" class="brand" data-src="<?php echo asset_url('img/logo_white.png');?>" data-src-retina="<?php echo asset_url('img/logo_white_2x.png');?>" height="22">
+
+	    <a href="#" class="icon-toggle-menu" onclick="toggleMenuBar()">
+		  <i></i>
+		  <i></i>
+		  <i></i>
+	    </a>
+
         <!-- <div class="sidebar-header-controls">
           <button type="button" class="btn btn-xs sidebar-slide-toggle btn-link m-l-20" data-pages-toggle="#appMenu"><i class="fa fa-angle-down fs-16"></i>
           </button>
@@ -49,7 +56,10 @@
 							<a href="<?php echo site_url('admin/users/index') ?>">
 							  <span class="title">Merchants</span>
 							</a>
-							<span class="<?php echo ($this->uri->segment(2) == 'users')&&($this->uri->segment(3) == 'index') ? 'bg-success' : '';?> icon-thumbnail"><i class="fa fa-user"></i></span>
+							<span class="<?php echo ($this->uri->segment(2) == 'users')&&($this->uri->segment(3) == 'index') ? 'bg-success' : '';?> icon-thumbnail"><i class="fa fa-user"></i></span>							
+						</li>
+						
+						<li class="">
 							<a href="<?php echo site_url('admin/users/bankstatus') ?>">
 							  <span class="title">Bank Status</span>
 							</a>

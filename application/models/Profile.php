@@ -13,7 +13,10 @@ Class Profile extends CI_Model
 						ub.account_title, ub.account_number, ub.status as bank_status, 
 						
 						us.store_id, us.name as store_name, us.description, us.logo, us.address as business_address, us.phone, 
-						us.status as store_status 
+						us.status as store_status,
+						
+						us.receipt_header_text, us.receipt_footer_text, us.receipt_bg_color, us.receipt_text_color 
+						
 				from users u 						
 				left join user_details ud on u.user_id=ud.user_id 
 				left join user_banks ub on u.user_id=ub.user_id 

@@ -53,7 +53,28 @@ Class Product extends CI_Model
 
     function get_products_by_category($category_id)
     {
-        $sql = "select * from products where product_id IN (select product_id from product_categories where category_id=$category_id) and status=1" ;
+		$_arrFilterCategories = array();
+		if($category_id)
+		{
+			$filterCategories = $this->getAllCategoriesByCategoryId($category_id);
+			if($filterCategories)
+			{
+				foreach ($filterCategories as $row)
+				{	
+					$_arrFilterCategories[] = $row['category_id'];		
+				}
+			}
+		}
+		
+		if(is_array($_arrFilterCategories) && count($_arrFilterCategories) > 0)
+        {
+			$sql = "select * from products where product_id IN (select product_id from product_categories where category_id IN (".implode(',', $_arrFilterCategories)." )) and status=1 " ;
+        }
+		else
+		{
+			$sql = "select * from products where product_id IN (select product_id from product_categories where category_id=$category_id) and status=1" ;
+		}		
+        
         $query = $this->db->query($sql);
         $result = $query->result_array();
         $query->free_result();
@@ -228,7 +249,8 @@ Class Product extends CI_Model
         $arrayWhereClause[] = " p.user_id ='$userId' AND p.store_id='$storeId' AND p.status >0 ";
         if($filterCategory)
         {
-            $arrayWhereClause[] = "(pc.category_id IN (".implode(',', $filterCategory)."))";
+            //-->$arrayWhereClause[] = "(pc.category_id IN (".implode(',', $filterCategory)."))";
+			$arrayWhereClause[] = " ( p.product_id IN ( select product_id from product_categories where category_id IN (".implode(',', $filterCategory)." )) ) ";
         }
         if($searchKeyword)
         {
@@ -256,9 +278,7 @@ Class Product extends CI_Model
         $sql = "SELECT 
                         $select 
                     FROM
-                        products AS p
-                        LEFT JOIN product_categories AS pc
-                        on p.product_id = pc.product_id 
+                        products AS p 
                     ". $whereCondition. " 
                     ". $order. " 
                     ". $limit. " 

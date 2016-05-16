@@ -37,6 +37,8 @@ class Api extends REST_Controller {
         $this->token    	= 0;
         $this->store_id 	= 0;
 		$this->device_type	= 0;
+		
+		$isLocalTesting = false;
 
         $headers = getallheaders();
 
@@ -45,6 +47,13 @@ class Api extends REST_Controller {
 			$headerToken	= @$headers['Token'];
 			$headerUserId	= @$headers['Userid'];
 			$headerStoreId	= @$headers['Storeid'];
+			
+			if($isLocalTesting)
+			{
+				$headerToken	= @$headers['token'];
+				$headerUserId	= @$headers['userid'];
+				$headerStoreId	= @$headers['storeid'];
+			}
 			
             if($headerToken)
             {
@@ -970,7 +979,13 @@ class Api extends REST_Controller {
                     //$this->device->insert_device($device_data);
 
                     $device = $this->device->get_user_device($user['user_id'], $device_id);
-                    if(count($device) > 0)
+					
+					//insert device table
+					$device_data = array('user_id'=>$user['user_id'],'uid'=>$device_id, 'type'=>$device_type,'token'=>$token,"os_version"=>$os_version);
+					$this->device->insert_device($device_data);
+                    
+					/* //UJ: Not needed. It will update all previous tokens when we have some new token assigned!
+					if(count($device) > 0)
                     {
                         //update device table
                         $device_data = array('uid'=>$device_id, 'type'=>$device_type,'token'=>$token,"os_version"=>$os_version);
@@ -981,7 +996,8 @@ class Api extends REST_Controller {
                         //insert device table
                         $device_data = array('user_id'=>$user['user_id'],'uid'=>$device_id, 'type'=>$device_type,'token'=>$token,"os_version"=>$os_version);
                         $this->device->insert_device($device_data);
-                    }    
+                    }
+					*/
                 }    
                 
                 $array['user_id']          = $user['user_id'];
@@ -1436,7 +1452,9 @@ class Api extends REST_Controller {
 
     function getCategories_post()
     {
-        $categories              = $this->category->get_all_categories($this->user_id, $this->store_id);
+        $categories              = $this->category->get_all_categories_for_app_listing($this->user_id, $this->store_id);		
+		$categories 			= categoryTree($categories);
+		
         $data["header"]["error"] = "0";
         $data['body']            = array("categories"=>$categories);
         $this->response($data, 200);
