@@ -33,18 +33,7 @@
 		</div>
 	</div>
 	
-	<div class="row">
-		<div class="col-md-6 no-padding">
-			<div class="checkbox check-primary">
-				<input type="checkbox" value="1" id="checkbox1">
-				<label for="checkbox1">Remember Me</label>
-			</div>
-		</div>
-		<div class="col-md-6 text-right" style="display: none;">
-			<a href="Javascript: void();" class="small">Forget Password? </a>
-		</div>
-	</div>					
-	
+	<br />
 	<button class="btn btn-primary btn-cons m-t-10" type="submit">Log In</button>
 	
 </form>
