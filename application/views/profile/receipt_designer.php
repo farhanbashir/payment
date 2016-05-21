@@ -52,6 +52,14 @@ if(!empty($receiptInfoData))
 			</div>
 			<br /><br />
 			<button name="btn-receipt-info" value="submit" type="submit" class="btn btn-primary btn-cons">Save</button>
+			
+			<br /><br /><br /><br />
+			<div class="form-group">
+				<label>Email Address for Testing</label>
+				<input name="test_email" value ="" type="text" class="form-control" >
+			</div>
+			<br />
+			<button name="btn-send-test-reciept" value="submit" type="submit" class="btn btn-primary btn-cons">Send Now</button>
 		</form>
 	</div>
 

@@ -371,6 +371,22 @@ Class Settings extends CI_Controller
    				$this->session->set_flashdata('successMsgReceiptInfo','Receipt Design Information updated successfully');
    			}
    		}
+		elseif($this->input->post('btn-send-test-reciept'))
+   		{
+   			$receiptInfoData = $this->input->post();
+
+   			extract($receiptInfoData);
+			
+			
+			
+			/*
+			$header_text
+   			$footer_text
+			$bg_color
+			$text_color			
+			$test_email
+			*/
+   		}
    		else
    		{
    			$receiptInfoData['header_text'] = $userStoreDetails['receipt_header_text'];
