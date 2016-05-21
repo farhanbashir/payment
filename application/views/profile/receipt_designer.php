@@ -3,6 +3,7 @@ $receipt_header_text ="";
 $receipt_footer_text ="";
 $receipt_bg_color ="";
 $receipt_text_color ="";
+$logo = "";
 
 if(!empty($receiptInfoData))
 {
@@ -10,6 +11,9 @@ if(!empty($receiptInfoData))
 	$receipt_footer_text = $receiptInfoData['footer_text'];
 	$receipt_bg_color 	 = $receiptInfoData['bg_color'];
 	$receipt_text_color  = $receiptInfoData['text_color'];
+	$receipt_text_color  = $receiptInfoData['text_color'];
+	$logo 				 = $receiptInfoData['old_image'];
+
 }
 
 ?>
@@ -23,14 +27,27 @@ if(!empty($receiptInfoData))
 			echo getHTMLForSuccessMessage($this->session->flashdata('successMsgReceiptInfo'));
 		}
 		
-		if($this->session->flashdata('errMsgBasicInfo')!='')
+		if($this->session->flashdata('errMsgReceiptInfo')!='')
 		{
-			echo getHTMLForErrorMessage($this->session->flashdata('errMsgBasicInfo'));
+			echo getHTMLForErrorMessage($this->session->flashdata('errMsgReceiptInfo'));
 		}
 		?>
 		
-		<form role="form" method="post" action="">
-
+		<form role="form" method ="post"action="" enctype="multipart/form-data" accept-charset="utf-8">
+			<div class="form-group">
+				<label>Logo</label>
+				<input type="file" name="image" >
+				<input type="hidden" name="old_image" value="<?php echo $logo;?>">
+				<?php
+					if($logo)						
+					{
+						?>
+							<br /><br />
+							<img src="<?php echo $logo;?>" width="150" alt="." />
+						<?php
+					}
+				?>				
+			</div>	
 			<div class="form-group">
 				<label>Header Text</label>
 				<input name="header_text" value ="<?php echo $receipt_header_text;?>" type="text" class="form-control" >
@@ -58,4 +75,5 @@ if(!empty($receiptInfoData))
 </div>
 <?php
 $this->session->set_flashdata('successMsgReceiptInfo','');
+$this->session->set_flashdata('errMsgReceiptInfo','');
 ?>

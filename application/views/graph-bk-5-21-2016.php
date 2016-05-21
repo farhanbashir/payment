@@ -83,17 +83,15 @@
 					?>
 				]);
 				var options = 	{	
-									legend: { position: 'top' },
-  									bar: { groupWidth: '25%' },
 									titleTextStyle: {
 							     	color: '333333',
 							        fontName: 'Arial',
-								    
+								    fontSize: 10
 								    },
 		                       		'width':1150,
 		                       		'height':400
 	                       		};
-	            var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+	            var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
         		chart.draw(data, options);
 	            <?php
 
@@ -162,11 +160,9 @@
 	        ]);
 
 	        var options2 = 	{
-	        					legend: { position: 'top' },
-  								bar: { groupWidth: '25%' },
 	                       'width':1150,
 	                       'height':400};
-            var chart2 = new google.visualization.ColumnChart(document.getElementById('chart_div2'));
+            var chart2 = new google.visualization.LineChart(document.getElementById('chart_div2'));
         	chart2.draw(data2, options2);           
 	    	<?php
 	    }?>

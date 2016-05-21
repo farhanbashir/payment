@@ -51,124 +51,7 @@ class Products extends CI_Controller {
         $this->load->view('main', array('content' => $content));
 	}
 	
-	function ajaxProductsListing()
-	{
-        $userId  = getLoggedInUserId();
-        $storeId = getLoggedInStoreId();
-        
-        $_getParams = $_GET;
-        
-        $params     				= _processDataTableRequest($_getParams);
-
-        $filterCategory = $_getParams['filter_category'];
-        $params['filter_category']  = '';
-        $draw       				= $params['draw'];
-
-		$_filterCategories = array();
-        if($filterCategory)
-        {
-        	$filterCategories = $this->product->getAllCategoriesByCategoryId($filterCategory);
-        	if($filterCategories)
-        	{
-        		foreach ($filterCategories as $row)
-        		{	
-        			$_filterCategories[] = $row['category_id'];		
-        		}
-				
-        		$params['filter_category'] = $_filterCategories;
-        	}	
-		}
-
-        $productsList = $this->product->getProducts($params, $userId, $storeId);
-
-        $recordsFiltered = $this->product->getProductsCount($params, $userId, $storeId); 
-        $recordsTotal = $this->product->getProductsCountWithoutFilter(array(), $userId, $storeId);
-        
-        $productsData = array();
-        
-        if(is_array($productsList) && count($productsList) > 0)
-        {
-			foreach ($productsList as $row) 
-			{
-				$productId   = $row['product_id'];
-
-				$linkEdit     = site_url('admin/products/save/'.$productId);
-				$linkDelete   = site_url('admin/products/delete_product/'.$productId);
-
-				$tplActions  = <<<EOT
-
-					<a href="$linkEdit">
-						<button class="btn btn-primary btn-cons">Edit</button>
-					</a>
-					
-					<br /><br />
-					
-					<a onclick="return confirm('Are you sure want to delete','$linkDelete')" href="$linkDelete">
-						<button class="btn btn-danger btn-cons">Remove</button>
-					</a>
-EOT;
-				// Product Categoires!
-				$productCategories = $this->product->getProductCategories($productId);
-				
-				$arrProductCategories = array();
-				if(is_array($productCategories) && count($productCategories) > 0)
-				{	
-					$count=0;
-						
-					foreach($productCategories as $_productCategoryInfo)
-					{
-						$arrProductCategories[] = $_productCategoryInfo['name'];
-					}
-				}
-				
-				$strProductCategories = '';
-				if(is_array($arrProductCategories) && count($arrProductCategories) > 0)
-				{
-					$strProductCategories = implode(', ', $arrProductCategories);
-				}
-				
-				// Product Images!
-				$strProductImage = '';
-				$productImages = $this->product->getProductImages($productId);
-				
-				if(is_array($productImages) && count($productImages) > 0)
-				{
-					$productImages = $productImages[0];
-					
-					if($productImages)
-					{
-						$productImageLink = @$productImages['media_path'];
-						
-						if($productImageLink)
-						{
-							$strProductImage =  '<img src="'.$productImageLink.'" width="150" alt="." />';
-						}
-					}
-				}
-				
-				$tempArray  		= array();
-				
-				$tempArray[]       = $productId;
-				$tempArray[]       = $row['name'];            
-				$tempArray[]       = $strProductCategories;
-				$tempArray[]       = CONST_CURRENCY_DISPLAY.$row['price'];
-				$tempArray[]       = $strProductImage;
-				$tempArray[]       = $tplActions;
-
-				$productsData[] 	= $tempArray;
-			}
-		}
-
-		$data = array(
-			"draw"            => isset ( $draw ) ? intval( $draw ) : 0,
-			"recordsTotal"    => $recordsTotal,
-			"recordsFiltered" => $recordsFiltered,
-			"data"            => $productsData
-		);
-
-		echo json_encode($data);
-		exit;
-	}
+	
 
     function save($productId=0)
     {   
@@ -369,6 +252,117 @@ EOT;
 		$content = $this->load->view('products/product_form', $data, true);
 		$this->load->view('main', array('content' => $content));
     }
+    function ajaxProductsListing()
+	{
+        $userId  = getLoggedInUserId();
+        $storeId = getLoggedInStoreId();
+        
+        $_getParams = $_GET;
+        
+        $params     				= _processDataTableRequest($_getParams);
+
+        $filterCategory = $_getParams['filter_category'];
+        $params['filter_category']  = '';
+        $draw       				= $params['draw'];
+
+		$_filterCategories = array();
+        if($filterCategory)
+        {
+        	$filterCategories = $this->product->getAllCategoriesByCategoryId($filterCategory);
+        	if($filterCategories)
+        	{
+        		foreach ($filterCategories as $row)
+        		{	
+        			$_filterCategories[] = $row['category_id'];		
+        		}
+				
+        		$params['filter_category'] = $_filterCategories;
+        	}	
+		}
+
+        $productsList = $this->product->getProducts($params, $userId, $storeId);
+
+        $recordsFiltered = $this->product->getProductsCount($params, $userId, $storeId); 
+        $recordsTotal = $this->product->getProductsCountWithoutFilter(array(), $userId, $storeId);
+        
+        $productsData = array();
+        
+        if(is_array($productsList) && count($productsList) > 0)
+        {
+			foreach ($productsList as $row) 
+			{
+				$productId   = $row['product_id'];
+
+				
+
+				$tplActions  = <<<EOT
+
+					<a href="#$productId"  onclick="Javascript: return openPopupForProductDetails('$productId');">
+						<button class="btn btn-primary btn-cons">View Details</button>
+					</a>
+EOT;
+				// Product Categoires!
+				$productCategories = $this->product->getProductCategories($productId);
+				
+				$arrProductCategories = array();
+				if(is_array($productCategories) && count($productCategories) > 0)
+				{	
+					$count=0;
+						
+					foreach($productCategories as $_productCategoryInfo)
+					{
+						$arrProductCategories[] = $_productCategoryInfo['name'];
+					}
+				}
+				
+				$strProductCategories = '';
+				if(is_array($arrProductCategories) && count($arrProductCategories) > 0)
+				{
+					$strProductCategories = implode(', ', $arrProductCategories);
+				}
+				
+				// Product Images!
+				$strProductImage = '';
+				$productImages = $this->product->getProductImages($productId);
+				
+				if(is_array($productImages) && count($productImages) > 0)
+				{
+					$productImages = $productImages[0];
+					
+					if($productImages)
+					{
+						$productImageLink = @$productImages['media_path'];
+						
+						if($productImageLink)
+						{
+							$strProductImage =  '<img src="'.$productImageLink.'" width="150" height="100" alt="." />';
+						}
+					}
+				}
+				
+				$tempArray  		= array();
+				
+				$tempArray[]       = $productId;
+				$tempArray[]       = $row['name'];            
+				$tempArray[]       = $strProductCategories;
+				$tempArray[]       = CONST_CURRENCY_DISPLAY.$row['price'];
+				$tempArray[]       = $strProductImage;
+				$tempArray[]       = $tplActions;
+
+				$productsData[] 	= $tempArray;
+			}
+		}
+
+		$data = array(
+			"draw"            => isset ( $draw ) ? intval( $draw ) : 0,
+			"recordsTotal"    => $recordsTotal,
+			"recordsFiltered" => $recordsFiltered,
+			"data"            => $productsData
+		);
+
+		echo json_encode($data);
+		exit;
+	}
 
     function delete_product($product_id=0)
     { 
@@ -389,4 +383,40 @@ EOT;
 		
 		redirect('admin/products', 'refresh');
     }
+
+
+    public function popup_product($productId=0)
+    {	
+    	$data = array();
+
+    	
+    	$userId = getLoggedInUserId();
+    	$storeId = getLoggedInStoreId();
+    	$productInfo = $this->product->getById($productId, $userId, $storeId);
+		
+		if($productInfo)
+		{
+			$productCategories = $this->product->getProductCategories($productId);
+			
+			$arrProductImages = array();
+
+			$productImages = $this->product->getProductImages($productId);
+			
+			if(is_array($productImages) && count($productImages) > 0)
+			{	
+				foreach ($productImages as $row)
+				{
+					$arrProductImages[] = @$row['media_path'];
+				}
+			}
+
+			$data['productId']   	   = $productId;
+			$data['productInfo']   	   = $productInfo;
+			$data['productImages'] 	   = $arrProductImages;
+			$data['productCategories'] = $productCategories;
+
+			 $this->load->view('products/popup_product.php', $data);
+		}  	
+    }
+
 }

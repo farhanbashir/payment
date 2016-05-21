@@ -68,6 +68,7 @@
 
 <!-- END CONTAINER FLUID -->
 </div>
+<div id="modal-wrapper"></div>
 <script src="<?php echo asset_url('plugins/jquery-datatable/media/js/jquery.dataTables.min.js');?>" type="text/javascript"></script>
 <script>
 $(document).ready(function() 
@@ -100,14 +101,18 @@ $(document).ready(function()
     ]
   } );
 
-  $('#filter-category').change(function()
+  $('#product-listing').change(function()
   {   
       var loadTable = $('#product-listing').DataTable();
       
       loadTable.draw();  
   });
+  
 
 } );
 
+  $('#product-listing').on('click', 'tr', function () {
+        $(this).find('.btn-primary').trigger('click');
+    } );
 
 </script>

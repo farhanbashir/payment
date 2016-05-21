@@ -53,9 +53,6 @@ class Users extends CI_Controller {
 
     function ajaxMerchantsListing()
     {
-
-
-
         $_getParams = $_GET;
         $params     = _processDataTableRequest($_getParams);
         $draw       = $params['draw'];
@@ -70,7 +67,16 @@ class Users extends CI_Controller {
         if(is_array($users_list) && count($users_list) > 0)
         {
             foreach ($users_list as $row) 
-            {
+            {  
+                $userId = $row['user_id'];
+
+                $deactiveLink = site_url('auth/deactive_user/'.$userId);
+                $tplAction  = <<<EOT
+
+                    <a onclick="return confirm('Are you sure, you want to delete Merchant account? It can not be reverted. So, please make sure before proceed','$deactiveLink')" href="$deactiveLink"
+                        <button class="btn btn-danger btn-cons">Deactivate Now</button>
+                    </a>
+EOT;
                 $tempArray   = array();
 
                 $tempArray[] = $row['user_id'];
@@ -78,8 +84,8 @@ class Users extends CI_Controller {
                 $tempArray[] = $row['last_name'];
                 $tempArray[] = $row['email'];
                 $tempArray[] = date(CONST_DATE_TIME_DISPLAY,strtotime($row['created']));
-                $tempArray[] = '<p><span class="label label-success">Active</span></p>';
-                $tempArray[] = '<a href="'.site_url("admin/users/login_merchant/".$row["user_id"]).'" class="btn btn-warning">Log-In as this Merchant</a>
+                $tempArray[] = $tplAction;
+                $tempArray[] = '<a href="'.site_url("admin/users/login_merchant/".$userId).'" class="btn btn-warning">Log-In as this Merchant</a>
                 </p>';
 
                 $usersData[] = $tempArray;

@@ -102,7 +102,7 @@ EOT;
         $userId = getLoggedInUserId();
         $storeId = getLoggedInStoreId();
 
-        $formHeading = "Create Category";
+        $formHeading = "Add New Category";
 
         if($categoryId)
         {
