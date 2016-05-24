@@ -33,7 +33,21 @@ class Products extends CI_Controller {
         }
 
     }
-	
+	function test()
+	{	
+	 	$userId = $this->input->post('productId');	
+		if($userId!='')
+		{
+			echo $userId;die;
+		}
+		else
+		{
+			$image =  uploadFile($this->config->item('product_image_base'), asset_url('img/products'));
+			echo json_encode($image);
+		}
+
+	}
+
     public function index()
 	{ 
         $userId  = getLoggedInUserId();
@@ -95,7 +109,14 @@ class Products extends CI_Controller {
 				$productImages = $this->product->getProductImages($productId);
 				
 				if(is_array($productImages) && count($productImages) > 0)
-				{
+				{	
+					$productImagesPath = array();
+
+					foreach($productImages as $row) 
+					{
+						$productImagesPath[]  = @$row['media_path'];
+					}
+
 					$productImages = $productImages[0];
 					
 					if($productImages)
@@ -114,6 +135,7 @@ class Products extends CI_Controller {
 				$postedData['price']        =   $productInfo['price'];
 				$postedData['old_image']    =   $strProductImage;
 				$postedData['categories']   =   $categories;				
+				$postedData['productImages']=   $productImagesPath;				
 			}
 			else
 			{
@@ -123,10 +145,11 @@ class Products extends CI_Controller {
 		
 		#Submitter - START
 		if($this->input->post('btn-submit'))
-		{
+		{	
 			$postedData = $this->input->post();
 
 			extract($postedData);
+
 			$categoryIds = array();
 			$product_name  = htmlentities($product_name); 
 			$description   = htmlentities($description);
@@ -247,6 +270,7 @@ class Products extends CI_Controller {
 		$all_categories = categoryTree($all_categories);
 
 		$data['postedData'] = $postedData;
+		$data['productId']  = $productId;
 		$data['categories'] = $all_categories;
 		$data['formHeading'] = $formHeading;
 		$content = $this->load->view('products/product_form', $data, true);
