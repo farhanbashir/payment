@@ -22,7 +22,7 @@ if(isset($postedData) && !empty($postedData))
 	$description = $postedData['description'];
 	$price = $postedData['price'];
 	$file_name = $postedData['old_image'];
-	$productImages = $postedData['productImages'];
+	//$productImages = $postedData['productImages'];
 
 	if(!empty($ArrEditCategories))
 	{
@@ -92,9 +92,9 @@ if(isset($postedData) && !empty($postedData))
 					<div class="form-group" id="imageUpload">
 						<label>Add Product Images</label>
 						<input type="file" id="image" name="image" >
-						<img src='<?php echo asset_url('img/loader.gif');?>' height='20'; id="loader">
+						<!-- <img src='<?php echo asset_url('img/loader.gif');?>' height='20'; id="loader"> -->
 						<input type="hidden" name="old_image" value="<?php echo $file_name;?>">
-						<input type="hidden" id ="productImages" name="imges[]" value="<?php echo $productImages[0];?>">
+						<!-- <input type="hidden" id ="productImages" name="imges[]" value="<?php echo $productImages[0];?>"> -->
 					</div>
 					<br /><br />
 					
@@ -132,7 +132,7 @@ if(isset($postedData) && !empty($postedData))
 <script>
 $( document ).ready(function()
 {	
-	console.log($("#productImages").val())
+	/*console.log($("#productImages").val())
 	$("loader").hide();
 
 	$("#image").change(function()
@@ -196,12 +196,12 @@ $( document ).ready(function()
                 }
      		});
 	    }
-	});
+	});*/
 });
 function deleteProductImage(productImage)
 {	
 
-	console.log(productImage);
+	//console.log(productImage);
 }
 
 </script>

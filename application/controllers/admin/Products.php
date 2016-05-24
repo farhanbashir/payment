@@ -111,12 +111,12 @@ class Products extends CI_Controller {
 				
 				if(is_array($productImages) && count($productImages) > 0)
 				{	
-					$productImagesPath = array();
+					/*$productImagesPath = array();
 
 					foreach($productImages as $row) 
 					{
 						$productImagesPath[]  = @$row['media_path'];
-					}
+					}*/
 
 					$productImages = $productImages[0];
 					
@@ -136,7 +136,7 @@ class Products extends CI_Controller {
 				$postedData['price']        =   $productInfo['price'];
 				$postedData['old_image']    =   $strProductImage;
 				$postedData['categories']   =   $categories;				
-				$postedData['productImages']=   $productImagesPath;				
+				//$postedData['productImages']=   $productImagesPath;				
 			}
 			else
 			{
