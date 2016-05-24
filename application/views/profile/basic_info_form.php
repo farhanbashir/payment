@@ -5,6 +5,9 @@ $email = '';
 $security_question_id = '';
 $security_answer = '';
 
+$userId = getLoggedInUserId();
+
+
 if(!empty($basicInfoData))
 {
 	$first_name = $basicInfoData['first_name'];
@@ -78,7 +81,10 @@ if(!empty($basicInfoData))
 				<strong>Deactivate Your Account</strong>		  
 				<br />
 				This will remove all your account information and delete your account completely<br />
-				<a href="Javascript: void();">DEACTIVATE NOW</a>
+				
+               <a onclick="return confirm('Are you sure, you want to delete your account? It can not be reverted. So, please make sure before proceed','<?php echo site_url('auth/deactive_user/'.$userId);?>')" href="<?php echo site_url('auth/deactive_user/'.$userId);?>">
+                    Deactivate Now
+                </a>
 			</p>
 			<br /><br />
 			<button name="btn-basic-info" value="submit" type="submit" class="btn btn-primary btn-cons">Save</button>

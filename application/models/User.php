@@ -225,6 +225,12 @@ Class User extends CI_Model
         return $result;
     }
 
+    function deactiveUser($userId)
+    {   
+        $sql = "UPDATE users SET email = CONCAT('deleted-', email),status = -1 where user_id='$userId'";
+        $this->db->query($sql);
+    }
+    
     function get_latest_five_users()
     {
         $sql = "select * from users where role_id".CONST_ROLE_ID_BUSINESS_ADMIN." order by user_id desc limit 5";
@@ -352,7 +358,7 @@ Class User extends CI_Model
 
         $arrayWhereClause = array();
 
-        $arrayWhereClause[] = " (role_id = '". CONST_ROLE_ID_BUSINESS_ADMIN ."') ";
+        $arrayWhereClause[] = " (status > 0) AND (role_id = '". CONST_ROLE_ID_BUSINESS_ADMIN ."') ";
         
         if($searchKeyword)
         {

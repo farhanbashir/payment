@@ -68,6 +68,7 @@ if(isset($postedData) && !empty($postedData))
 					<div class="form-group">
 						<label>Product Image</label>
 						<input type="file" name="image" >
+						<button name="btn-submit" value="button" class="btn btn-info" type="button" id="">Add More</button>
 						<input type="hidden" name="old_image" value="<?php echo $file_name;?>">
 					</div>
 					<?php
@@ -76,10 +77,21 @@ if(isset($postedData) && !empty($postedData))
 						?>
 							<br /><br />
 							<img src="<?php echo $file_name;?>" width="150" alt="." />
+							<button name="btn-submit" value="button" class="btn btn-danger" type="button" id="">Delete</button>
+							<br /><br />
+
 						<?php
 					}
+
 					?>	
+					<div class="form-group">
+						<label>Product Image</label>
+						<input type="file" name="image" >
+						<button name="btn-submit" value="button" class="btn btn-info" type="button" id="">Add More</button>
+						<input type="hidden" name="old_image" value="<?php echo $file_name;?>">
+					</div>
 					<br /><br />
+					
 					<button name="btn-submit" value="submit" class="btn btn-primary" type="submit">Submit</button>
 				</form>
 			</div>     

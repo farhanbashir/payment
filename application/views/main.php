@@ -218,6 +218,32 @@
 			
 			return false;
 		}
+
+        function openPopupForProductDetails(productId)
+        {   
+            var popupUrl = '<?php echo site_url('admin/products/popup_product/') ?>/'+productId;
+           
+            jQuery.ajax({
+                url:popupUrl,
+                success: function(data)
+                {
+                    if(data)
+                    {
+                        $("#modal-wrapper").html(data);
+                        $('#modal').modal('show');
+                    }
+                }
+            });
+            
+            return false;
+        }
+
+        function closeModal()
+        {   
+            $('#modal').modal('hide');
+            
+            return false;
+        }
 	</script>
 
 

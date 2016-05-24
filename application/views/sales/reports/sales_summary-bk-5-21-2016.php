@@ -56,14 +56,13 @@ else
 		var options = {
 			
 			curveType: 'function',
-			legend: { position: 'top' },
-  			bar: { groupWidth: '25%' },
+			legend: { position: 'bottom' },
 			vAxis: {minValue: 0},
 			hAxis: { minValue: 0, maxValue: 9 },
 			pointSize:10,
 		};
 
-		var chart = new google.visualization.ColumnChart(document.getElementById('curve_chart'));
+		var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
 
 		chart.draw(data, options);
 	}

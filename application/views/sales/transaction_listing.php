@@ -79,4 +79,8 @@ $(document).ready(function()
   } );
 } );
 
+  $('#transaction-listing').on('click', 'tr', function () {
+        $(this).find('.btn-primary').trigger('click');
+    } );
+
 </script>

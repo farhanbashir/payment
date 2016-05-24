@@ -3,7 +3,6 @@ $business_name="";
 $description="";
 $email="";
 $phone="";
-$logo="";
 $address="";
 $facebook="";
 $twitter="";
@@ -15,7 +14,6 @@ if(!empty($businessInfoData))
 	$description = $businessInfoData['description'];
 	$email = $businessInfoData['email'];
 	$phone = $businessInfoData['phone'];
-	$logo = $businessInfoData['old_image'];
 	$address = $businessInfoData['address'];
 	$facebook = $businessInfoData['facebook'];
 	$twitter = $businessInfoData['twitter'];
@@ -39,20 +37,7 @@ if(!empty($businessInfoData))
 		}
 		?>
 		<form role="form" method ="post"action="" enctype="multipart/form-data" accept-charset="utf-8">
-			<div class="form-group">
-				<label>Logo</label>
-				<input type="file" name="image" >
-				<input type="hidden" name="old_image" value="<?php echo $logo;?>">
-				<?php
-					if($logo)						
-					{
-						?>
-							<br /><br />
-							<img src="<?php echo $logo;?>" width="150" alt="." />
-						<?php
-					}
-				?>				
-			</div>
+			
 			<div class="form-group">
 				<label>Business Name</label>
 				<input name="business" value="<?php echo $business_name;?>" type="text" class="form-control" >

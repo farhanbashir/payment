@@ -186,14 +186,15 @@ class Sales extends CI_Controller {
       {
         $orderInfo				= $this->order->get_order_detail($order_id);
         $paymentTransaction 	= $this->order->get_payment_transaction_by_order($order_id);
+       
         $products 				= $this->product->get_order_products($order_id);
         $refundTransaction		= $this->order->get_refund_transactions_by_order($order_id);
 
         $data = array();
 
-        $data['order_id'] 			= $order_id;
-        $data['products'] 			= $products;
-        $data['orderInfo'] 			= $orderInfo;
+        $data['order_id'] 			    = $order_id;
+        $data['products'] 			    = $products;
+        $data['orderInfo'] 			    = $orderInfo;
         $data['paymentTransaction'] = $paymentTransaction;		
         $data['refundTransaction'] 	= $refundTransaction;
 

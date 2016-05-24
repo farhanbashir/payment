@@ -29,127 +29,127 @@ if(empty($category_sales))
   echo "No Records Founds";
 }
 else
-{?>
+  {?>
 
-  <?php 
-  $ArrColumns = array();
+<?php 
 
-  foreach ($category_sales as $row)
-  {
-    $ArrColumns[] = $row['category_name']; 
+$ArrColumns = array();
+
+foreach ($category_sales as $row)
+{
+  $ArrColumns[] = $row['category_name']; 
+}
+
+$ArrCategories = array_unique($ArrColumns);
+
+$ArrCategories = array_values($ArrCategories);
+
+foreach ($category_sales as $row) 
+{ 
+
+
+  $ArrData['Day'] = $row['order_date'];
+
+  for ($i=0; $i <count($ArrCategories) ; $i++) 
+  { 
+    if($row['category_name']==$ArrCategories[$i])
+    {
+      $ArrData[$ArrCategories[$i]] = $row['total_sale'];
+
+    }
+    else
+    {
+      $ArrData[$ArrCategories[$i]] = 0;
+    }
   }
 
-  $ArrCategories = array_unique($ArrColumns);
+  $GraphData[]= $ArrData;
 
-  $ArrCategories = array_values($ArrCategories);
+}
+?>
+<script type="text/javascript">
+google.charts.load("current", {packages:['corechart']});
+google.charts.setOnLoadCallback(drawChart);
 
-  foreach ($category_sales as $row) 
+function drawChart() {
+
+ var data = google.visualization.arrayToDataTable([
+
+  ['Date',
+
+  <?php
+  for ($i=0; $i < count($ArrCategories) ; $i++) 
   { 
-    
-    
-    $ArrData['Day'] = $row['order_date'];
-    
-    for ($i=0; $i <count($ArrCategories) ; $i++) 
+   echo "'".$ArrCategories[$i]."',";
+ }
+ ?> 
+ { role: 'annotation' } ],
+
+
+
+ <?php 
+ foreach ($GraphData as $row)
+  {?>
+    ['<?php echo date('d-m',strtotime($row['Day']));?>',
+    <?php
+    for ($i=0; $i <count($ArrCategories) ; $i++)
     { 
-      if($row['category_name']==$ArrCategories[$i])
-      {
-        $ArrData[$ArrCategories[$i]] = $row['total_sale'];
-
-      }
-      else
-      {
-        $ArrData[$ArrCategories[$i]] = 0;
-      }
+      echo (int)$row[$ArrCategories[$i]].",";
     }
-
-    $GraphData[]= $ArrData;
+    echo "''],";
   }
   ?>
-  <script type="text/javascript">
-        google.charts.load('current', {'packages':['line']});
-        google.charts.setOnLoadCallback(drawChart);
 
-      function drawChart() {
+  ]);
 
-        var data = new google.visualization.DataTable();
-        data.addColumn('string', 'Date');
+ var options = {
 
-        <?php 
-        for ($i=0; $i <count($ArrCategories) ; $i++) 
+  legend: { position: 'top' },
+  bar: { groupWidth: '25%' },
+  isStacked: true,
+};
+var chart = new google.visualization.ColumnChart(document.getElementById("curve_chart"));
+chart.draw(data, options);
+}
+</script>
+
+<div id="curve_chart" style="width: 1200px; height: 800px"></div>
+<div id="" class="dataTables_wrapper form-inline no-footer">
+  <div class="">
+    <table class="table table-hover demo-table-search dataTable no-footer" id="" role="grid" aria-describedby="tableWithSearch_info">
+      <thead>
+        <tr role="row">
+          <th width="20%">Dates</th>
+          <th width="20%">Category</th>
+          <th width="20%">Quantity</th>
+          <th width="20%">Gross Sales</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php
+        foreach ($category_sales as $row) 
           {?>
-            data.addColumn('number', '<?php echo $ArrCategories[$i];?>');
-             
-            <?php
-          }?>
-          data.addRows
-          ([
-            <?php
-            foreach ($GraphData as $row) 
-            {   
-              echo "['".date("m-d",strtotime($row['Day']))."',";
-              for ($i=0; $i <count($ArrCategories) ; $i++)
-              { 
-                echo $row[$ArrCategories[$i]].",";
-              }
-              echo "],";
-            }
-            ?>
-        ]);
-
-        var options = {
-          chart: {
-            /*title: 'Box Office Earnings in First Two Weeks of Opening',
-            subtitle: 'in millions of dollars (USD)'*/
-          },
-          vAxis: {title: "# Price"},
-          width: 900,
-          height: 500,
-          
-        };
-
-        var chart = new google.charts.Line(document.getElementById('curve_chart'));
-
-        chart.draw(data, options);
+        <tr role="row" class="odd">
+          <td class="v-align-middle sorting_1">
+            <p><?php echo date('F m, Y',strtotime($row['order_date']));?></p>
+          </td>
+          <td class="v-align-middle">
+            <p><?php echo $row['category_name'];?></p>
+          </td>
+          <td class="v-align-middle">
+            <p><?php echo $row['total_quantity'];?></p>
+          </td>
+          <td class="v-align-middle">
+            <p><?php echo CONST_CURRENCY_DISPLAY.$row['total_sale'];?></p>
+          </td>
+        </tr>
+        <?php
       }
-  </script>
+      ?>
 
-  <div id="curve_chart" style="width: 1200px; height: 800px"></div>
-  <div id="" class="dataTables_wrapper form-inline no-footer">
-    <div class="">
-      <table class="table table-hover demo-table-search dataTable no-footer" id="" role="grid" aria-describedby="tableWithSearch_info">
-        <thead>
-          <tr role="row">
-            <th width="20%">Dates</th>
-            <th width="20%">Category</th>
-            <th width="20%">Quantity</th>
-            <th width="20%">Gross Sales</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php
-          foreach ($category_sales as $row) 
-          {?>
-            <tr role="row" class="odd">
-              <td class="v-align-middle sorting_1">
-                <p><?php echo date('F m, Y',strtotime($row['order_date']));?></p>
-              </td>
-              <td class="v-align-middle">
-                <p><?php echo $row['category_name'];?></p>
-              </td>
-              <td class="v-align-middle">
-                <p><?php echo $row['total_quantity'];?></p>
-              </td>
-              <td class="v-align-middle">
-                <p><?php echo CONST_CURRENCY_DISPLAY.$row['total_sale'];?></p>
-              </td>
-            </tr>
-            <?php
-          }
-          ?>
-          
-        </tbody>
-      </table>
-    </div>
-  </div>
-  <?php
+    </tbody>
+  </table>
+</div>
+</div>
+<?php
 }?>

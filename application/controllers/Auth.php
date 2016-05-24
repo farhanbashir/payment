@@ -237,6 +237,40 @@ class Auth extends CI_Controller {
     {
     	$this->load->view('forgot_password');
     }
+
+    function deactive_user($userId = 0)
+    {   
+        if(!intval($userId))
+        {
+            redirect(base_url(),'refresh');
+        }
+
+        $roll_id = $this->session->userdata('logged_in')['role_id'];
+
+        if($roll_id==CONST_ROLE_ID_SUPER_ADMIN)
+        {
+            $this->user->deactiveUser($userId);
+            $this->session->set_userdata('logged_in_merchant','');
+            $this->session->set_flashdata('Message','Merchant successfully deactive');
+            redirect('admin/users','refresh');
+        }
+
+        elseif($roll_id==CONST_ROLE_ID_BUSINESS_ADMIN)
+        {
+            if($userId==getLoggedInUserId())
+            {
+                $this->user->deactiveUser($userId);
+                $this->session->set_flashdata('Message','Your account successfully deactive');
+                $this->session->set_userdata('logged_in','');
+                redirect(base_url(),'refresh');
+            }
+        }
+        else
+        {
+            redirect(base_url());
+        }
+    }
+
 }
 
 /* End of file welcome.php */

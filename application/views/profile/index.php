@@ -13,7 +13,7 @@
 		$tab1 = "";
 		$tab3 = "active";
 	}
-	if($this->session->flashdata('successMsgReceiptInfo')!='' || $this->session->flashdata('successMsgReceiptInfo')!='' )
+	if($this->session->flashdata('errMsgReceiptInfo')!='' || $this->session->flashdata('successMsgReceiptInfo')!='' )
 	{
 		$tab1 = "";
 		$tab4 = "active";

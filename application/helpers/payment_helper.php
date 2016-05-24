@@ -1072,8 +1072,7 @@ function generateReceiptByOrderId($order_id=0, $user_id=0)
 		$_data['storeDetails'] 			= $storeDetails;		
 		$_data['orderInfo'] 			= $orderInfo;
 		$_data['paymentTransaction']	= $paymentTransaction;		
-		$_data['userDetails'] 			= $userDetails;
-		
+		$_data['userDetails'] 			= $userDetails;		
 		
 		$orderReceipt	= @$orderInfo['receipt'];	
 
@@ -1135,7 +1134,8 @@ function _createRecieptPDF($data=array())
 	$ccNumber			= @$paymentTransaction['cc_number'];
 	$ccName				= @$paymentTransaction['cc_name'];
 	
-	//order details
+	//order details	
+	$order_id			= @$orderInfo['order_id'];
 	$totalAmount		= @$orderInfo['total_amount'];
 	$customerSignature	= @$orderInfo['customer_signature'];
 	$customerEmail		= @$orderInfo['customer_email'];
@@ -1143,7 +1143,8 @@ function _createRecieptPDF($data=array())
 	$orderTime			= date(CONST_TIME_FORMAT, strtotime(@$orderInfo['created']));
 	$orderReceipt		= @$orderInfo['receipt'];		
 	
-	//user details
+	//user details	
+	$user_id			= @$userDetails['user_id'];
 	$userFirstName		= @$userDetails['first_name'];
 	$userEmail			= @$userDetails['email'];
 	
@@ -1386,8 +1387,9 @@ EOT;
 
 EOT;
 
-	//echo $html;
-	//exit;
+	echo $html;
+	exit;
+	
 	if($html)
 	{
 		$CI->load->library('Pdf');
