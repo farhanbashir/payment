@@ -1090,9 +1090,9 @@ function generateReceiptByOrderId($order_id=0, $user_id=0)
 			$order_data['receipt'] = $recieptUrl;		//it has recipt path!
 			$order_data['updated'] = date('Y-m-d H:i:s');
 			
-			$CI->order->edit_order($order_id, $order_data);
-			
-			_sendRecieptEmail($_data);
+			$CI->order->edit_order($order_id, $order_data);			
+
+			_sendRecieptEmail($_data, $recieptUrl);
 		}
 		
 		return $recieptUrl;
@@ -1215,7 +1215,6 @@ EOT;
 				</tr>
 EOT;
 	}
-	
 	$tplReceiptHeaderText = '';
 	if($receiptHeaderText)
 	{
@@ -1235,7 +1234,7 @@ EOT;
 		$tplCCNumber = <<<EOT
 	
 				<tr>
-					<td align="left" colspan="2" style="font-family: 'Courier New'; font-size: 13px;">
+					<td align="left" colspan="2" style="font-family: 'Courier New'; font-size: 13px;color:$receiptTextColor;">
 						<strong>$ccNumber</strong>
 						
 						<br />
@@ -1257,7 +1256,7 @@ EOT;
 			$tplCustomerSignature = <<<EOT
 	
 				<tr>
-					<td align="center" style="font-family: 'Courier New'; font-size: 11px;">
+					<td align="center" style="font-family: 'Courier New'; font-size: 11px;color:$receiptTextColor;">
 						<strong>VERIFIED BY SIGNATURE</strong>
 					</td>
 				</tr>
@@ -1298,7 +1297,7 @@ EOT;
 		
 	$html = <<<EOT
 
-		<table width="200px" border="0" cellpadding="5" cellspacing="0" style="border: 1px solid #000;">
+		<table width="200px" border="0" cellpadding="5" cellspacing="0" style="border: 1px solid #000;color:$receiptTextColor;"  bgcolor="$receiptBGColor">
 			
 			$tplLogo
 			
@@ -1308,68 +1307,68 @@ EOT;
 			
 			$tplReceiptHeaderText
 			
-			<tr>
+			<tr style="color:$receiptTextColor;">
 				<td align="center" style="font-family: 'Courier New'; font-size: 10px;">
 					<table width="100%" border="0" cellpadding="2" cellspacing="0" >
 						<tr>
-							<td align="left" style="font-family: 'Courier New'; font-size: 10px;">
+							<td align="left" style="font-family: 'Courier New'; font-size: 10px;color:$receiptTextColor;">
 								<strong>MERCHANT ID:</strong>
 							</td>
-							<td align="right" style="font-family: 'Courier New'; font-size: 10px;">
+							<td align="right" style="font-family: 'Courier New'; font-size: 10px;color:$receiptTextColor;">
 								<strong>$user_id</strong>
 							</td>
 						</tr>
 						<tr>
-							<td align="left" style="font-family: 'Courier New'; font-size: 10px;">
+							<td align="left" style="font-family: 'Courier New'; font-size: 10px;color:$receiptTextColor;">
 								<strong>ORDER ID:</strong>
 							</td>
-							<td align="right" style="font-family: 'Courier New'; font-size: 10px;">
+							<td align="right" style="font-family: 'Courier New'; font-size: 10px;color:$receiptTextColor;">
 								<strong>$order_id</strong>
 							</td>
 						</tr>
 						<tr>
-							<td align="left" style="font-family: 'Courier New'; font-size: 10px;">
+							<td align="left" style="font-family: 'Courier New'; font-size: 10px;color:$receiptTextColor;">
 								<strong>INVOICE ID:</strong>
 							</td>
-							<td align="right" style="font-family: 'Courier New'; font-size: 10px;">
+							<td align="right" style="font-family: 'Courier New'; font-size: 10px;color:$receiptTextColor;">
 								<strong>$invoiceId</strong>
 							</td>
 						</tr>
 						<tr>
-							<td align="left" style="font-family: 'Courier New'; font-size: 8px;">
+							<td align="left" style="font-family: 'Courier New'; font-size: 8px;color:$receiptTextColor;">
 								DATE: $orderDate
 							</td>
-							<td align="right" style="font-family: 'Courier New'; font-size: 8px;">
+							<td align="right" style="font-family: 'Courier New'; font-size: 8px;color:$receiptTextColor;">
 								TIME: $orderTime
 							</td>
 						</tr>					
 						<tr>
-							<td colspan="2" height="10" style="height: 10px;"></td>
+							<td colspan="2" height="10" style="height: 10px;color:$receiptTextColor;"></td>
 						</tr>
 						
 						$tplCCNumber
 						
 						<tr>
-							<td align="left" style="font-family: 'Courier New'; font-size: 10px;">
+							<td align="left" style="font-family: 'Courier New'; font-size: 10px;color:$receiptTextColor;">
 								<strong>By Cash</strong>
 							</td>
-							<td align="right" style="font-family: 'Courier New'; font-size: 10px;">
+							<td align="right" style="font-family: 'Courier New'; font-size: 10px;color:$receiptTextColor;">
 								<strong>$paymentCurrency $cashAmount</strong>
 							</td>
 						</tr>
 						<tr>
-							<td align="left" style="font-family: 'Courier New'; font-size: 10px;">
+							<td align="left" style="font-family: 'Courier New'; font-size: 10px;color:$receiptTextColor;">
 								<strong>By Credit Card</strong>
 							</td>
-							<td align="right" style="font-family: 'Courier New'; font-size: 10px;">
+							<td align="right" style="font-family: 'Courier New'; font-size: 10px;color:$receiptTextColor;">
 								<strong>$paymentCurrency $ccAmount</strong>
 							</td>
 						</tr>						
 						<tr>
-							<td align="left" style="font-family: 'Courier New'; font-size: 10px;">
+							<td align="left" style="font-family: 'Courier New'; font-size: 10px;color:$receiptTextColor;">
 								<strong>TOTAL AMOUNT</strong>
 							</td>
-							<td align="right" style="font-family: 'Courier New'; font-size: 10px;">
+							<td align="right" style="font-family: 'Courier New'; font-size: 10px;color:$receiptTextColor;">
 								<strong>$paymentCurrency $totalAmount</strong>
 							</td>
 						</tr>
@@ -1387,11 +1386,9 @@ EOT;
 
 EOT;
 
-	echo $html;
-	exit;
-	
 	if($html)
-	{
+	{	
+		$CI =& get_instance();
 		$CI->load->library('Pdf');
 		
 		$pdf = new Pdf(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
@@ -1444,14 +1441,15 @@ EOT;
 	return false;
 }
 
-function _sendRecieptEmail($data=array())
-{
+function _sendRecieptEmail($data=array(), $pdfFilePath)
+{	
+	$CI =& get_instance();
 	$storeDetails 		= @$data['storeDetails'];
 	$orderInfo 			= @$data['orderInfo'];
 	
 	$customerEmail		= @$orderInfo['customer_email'];
 	$storeEmail			= @$storeDetails['email'];
-	
+	$order_id 			= @$orderInfo['order_id'];
 	//sending receipt to customer!
 	if($customerEmail && $storeEmail)
 	{

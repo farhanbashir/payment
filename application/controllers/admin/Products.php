@@ -40,6 +40,7 @@ class Products extends CI_Controller {
 		{
 			echo $userId;die;
 		}
+		
 		else
 		{
 			$image =  uploadFile($this->config->item('product_image_base'), asset_url('img/products'));

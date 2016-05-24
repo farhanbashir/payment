@@ -15,3 +15,4 @@ $config["store_image_base"] = './assets/img/stores/';
 $config["user_image_base"] = './assets/img/users/';
 $config["order_signature_image_base"] = './assets/img/orders/signature/';
 $config["order_recipts_image_base"] = './assets/img/orders/recipts/';
+$config["order_recipt_temp_image_base"] = './assets/img/orders/recipt/temp/';

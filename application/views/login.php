@@ -43,5 +43,12 @@
 <div style="font-weight: bold;">
 	Not a member? <a href="<?php echo site_url('auth/register');?>" class="">Join Now</a>
 </div>
+<br />
 
+<a href="https://itunes.apple.com/bb/app/icannpay/id1101212235" target="_blank">
+	<img src="<?php echo asset_url('img/apple-store.png');?>" height="30" alt="apple">
+</a>
+<a href="https://play.google.com/store/apps/details?id=com.dd.icannpay" target="_blank">
+	<img src="<?php echo asset_url('img/google-play-store.png');?>" height="30" alt="apple">
+</a>
 <!-- END Login Right Container-->
