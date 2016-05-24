@@ -317,16 +317,28 @@ Class Settings extends CI_Controller
    		   #<!---Submitter::Receipt Design Info Start--->
 
    		if($this->input->post('btn-receipt-info'))
-   		{  
-
+   		{
    			$receiptInfoData = $this->input->post();
 
    			extract($receiptInfoData);
    			
    			$saveReceiptInfoData = array();
+   			
+   			$saveReceiptInfoData['receipt_header_text'] = $header_text;
+   			$saveReceiptInfoData['receipt_footer_text'] = $footer_text;
+   			$saveReceiptInfoData['receipt_bg_color']	= $bg_color;
+   			$saveReceiptInfoData['receipt_text_color']  = $text_color;
+   			$saveReceiptInfoData['updated'] 			= date("Y-m-d H:i:s");
+
+   			$User_Store_Detail = $this->profile->checkUserStoreDetails($userId);
+   			if($User_Store_Detail)
+   			{
+   				$this->profile->edit_user_store($storeId, $saveReceiptInfoData);
+   				$this->session->set_flashdata('successMsgReceiptInfo','Receipt Design Information updated successfully');
+   			}
 
    			if (isset($_FILES['image']) && !empty($_FILES['image']['name']))
-            { 
+            {
                $config['upload_path'] = './'.CONST_IMAGE_UPLOAD_DIR;
                $config['allowed_types'] = 'gif|jpg|png';
                $this->load->library('upload');
@@ -360,8 +372,9 @@ Class Settings extends CI_Controller
                   }
                }
             }
-            if(is_array($aErrorMessage) && count($aErrorMessage))
-            {  
+            
+			if(is_array($aErrorMessage) && count($aErrorMessage))
+            {
                $showErrorMessage = getFormValidationErrorMessage($aErrorMessage);
                $this->session->set_flashdata('errMsgReceiptInfo',$showErrorMessage);
             }
@@ -380,16 +393,64 @@ Class Settings extends CI_Controller
                   $this->session->set_flashdata('successMsgReceiptInfo','Receipt Design Information updated successfully');
                }
             }
-         }
+		}
+		elseif($this->input->post('btn-send-test-reciept'))
+   		{
+   			$receiptInfoData = $this->input->post();
+
+   			extract($receiptInfoData);
+			
+			$_storeDetails		= $this->profile->checkUserStoreDetails($userId);
+			$_userDetails		= $this->profile->get_user_detail($userId);
+			
+			//_storeDetails
+			$_storeDetails['receipt_header_text']	= $header_text; 
+			$_storeDetails['receipt_footer_text']	= $footer_text;
+			$_storeDetails['receipt_bg_color']		= $bg_color;
+			$_storeDetails['receipt_text_color']	= $text_color;
+			
+			//paymentTransaction
+			$paymentTransaction = array();
+			$paymentTransaction['cx_descriptor'] 	= 'some text';
+			$paymentTransaction['transaction_id'] 	= 2001;
+			$paymentTransaction['amount_cash']		= 0;
+			$paymentTransaction['amount_cc']		= 156;
+			$paymentTransaction['cc_number']		= '4111111111111111';
+			$paymentTransaction['cc_name']			= 'Umair Khan';
+			
+			//orderInfo
+			$orderInfo = array();
+			$orderInfo['order_id']					= rand();
+			$orderInfo['total_amount']				= 156;
+			$orderInfo['customer_signature']		= '';
+			$orderInfo['customer_email']			= $test_email;
+			$orderInfo['created']					= date('Y-m-d H:i:s');
+			
+			$_data = array();
+			$_data['storeDetails']			= $_storeDetails;
+			$_data['orderInfo']				= $orderInfo;
+			$_data['paymentTransaction']	= $paymentTransaction;
+			$_data['userDetails'] 			= $_userDetails;
+			
+			_createRecieptPDF($_data);
+			
+			/*
+			$header_text
+   			$footer_text
+			$bg_color
+			$text_color			
+			$test_email
+			*/
+   		}
    		else
-   		{  
+   		{
             $receiptInfoData['old_image']      = $userStoreDetails['logo'];
    			$receiptInfoData['header_text'] = $userStoreDetails['receipt_header_text'];
    			$receiptInfoData['footer_text'] = $userStoreDetails['receipt_footer_text'];
    			$receiptInfoData['bg_color'] = $userStoreDetails['receipt_bg_color'];
    			$receiptInfoData['text_color'] = $userStoreDetails['receipt_text_color'];
    		}
-
+		
    		$data['basicInfoData'] 		= $basicInfoData;
    		$data['businessInfoData'] 	= $businessInfoData;
    		$data['bankInfoData'] 		= $bankInfoData;

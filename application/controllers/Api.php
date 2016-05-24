@@ -2126,14 +2126,32 @@ class Api extends REST_Controller {
         }*/
 
         $order_detail = $this->order->get_order_detail($order_id);
+		if(!$order_detail)
+		{
+			$data["header"]["error"] = "1";
+            $data["header"]["message"] = "Order ID is not valid";
+            $this->response($data, 200);  
+		}
+		
         if($order_detail['user_id'] !== $this->user_id)
         {
             $data["header"]["error"] = "1";
             $data["header"]["message"] = "Order do not belong to this user";
             $this->response($data, 200);   
         }
-
+		
+		$_refund_amount = $amount_cc + $amount_cash;
+		$_total_amount  = $order_detail['total_amount'];
+		
+		if($_refund_amount > $_total_amount)
+		{
+			$data["header"]["error"] = "1";
+            $data["header"]["message"] = "Refund amount should be less than order amount";
+            $this->response($data, 200); 
+		}
+		
 		$apiStatus = true;
+		$refund_cx_transaction_id = 0;
 		if($amount_cc > 0) //refund via credit card
 		{
 			$apiStatus = false;
@@ -2164,7 +2182,9 @@ class Api extends REST_Controller {
 						{
 							$apiStatus = true;
 							
-							//-->$apiData = $apiResponse['data']; //TODO: will use later when cardXecure fix refund issue in to their system - Currently CardXeure return Invalid Transaction ID, even its correct.
+							$apiData = $apiResponse['data'];
+							
+							$refund_cx_transaction_id = @$apiData['transaction_id'];
 						}
 					}
 				}
@@ -2187,11 +2207,26 @@ class Api extends REST_Controller {
 		{
 			$amount = $amount_cc + $amount_cash;
 			$total_amount = $order_detail['total_amount'] - $amount;
-			$this->order->edit_order($order_id, array('total_refund'=>$order_detail['total_refund']+$amount,'total_amount'=>$total_amount));
+			$this->order->edit_order(
+										$order_id, array
+													(
+														'total_refund'	=>	$order_detail['total_refund']+$amount,
+														'total_amount'	=>	$total_amount
+													)
+									);
 
-			$transaction_data = array("order_id"=>$order_id,"store_id"=>$this->store_id,"user_id"=>$this->user_id,"type"=>CONST_TRANSACTION_TYPE_REFUND,"amount_cc"=>$amount_cc,"amount_cash"=>$amount_cash,"created"=>$created);
+			$transaction_data = array(
+										"order_id" 			=> $order_id,
+										"store_id" 			=> $this->store_id,
+										"user_id" 			=> $this->user_id,
+										"type" 				=> CONST_TRANSACTION_TYPE_REFUND,
+										"amount_cc" 		=> $amount_cc,
+										"amount_cash" 		=> $amount_cash,
+										"cx_transaction_id" => $refund_cx_transaction_id, 
+										"app_type"			=> $this->device_type,
+										"created" 			=> $created
+									);
 			$this->order->add_transaction($transaction_data);
-
 
 			$data["header"]["error"] = "0";
 			$data["header"]["message"] = "Success";

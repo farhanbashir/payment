@@ -67,8 +67,17 @@ if(!empty($receiptInfoData))
 				<label>Text Color</label>
 				<input data-control="saturation" id="saturation-demo" name="text_color" value ="<?php echo $receipt_text_color;?>" type="text" class="form-control demo" >
 			</div>
-			<br /><br />
+			
+			<div class="form-group">
+				<label>Email Address for Testing</label>
+				<input name="test_email" value ="" type="text" class="form-control" >
+			</div>
+			
+			<br /><br />			
 			<button name="btn-receipt-info" value="submit" type="submit" class="btn btn-primary btn-cons">Save</button>
+			&nbsp; &nbsp;
+			<button name="btn-send-test-reciept" value="submit" type="submit" class="btn btn-warning btn-cons">Save & Send Test Email</button>
+			
 		</form>
 	</div>
 

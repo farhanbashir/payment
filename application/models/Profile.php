@@ -5,7 +5,7 @@ Class Profile extends CI_Model
     function get_user_detail($user_id)
     {
         $sql = "select 
-						u.first_name, u.last_name, u.email, u.role_id, 
+						u.user_id, u.first_name, u.last_name, u.email, u.role_id, 
 						
 						ud.security_question_id, ud.security_answer,
 						
