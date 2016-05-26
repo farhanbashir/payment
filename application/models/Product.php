@@ -328,7 +328,7 @@ Class Product extends CI_Model
 	
 	function getProductImages($productId=0)
     {
-		$sql = "SELECT file_name AS media_path, media_type
+		$sql = "SELECT file_name AS media_path, media_type,media_id
 				FROM product_media 
 				WHERE product_id='". $productId ."' ";
         
@@ -338,12 +338,38 @@ Class Product extends CI_Model
         return $result;
     }
 
-    function delete_product_media($productId)
+    function delete_product_media($productId = 0, $mediaId = 0)
     {
-        $this->db->where('product_id', $productId);
+        if($productId)
+        {
+            $this->db->where('product_id', $productId);
+        }
+        if($mediaId)
+        {
+            $this->db->where('media_id', $mediaId);
+        }
+
         $this->db->delete('product_media');      
     }
 	
+    function checkMediaByProductId($productId = 0,$mediaId = 0)
+    {
+        $sql = "SELECT * from product_media where product_id = '$productId' and media_id ='$mediaId'";
+        $query = $this->db->query($sql);
+        $result = $query->result_array();
+        if($result)
+        {
+            $query->free_result();
+            return $result[0];
+        }
+        else
+        {
+            return false;
+        }
+       
+
+    }
+
     /*function get_user_detail($user_id)
     {
         $sql = "select * from users where user_id=$user_id" ;

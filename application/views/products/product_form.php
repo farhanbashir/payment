@@ -6,8 +6,8 @@ $file_name = "";
 $product_name ="";
 $price = "";
 $description = ""; 
-$productImages = "";
-
+$productMedia = array();
+$productMediaHidden = false;
 if(isset($postedData) && !empty($postedData))
 {	
 	if(isset($postedData['categories']) && !empty($postedData['categories']))
@@ -21,8 +21,11 @@ if(isset($postedData) && !empty($postedData))
 	$product_name = $postedData['product_name'];
 	$description = $postedData['description'];
 	$price = $postedData['price'];
-	$file_name = $postedData['old_image'];
-	//$productImages = $postedData['productImages'];
+
+	if(isset($postedData['productMedia']))
+	{
+		$productMedia  = $postedData['productMedia'];
+	}
 
 	if(!empty($ArrEditCategories))
 	{
@@ -32,6 +35,7 @@ if(isset($postedData) && !empty($postedData))
 		}
 	}
 }
+
 ?>
 
 <div class="content ">
@@ -72,17 +76,37 @@ if(isset($postedData) && !empty($postedData))
 						<input  value="<?php echo $price;?>" name="price" type="text" data-a-sign="$ " class="autonumeric form-control">
 					</div>
 					<div id="images">
-
+						<br /><br />
 						<?php
-							if($file_name)						
-							{
-								?>
-									<br /><br />
-									<img src="<?php echo $file_name;?>" width="150" alt="." />
-									<button name="btn-submit" value="<?php echo $file_name;?>" onclick="return deleteProductImage(this.value)" class="btn btn-danger" type="button">Delete</button>
-									<br /><br />
+							if(is_array($productMedia) && count($productMedia) > 0)
+							{	
+								
+								for ($i=0; $i <count($productMedia) ; $i++)
+								{ 	
+									if(isset($productMedia[$i]['mediaId']))
+									{		
 
-								<?php
+											?>
+											<div>
+												<img src="<?php echo $productMedia[$i]['mediaPath'];?>" width="150" alt="." />
+												<button name="btn-submit" value="<?php echo $productMedia[$i]['mediaId'];?>" id="delete" class="btn btn-danger" type="button">Delete</button>
+												<br /><br />
+											</div>
+											<?php
+										
+									}
+									else
+									{	
+										$productMediaHidden = true;
+										?>
+										<div>
+											<img src="<?php echo $productMedia[$i];?>" width="150" alt="." />
+											<button name="btn-submit" value="<?php echo $productMedia[$i];?>" class="btn btn-danger" id="delete" type="button">Delete</button>
+											<br /><br />
+										</div>
+										<?php
+									}
+							    }
 							}
 						?>
 					</div>	
@@ -92,9 +116,21 @@ if(isset($postedData) && !empty($postedData))
 					<div class="form-group" id="imageUpload">
 						<label>Add Product Images</label>
 						<input type="file" id="image" name="image" >
-						<!-- <img src='<?php echo asset_url('img/loader.gif');?>' height='20'; id="loader"> -->
-						<input type="hidden" name="old_image" value="<?php echo $file_name;?>">
-						<!-- <input type="hidden" id ="productImages" name="imges[]" value="<?php echo $productImages[0];?>"> -->
+						<img src='<?php echo asset_url('img/loader.gif');?>' height='20'; id="loader">
+						<div id="productMedia">
+						<?php
+							if($productMediaHidden)
+							{	
+								for ($i=0; $i <count($productMedia) ; $i++) 
+								{ 	
+									?>
+										<input type="hidden" name="productMedia[]" value="<?php echo $productMedia[$i];?>">
+									<?php
+								}
+							}
+						?>
+						</div>
+
 					</div>
 					<br /><br />
 					
@@ -121,7 +157,6 @@ if(isset($postedData) && !empty($postedData))
 	 	$( document ).ready(function()
 	    {	
 	    	$("#multi").val([]).select2();
-
 	    	
 	    });
 	</script>
@@ -132,13 +167,13 @@ if(isset($postedData) && !empty($postedData))
 <script>
 $( document ).ready(function()
 {	
-	/*console.log($("#productImages").val())
-	$("loader").hide();
+	
+	$("#loader").hide();
 
-	$("#image").change(function()
+	$("#image").on('change',function()
 	{	
-		$("loader").show();
-		$("image").hide();
+		$("#image").hide();
+		$("#loader").show();
 		
 		var file_data = $("#image").prop("files")[0]; 
 
@@ -161,47 +196,124 @@ $( document ).ready(function()
 	  
 	    if(allowFileTypes >= 0)
 	    {	
-	    	console.log('ASD')
+	    	
 	    	$.ajax(
 	    	{
-                url: "<?php echo site_url('admin/Products/test');?>",
+                url: "<?php echo site_url('admin/Products/ajaxaUplaodImage');?>",
                 dataType: 'script',
                 cache: false,
                 contentType: false,
                 processData: false,
                 data: form_data,
                 type: 'post',
-                success: function(data)
+                success: function(imagePath)
                 {	
-                	data =  jQuery.parseJSON(data);
+                	imagePath =  jQuery.parseJSON(imagePath);
                 	
-                	if(data!='')
+                	if(imagePath!='')
                 	{	
-                		console.log(data);
+                		btnValue = imagePath;
+                		imgSrc   = imagePath;
+
+                		<?php if($productId <= 0)
+                		{	
+                			
+                			?>
+                			
+                			$("#productMedia").append('<input type="hidden" name="productMedia[]" value="'+imgSrc+'">');
+                			
+                			<?php
                 		
-	                    $( "#images").append('<img src="' + data + '" width="150" alt="." /><button name="btn-submit" value="' + data + '" class="btn btn-danger" type="button">Delete</button><br /><br />');
-                		$.ajax(
-					    {
-					        type: "POST",
-					        url: "<?php echo site_url('admin/Products/test');?>",
-					        data:{
-					          	'productId': '<?php echo $productId;?>',
-					        	'image' :data,	
-					        },
-					    });
-                	}
+                		}?>
+
+                		div = '<div><img src="' + imgSrc + '" width="150" alt="." /><button name="btn-submit" value="' + btnValue + '" class="btn btn-danger" type="button" id="delete">Delete</button>';
+	                	div		= div +	
+	                						'<br /><br />';
+	                	div		= div +
+	                			'</div>';
+
+	                	$( "#images").append(div);
+	                		
+	                		<?php 
+	                			if($productId > 0)
+	                			{	
+	                				?>
+		                			$.ajax(
+								    {	
+								        type: "POST",
+								        url: "<?php echo site_url('admin/Products/ajaxaUplaodImage');?>",
+								        data:{
+								          	'productId': '<?php echo $productId;?>',
+								        	'image' :data,	
+								        },
+								        success: function(mediaId)
+		               					{	
+											$('#images div:last-child button').attr('value', mediaId);
+		               					}
+								    });
+
+								    <?php
+								}
+							?>
+	                }
                 	$("#image" ).val('');
-                	$("loader").hide();
-                	$("image" ).show();
+                	$("#loader").hide(300);
+                	$("#image" ).show();
                 }
      		});
 	    }
-	});*/
-});
-function deleteProductImage(productImage)
-{	
+	});
+	
+	// delete image
+	$(document).on('click','#delete', function()
+	{	
+		console.log($(this).val())
+		var isImageDelete = false; 
+		
+		value = $(this).val();
 
-	//console.log(productImage);
-}
+		if(isNaN(value)==true)
+		{	
+			var arrImagesLength = $("input[name^='productMedia']").length;
+			var arrImages = $("input[name^='productMedia']");
+
+			for(i=0;i<arrImagesLength;i++)
+			{	
+				if(arrImages.eq(i).val() == value)
+				{	
+					isImageDelete = true;
+
+					$("input[name^='productMedia']").eq(i).remove();
+					
+				}
+			}
+		}
+
+		if(isNaN(value)==false)
+		{
+			isImageDelete = true;
+		}
+		
+		removeImage = $(this);
+		
+		if(isImageDelete)
+		{
+			$.ajax(
+		    {
+		        type: "POST",
+		        url: "<?php echo site_url('admin/Products/ajaxDeleteImage');?>",
+		        data:{
+		        	'productId' :'<?php echo $productId;?>',
+		        	'deleteImage' :value,	
+		        },
+		        success: function(data)
+		        {
+					$(removeImage).parent().remove();
+		        }
+		    });
+		}
+	});
+});
+ 
 
 </script>

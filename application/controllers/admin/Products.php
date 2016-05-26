@@ -33,14 +33,62 @@ class Products extends CI_Controller {
         }
 
     }
-	function test()
-	{	
-	 	$userId = $this->input->post('productId');	
-		if($userId!='')
-		{
-			echo $userId;die;
+
+    function ajaxDeleteImage()
+    {	
+    	$deleteImage = $this->input->post('deleteImage');	
+
+    	if($deleteImage)
+		{	
+			if(!intval($deleteImage))
+			{	
+				$deleteImage = str_replace(base_url(),"", $deleteImage);
+				
+				@unlink($deleteImage);
+				
+				return true;
+			}
+			else
+			{
+				$mediaId = $deleteImage;
+				$productId = $this->input->post('productId');;
+				$mediaInfo = $this->product->checkMediaByProductId($productId , $mediaId);
+				if($mediaInfo)
+				{
+					$mediaId 	 = $mediaInfo['media_id'];
+					$removeImage = str_replace(base_url(), '',$mediaInfo['file_name']);
+					
+					$this->product->delete_product_media(0,$mediaId);
+
+					@unlink($removeImage);
+				}
+			}
 		}
+    }
+
+	function ajaxaUplaodImage()
+	{	
 		
+	 	if($this->input->post('productId'))
+	 	{
+	 		$productId = $this->input->post('productId');
+
+	 		$image     = $this->input->post('image');
+
+	 		$mediaType = mime_content_type(str_replace(base_url(), '',$image));
+
+	 		$product_media = array();
+
+			$product_media['product_id']  = $productId;
+			$product_media['file_name']   = $image;
+			$product_media['media_type']  = $mediaType;
+			$product_media['status']      = CONST_STATUS_ID_ACTIVE;
+			$product_media['created']     = date("Y-m-d H:i:s");
+			$product_media['updated']     = date("Y-m-d H:i:s");
+
+			$productMediaId = $this->product->add_product_media($product_media);
+			return $productMediaId;
+	 	}
 		else
 		{
 			$image =  uploadFile($this->config->item('product_image_base'), asset_url('img/products'));
@@ -77,6 +125,7 @@ class Products extends CI_Controller {
 		$aErrorMessage = array();
 		$showErrorMessage = "";
 		$formHeading = "Add New Product";
+		$arrProductMedia  =  array();
 
 		if($productId)
 		{
@@ -87,7 +136,8 @@ class Products extends CI_Controller {
 				$formHeading = "Edit Product";
 				
 				// Product Categoires!
-				$categories = array();
+				$categories        = array();
+				
 				$productCategories = $this->product->getProductCategories($productId);
 				
 				$arrProductCategories = array();
@@ -106,37 +156,27 @@ class Products extends CI_Controller {
 				}
 				
 				// Product Images!
-				$strProductImage = '';
+				
 				$productImages = $this->product->getProductImages($productId);
 				
 				if(is_array($productImages) && count($productImages) > 0)
 				{	
-					/*$productImagesPath = array();
+					$_arrProductMedia = array();
 
 					foreach($productImages as $row) 
 					{
-						$productImagesPath[]  = @$row['media_path'];
-					}*/
+						$_arrProductMedia['mediaPath']  = @$row['media_path'];
+						$_arrProductMedia['mediaId']    = @$row['media_id'];
 
-					$productImages = $productImages[0];
-					
-					if($productImages)
-					{
-						$productImageLink = @$productImages['media_path'];
-						
-						if($productImageLink)
-						{
-							$strProductImage =  $productImageLink;
-						}
+						$arrProductMedia[] = $_arrProductMedia;
 					}
 				}
 				
-				$postedData['product_name'] =   $productInfo['name'];
-				$postedData['description']  =   $productInfo['description'];
-				$postedData['price']        =   $productInfo['price'];
-				$postedData['old_image']    =   $strProductImage;
-				$postedData['categories']   =   $categories;				
-				//$postedData['productImages']=   $productImagesPath;				
+				$postedData['product_name']  =   $productInfo['name'];
+				$postedData['description']   =   $productInfo['description'];
+				$postedData['price']         =   $productInfo['price'];
+				$postedData['categories']    =   $categories;				
+				$postedData['productMedia']  =   $arrProductMedia;				
 			}
 			else
 			{
@@ -145,17 +185,23 @@ class Products extends CI_Controller {
 		}
 		
 		#Submitter - START
+
 		if($this->input->post('btn-submit'))
 		{	
 			$postedData = $this->input->post();
 
 			extract($postedData);
 
-			$categoryIds = array();
+			$categoryIds   = array();
 			$product_name  = htmlentities($product_name); 
 			$description   = htmlentities($description);
 			$replaceWordInPrice = array('$',',');
 			$price = htmlentities(str_replace($replaceWordInPrice,'',$price));
+
+			if($productId)
+			{
+				$arrProductMedia  =  array();
+			}
 
 			if(!$product_name)
 			{
@@ -178,50 +224,30 @@ class Products extends CI_Controller {
 				}
 			}
 
-			$product_media = array();
+		
+			if(is_array($aErrorMessage) && count($aErrorMessage))
+			{	
+				if($productId)
+				{	
+					
+					$productImages = $this->product->getProductImages($productId);
 			
-			if(empty($aErrorMessage))
-			{
-				if (isset($_FILES['image']) && !empty($_FILES['image']['name']))
-				{
-					$config['upload_path'] = './assets/img/products/';
+					if(is_array($productImages) && count($productImages) > 0)
+					{	
+						$_arrProductMedia = array();
 
-					$config['allowed_types'] = 'gif|jpg|png';
+						foreach($productImages as $row) 
+						{
+							$_arrProductMedia['mediaPath']  = @$row['media_path'];
+							$_arrProductMedia['mediaId']    = @$row['media_id'];
 
-					$this->load->library('upload');
-
-					$load =$this->upload->initialize($config);
-
-					if ( ! $this->upload->do_upload("image"))
-					{
-						$imageUploadError = array('error' => $this->upload->display_errors());
-						$aErrorMessage[]  = $imageUploadError['error'];
-					}
-					else
-					{
-						$file_data     = $this->upload->data();
-
-						$file_name   = asset_url('img/products/'.$file_data['file_name']);
-
-						$media_type   = $file_data['image_type'];
-
-						$product_media['file_name']   = $file_name;
-						$product_media['media_type']  = $media_type;
-						$product_media['status']      = CONST_STATUS_ID_ACTIVE;
-						$product_media['created']     = date("Y-m-d H:i:s");
-						$product_media['updated']     = date("Y-m-d H:i:s");						
-
-						if($old_image)
-						{ 
-							$old_image = str_replace(base_url(),'', $old_image);
-							@unlink($old_image);
+							$arrProductMedia[] = $_arrProductMedia;
 						}
 					}
-				}
-			}
 
-			if(is_array($aErrorMessage) && count($aErrorMessage))
-			{
+					$postedData['productMedia']  =   $arrProductMedia;
+				}
+			
 				$showErrorMessage = getFormValidationErrorMessage($aErrorMessage);
 				$showErrorMessage = $this->session->set_flashdata('showErrorMessage', $showErrorMessage);
 			}
@@ -247,17 +273,28 @@ class Products extends CI_Controller {
 				{
 					$saveData['created'] = date("Y-m-d H:i:s");
 					$productId           = $this->product->add_product($saveData);
-					
 					$this->product->add_product_categories($categories, $productId);
 				}
 				
 				if($productId)
-				{
-					if(is_array($product_media) && count($product_media) > 0)
+				{	
+					
+
+					if(is_array($productMedia) && count($productMedia) > 0)
 					{
-						$product_media['product_id']= $productId;
-						$this->product->delete_product_media($productId);
-						$this->product->add_product_media($product_media);
+						for ($i=0; $i <count($productMedia); $i++) 
+						{ 
+							$mediaType = mime_content_type(str_replace(base_url(), '',$productMedia[$i]));
+
+							$product_media['product_id']  = $productId;
+							$product_media['file_name']   = $productMedia[$i];
+							$product_media['media_type']  = $mediaType;
+							$product_media['status']      = CONST_STATUS_ID_ACTIVE;
+							$product_media['created']     = date("Y-m-d H:i:s");
+							$product_media['updated']     = date("Y-m-d H:i:s");
+
+							$this->product->add_product_media($product_media);
+						}
 					}
 				}
 				
@@ -403,6 +440,8 @@ EOT;
 		if($productInfo)
 		{ 
 			$this->product->delete_product($product_id);
+			$this->product->delete_product_media($product_id);
+
 			$this->session->set_flashdata('Message','Product has been delete successfully');
 		}
 		
