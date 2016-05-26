@@ -89,7 +89,7 @@ if(isset($postedData) && !empty($postedData))
 											?>
 											<div>
 												<img src="<?php echo $productMedia[$i]['mediaPath'];?>" width="150" alt="." />
-												<button name="btn-submit" value="<?php echo $productMedia[$i]['mediaId'];?>" id="delete" class="btn btn-danger" type="button">Delete</button>
+												<button name="btn-submit" value="<?php echo $productMedia[$i]['mediaId'];?>" id="delete" class="btn btn-danger" type="button">Remove image</button>
 												<br /><br />
 											</div>
 											<?php
@@ -101,7 +101,7 @@ if(isset($postedData) && !empty($postedData))
 										?>
 										<div>
 											<img src="<?php echo $productMedia[$i];?>" width="150" alt="." />
-											<button name="btn-submit" value="<?php echo $productMedia[$i];?>" class="btn btn-danger" id="delete" type="button">Delete</button>
+											<button name="btn-submit" value="<?php echo $productMedia[$i];?>" class="btn btn-danger" id="delete" type="button">Remove image</button>
 											<br /><br />
 										</div>
 										<?php
@@ -220,7 +220,7 @@ $( document ).ready(function()
                 			
                 			?>
                 			
-                			$("#productMedia").append('<input type="hidden" name="productMedia[]" value="'+imgSrc+'">');
+                			$("#productMedia").append('<input type="hidden" name="productMedia[]" value="'+btnValue+'">');
                 			
                 			<?php
                 		
@@ -244,10 +244,10 @@ $( document ).ready(function()
 								        url: "<?php echo site_url('admin/Products/ajaxaUplaodImage');?>",
 								        data:{
 								          	'productId': '<?php echo $productId;?>',
-								        	'image' :data,	
+								        	'image' :imgSrc,	
 								        },
 								        success: function(mediaId)
-		               					{	
+		               					{	alert(mediaId);
 											$('#images div:last-child button').attr('value', mediaId);
 		               					}
 								    });

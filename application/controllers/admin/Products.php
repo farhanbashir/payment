@@ -87,7 +87,7 @@ class Products extends CI_Controller {
 			$product_media['updated']     = date("Y-m-d H:i:s");
 
 			$productMediaId = $this->product->add_product_media($product_media);
-			return $productMediaId;
+			echo $productMediaId;
 	 	}
 		else
 		{
