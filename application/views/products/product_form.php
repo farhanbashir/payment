@@ -110,8 +110,8 @@ if(isset($postedData) && !empty($postedData))
 							}
 						?>
 					</div>	
-					<div class="imageUploadError">
-
+					<div id="imageUploadError">
+						
 					</div>
 					<div class="form-group" id="imageUpload">
 						<label>Add Product Images</label>
@@ -169,6 +169,8 @@ $( document ).ready(function()
 {	
 	
 	$("#loader").hide();
+	$("#imageUploadError").hide();
+
 
 	$("#image").on('change',function()
 	{	
@@ -191,9 +193,12 @@ $( document ).ready(function()
 
 	    if(allowFileTypes < 0)
 	    {
-	    	errorImageUpload[0]  = "invalid file type";
+	    	$("#imageUploadError").empty();
+	    	$("#imageUploadError").append("<div class='alert alert-danger'>You Did Not Select The Valid File Type</div>");
+	    	$("#imageUploadError").show(1500).fadeOut("slow");
+	    	
 	    }
-	  
+	  	
 	    if(allowFileTypes >= 0)
 	    {	
 	    	
@@ -256,12 +261,15 @@ $( document ).ready(function()
 								}
 							?>
 	                }
-                	$("#image" ).val('');
-                	$("#loader").hide(300);
-                	$("#image" ).show();
+                	
                 }
      		});
+
 	    }
+
+	    $("#image" ).val('');
+    	$("#loader").hide(300);
+    	$("#image" ).show();
 	});
 	
 	// delete image
