@@ -104,7 +104,9 @@ if(isset($postedData) && !empty($postedData))
 	<script>
 	 	$( document ).ready(function()
 	    {
-	    	$("#multi").val([<?php echo implode(', ', $ArrEditCategoriesId);?>]).select2();
+	    	setTimeout(function(){			
+				$("#multi").val([<?php echo implode(', ', $ArrEditCategoriesId);?>]).select2();
+			}, 1000);
 	    });
 	</script>
 	<?php
