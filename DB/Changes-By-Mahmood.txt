@@ -12,3 +12,9 @@ CREATE TABLE `cron_status` (
 
 
 insert  into `cron_status`(`cron_id`,`cron_name`,`last_run`) values (1,'Check Bank Status','2016-05-06 12:20:02');
+
+
+*May 24, 2016:
+=================
+
+ALTER TABLE `user_stores` ADD `test_email` VARCHAR(50) NULL DEFAULT NULL AFTER `receipt_text_color`;

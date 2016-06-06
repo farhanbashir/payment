@@ -309,14 +309,15 @@ function xml_to_array($deXml,$main_heading = '') {
   function uploadFile($uploadDir, $baseUrl)
     {
         $_imageURL = "";
+       
         if(isset($_FILES))
-        {
+        {  
             if(isset($_FILES['file']))
-            {
+            {  
                 if(isset($_FILES['file']['name']))
                 {
                     $fileName = basename($_FILES['file']['name']);
-                    
+                   
                     if($fileName)
                     {                           
                         //$uploadDir = $this->config->item('store_image_base');
@@ -358,4 +359,5 @@ function xml_to_array($deXml,$main_heading = '') {
       return $result;
     }
 
+   
   

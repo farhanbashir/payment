@@ -141,3 +141,34 @@ function getHTMLForNotificationMessage($message)
 	
 	return $message;
 }
+
+function uploadImage($path)
+{
+	$ci = &get_instance();
+	
+	$imageUpload = false;
+	if (isset($_FILES['image']) && !empty($_FILES['image']['name']))
+	{
+		$config['upload_path'] = './'.$path;
+		$config['allowed_types'] = 'gif|jpg|png';
+
+		$ci->load->library('upload');
+
+		$load =$ci->upload->initialize($config);
+
+		if ( ! $ci->upload->do_upload("image"))
+		{   
+			$imageUploadError = array('error' => $ci->upload->display_errors());
+			$imageUpload['Error']  = $imageUploadError['error'];
+		}
+		else
+		{
+			$file_name 			 	  = $ci->upload->data();
+            $imageUpload['file_type'] = $file_name['file_type'];
+			$file_name                = $file_name['file_name'];
+            $imageUpload['file_path'] = base_url().$path.$file_name;
+		}
+	}
+
+	return $imageUpload;
+}

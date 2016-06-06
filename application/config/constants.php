@@ -84,7 +84,12 @@ define('EXIT_USER_INPUT', 7); // invalid user input
 define('EXIT_DATABASE', 8); // database error
 define('EXIT__AUTO_MIN', 9); // lowest automatically-assigned error code
 define('EXIT__AUTO_MAX', 125); // highest automatically-assigned error code
-define('CONST_IMAGE_UPLOAD_DIR', 'assets/img/stores/'); // highest automatically-assigned error code
+
+// images path
+
+define('CONST_IMAGE_UPLOAD_DIR', 'assets/img/stores/'); 
+define('CONST_IMAGE_UPLOAD_TEMP_ORDER_DIR', 'assets/img/orders/receipt/temp/'); 
+
 define('CONST_STATUS_ID_ACTIVE', 1);
 define('CONST_STATUS_ID_DELETE', -1);
 define('CONST_PAGINATION_LIMIT', 10);

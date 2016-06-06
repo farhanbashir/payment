@@ -306,7 +306,7 @@ Class Settings extends CI_Controller
    			$bankInfoData['account_number'] = $UsersDetails['account_number'];
    		}
 		
-		$bankInfoData['bank_status'] 	= $UsersDetails['bank_status'];
+		   $bankInfoData['bank_status'] 	= $UsersDetails['bank_status'];
 		
    		#<!-------Bank Information:: Section ENd-------->
    		#<------------------------------------------->
@@ -322,68 +322,103 @@ Class Settings extends CI_Controller
 
    			extract($receiptInfoData);
    			
-   			$saveReceiptInfoData = array();
-   			
-   			$saveReceiptInfoData['receipt_header_text'] = $header_text;
-   			$saveReceiptInfoData['receipt_footer_text'] = $footer_text;
-   			$saveReceiptInfoData['receipt_bg_color']	= $bg_color;
-   			$saveReceiptInfoData['receipt_text_color']  = $text_color;
-   			$saveReceiptInfoData['updated'] 			= date("Y-m-d H:i:s");
-
-   			$User_Store_Detail = $this->profile->checkUserStoreDetails($userId);
-   			if($User_Store_Detail)
-   			{
-   				$this->profile->edit_user_store($storeId, $saveReceiptInfoData);
-   				$this->session->set_flashdata('successMsgReceiptInfo','Receipt Design Information updated successfully');
-   			}
-
-   			if (isset($_FILES['image']) && !empty($_FILES['image']['name']))
+            if(!$test_email)
             {
-               $config['upload_path'] = './'.CONST_IMAGE_UPLOAD_DIR;
-               $config['allowed_types'] = 'gif|jpg|png';
-               $this->load->library('upload');
-               $load =$this->upload->initialize($config);
+               $aErrorMessage[] = "Test Email Address Is Required";
+            }
 
-               if ( ! $this->upload->do_upload("image"))
-               {  
-                  $imageUploadError = array('error' => $this->upload->display_errors());
-                  $aErrorMessage[]  = $imageUploadError['error'];
-               }
-               else
+            if($test_email)
+            {
+               if (!filter_var($test_email, FILTER_VALIDATE_EMAIL))
                {
-                  $file_name = $this->upload->data();
-                  
-                  $file_name = base_url().CONST_IMAGE_UPLOAD_DIR.$file_name['file_name'];
-                  
-                  $User_Store_Detail = $this->profile->checkUserStoreDetails($userId);
-                  
-                  if($User_Store_Detail)
-                  {  
-                     $old_image = $User_Store_Detail['logo'];
-
-                     $this->profile->edit_user_store($storeId, array('logo'=>$file_name));
-                     $receiptInfoData['old_image'] = $file_name;
-                  }
-                  
-                  if($old_image)
-                  {  
-                     $old_image = str_replace(base_url(),'', $old_image);
-                     @unlink($old_image);
-                  }
+                  $aErrorMessage[] = "Please provide valid email address"; 
                }
             }
-            
-			if(is_array($aErrorMessage) && count($aErrorMessage))
+
+            if(is_array($aErrorMessage) && count($aErrorMessage))
             {
                $showErrorMessage = getFormValidationErrorMessage($aErrorMessage);
                $this->session->set_flashdata('errMsgReceiptInfo',$showErrorMessage);
             }
             else
             {
+
+               $isImageUpload = uploadImage(CONST_IMAGE_UPLOAD_DIR);
+
+               $file_path = false;
+              
+               if($isImageUpload)
+               {
+                  if(isset($isImageUpload['Error']))
+                  {
+                     $aErrorMessage[] = $isImageUpload['Error'];
+                  }
+                  else
+                  {
+                     $file_path = $isImageUpload['file_path'];
+                      
+                     if($file_path)
+                     {   
+                        $User_Store_Detail = $this->profile->checkUserStoreDetails($userId);
+                     
+                        if($User_Store_Detail)
+                        {  
+                           $old_image = $User_Store_Detail['logo'];
+
+                           $this->profile->edit_user_store($storeId, array('logo'=>$file_path));
+                           $receiptInfoData['old_image'] = $file_path;
+                        }
+                     }
+                     
+                     $receiptInfoData['tempLogo'] = "";
+                     
+                     if($old_image)
+                     {   
+                        $old_image = str_replace(base_url(),'', $old_image);
+                        @unlink($old_image);
+                     }
+                  }            
+               }
+               else
+               {
+                  if($tempLogo)
+                  {  
+                     $tempLogo = str_replace(base_url(),'', $tempLogo);
+
+                     $fileName = str_replace(CONST_IMAGE_UPLOAD_TEMP_ORDER_DIR, '', $tempLogo);
+                     
+                     rename($tempLogo, CONST_IMAGE_UPLOAD_DIR.$fileName);
+                     
+                     $logo = base_url().CONST_IMAGE_UPLOAD_DIR.$fileName;
+                     $receiptInfoData['old_image'] = $logo;
+                     
+                     $this->profile->edit_user_store($storeId, array('logo'=>$logo));
+                     
+                     if($old_image)
+                     {  
+                        $old_image = str_replace(base_url(),'', $old_image);
+                        @unlink($old_image);
+                     }
+
+                   
+                     $receiptInfoData['tempLogo'] = "";
+                  }
+               }
+            }
+            //if image upload error
+			   if(is_array($aErrorMessage) && count($aErrorMessage))
+            {
+               $showErrorMessage = getFormValidationErrorMessage($aErrorMessage);
+               $this->session->set_flashdata('errMsgReceiptInfo',$showErrorMessage);
+            }
+            else
+            {  
+
                $saveReceiptInfoData['receipt_header_text'] = $header_text;
                $saveReceiptInfoData['receipt_footer_text'] = $footer_text;
                $saveReceiptInfoData['receipt_bg_color']  = $bg_color;
                $saveReceiptInfoData['receipt_text_color']  = $text_color;
+               $saveReceiptInfoData['test_email']        = $test_email;
                $saveReceiptInfoData['updated']        = date("Y-m-d H:i:s");
 
                $User_Store_Detail = $this->profile->checkUserStoreDetails($userId);
@@ -393,73 +428,146 @@ Class Settings extends CI_Controller
                   $this->session->set_flashdata('successMsgReceiptInfo','Receipt Design Information updated successfully');
                }
             }
-		}
-		elseif($this->input->post('btn-send-test-reciept'))
-   		{
-   			$receiptInfoData = $this->input->post();
+		   }
+   		elseif($this->input->post('btn-send-test-reciept'))
+      	{ 
+      		$receiptInfoData = $this->input->post();
 
-   			extract($receiptInfoData);
-			
-			$_storeDetails		= $this->profile->checkUserStoreDetails($userId);
-			$_userDetails		= $this->profile->get_user_detail($userId);
-			
-			//_storeDetails
-			$_storeDetails['receipt_header_text']	= $header_text; 
-			$_storeDetails['receipt_footer_text']	= $footer_text;
-			$_storeDetails['receipt_bg_color']		= $bg_color;
-			$_storeDetails['receipt_text_color']	= $text_color;
-			
-			//paymentTransaction
-			$paymentTransaction = array();
-			$paymentTransaction['cx_descriptor'] 	= 'some text';
-			$paymentTransaction['transaction_id'] 	= 2001;
-			$paymentTransaction['amount_cash']		= 0;
-			$paymentTransaction['amount_cc']		= 156;
-			$paymentTransaction['cc_number']		= '4111111111111111';
-			$paymentTransaction['cc_name']			= 'Umair Khan';
-			
-			//orderInfo
-			$orderInfo = array();
-			$orderInfo['order_id']					= rand();
-			$orderInfo['total_amount']				= 156;
-			$orderInfo['customer_signature']		= '';
-			$orderInfo['customer_email']			= $test_email;
-			$orderInfo['created']					= date('Y-m-d H:i:s');
-			
-			$_data = array();
-			$_data['storeDetails']			= $_storeDetails;
-			$_data['orderInfo']				= $orderInfo;
-			$_data['paymentTransaction']	= $paymentTransaction;
-			$_data['userDetails'] 			= $_userDetails;
-			
-			_createRecieptPDF($_data);
-			
-			/*
-			$header_text
-   			$footer_text
-			$bg_color
-			$text_color			
-			$test_email
-			*/
-   		}
-   		else
+      		extract($receiptInfoData);
+   			
+            $_storeDetails		= $this->profile->checkUserStoreDetails($userId);
+   			$_userDetails		= $this->profile->get_user_detail($userId);
+
+            if($bg_color=='')
+            {
+               $bg_color = "#FFFFFF";
+            }
+            if($text_color=='')
+            {
+               $text_color = "#000000";
+            }
+            if(!$test_email)
+            {
+               $aErrorMessage[] = "Test Email Address Is Required";
+            }
+
+            if($test_email)
+            {
+               if (!filter_var($test_email, FILTER_VALIDATE_EMAIL))
+               {
+                  $aErrorMessage[] = "Please provide valid email address"; 
+               }
+            }
+
+            $isImageUpload = uploadImage(CONST_IMAGE_UPLOAD_TEMP_ORDER_DIR);
+
+            $file_path = false;
+           
+            if($isImageUpload)
+            {
+               if(isset($isImageUpload['Error']))
+               {
+                  $aErrorMessage[] = $isImageUpload['Error'];
+               }
+               else
+               {
+                  $file_path = $isImageUpload['file_path'];
+                   
+                  if($file_path)
+                  {   
+                      $receiptInfoData['tempLogo'] = $file_path;
+                  }
+               }            
+            }
+            else
+            {
+               if($tempLogo)
+               {
+                  $file_path = $tempLogo;
+               }
+            }
+
+            //if image upload error has occured
+            if(is_array($aErrorMessage) && count($aErrorMessage))
+            {
+               $showErrorMessage = getFormValidationErrorMessage($aErrorMessage);
+               $this->session->set_flashdata('errMsgReceiptInfo',$showErrorMessage);
+            }
+            else
+            {
+               //_storeDetails
+               $_storeDetails['receipt_header_text']  = $header_text; 
+               $_storeDetails['receipt_footer_text']  = $footer_text;
+               $_storeDetails['receipt_bg_color']     = $bg_color;
+               $_storeDetails['receipt_text_color']   = $text_color;
+               $_storeDetails['logo']  = @$file_path;
+               
+               //paymentTransaction
+               $paymentTransaction = array();
+               $paymentTransaction['cx_descriptor']   = 'some text';
+               $paymentTransaction['transaction_id']  = 2001;
+               $paymentTransaction['amount_cash']     = 0;
+               $paymentTransaction['amount_cc']    = 156;
+               $paymentTransaction['cc_number']    = '4111111111111111';
+               $paymentTransaction['cc_name']         = 'Umair Khan';
+               
+               //orderInfo
+               $orderInfo = array();
+               $orderInfo['order_id']              = rand();
+               $orderInfo['total_amount']          = 156;
+               $orderInfo['customer_signature']    = '';
+               $orderInfo['customer_email']        = $test_email;
+               $orderInfo['created']               = date('Y-m-d H:i:s');
+               
+               $_data = array();
+               $_data['storeDetails']        = $_storeDetails;
+               $_data['orderInfo']           = $orderInfo;
+               $_data['paymentTransaction']  = $paymentTransaction;
+               $_data['userDetails']         = $_userDetails;
+               
+               $recieptUrl = _createRecieptPDF($_data);
+               
+               if($recieptUrl)
+               {  
+
+                  _sendRecieptEmail($_data, $recieptUrl);
+                  $this->session->set_flashdata('successMsgReceiptInfo','Email Receipt has send successfully to '.$test_email);
+               }
+               else
+               {
+                  $this->session->set_flashdata('errMsgReceiptInfo','Something wnt wrong please try again');
+               }
+            }
+           
+   			/*
+   			$header_text
+      			$footer_text
+   			$bg_color
+   			$text_color			
+   			$test_email
+   			*/
+      	}
+      	else
    		{
-            $receiptInfoData['old_image']      = $userStoreDetails['logo'];
+            $receiptInfoData['old_image']   = $userStoreDetails['logo'];
    			$receiptInfoData['header_text'] = $userStoreDetails['receipt_header_text'];
    			$receiptInfoData['footer_text'] = $userStoreDetails['receipt_footer_text'];
-   			$receiptInfoData['bg_color'] = $userStoreDetails['receipt_bg_color'];
-   			$receiptInfoData['text_color'] = $userStoreDetails['receipt_text_color'];
+   			$receiptInfoData['bg_color']    = $userStoreDetails['receipt_bg_color'];
+            $receiptInfoData['text_color']  = $userStoreDetails['receipt_text_color'];
+   			$receiptInfoData['test_email']  = $userStoreDetails['test_email'];
+            $receiptInfoData['tempLogo']    = '';
    		}
-		
-   		$data['basicInfoData'] 		= $basicInfoData;
-   		$data['businessInfoData'] 	= $businessInfoData;
-   		$data['bankInfoData'] 		= $bankInfoData;
-   		$data['receiptInfoData'] 	= $receiptInfoData;
-   		$data['security_questions'] = $this->profile->get_questions();
+		#<!-------Receipt Design:: Section END-------->
 
-   		$content = $this->load->view('profile/index.php', $data, true);
-        $this->load->view('main', array('content' => $content));
-   	}
+		$data['basicInfoData'] 		= $basicInfoData;
+		$data['businessInfoData'] 	= $businessInfoData;
+		$data['bankInfoData'] 		= $bankInfoData;
+		$data['receiptInfoData'] 	= $receiptInfoData;
+		$data['security_questions'] = $this->profile->get_questions();
+
+		$content = $this->load->view('profile/index.php', $data, true);
+     $this->load->view('main', array('content' => $content));
+	}
 }
 
 ?>

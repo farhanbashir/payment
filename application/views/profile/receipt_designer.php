@@ -4,7 +4,8 @@ $receipt_footer_text ="";
 $receipt_bg_color ="";
 $receipt_text_color ="";
 $logo = "";
-
+$tempLogo = "";
+$test_email = "";
 if(!empty($receiptInfoData))
 {
 	$receipt_header_text = $receiptInfoData['header_text'];
@@ -13,6 +14,8 @@ if(!empty($receiptInfoData))
 	$receipt_text_color  = $receiptInfoData['text_color'];
 	$receipt_text_color  = $receiptInfoData['text_color'];
 	$logo 				 = $receiptInfoData['old_image'];
+	$tempLogo 		     = $receiptInfoData['tempLogo'];
+	$test_email 		 = $receiptInfoData['test_email'];
 
 }
 
@@ -38,12 +41,21 @@ if(!empty($receiptInfoData))
 				<label>Logo</label>
 				<input type="file" name="image" >
 				<input type="hidden" name="old_image" value="<?php echo $logo;?>">
+				<input type="hidden" name="tempLogo" value="<?php echo $tempLogo;?>">
 				<?php
-					if($logo)						
+					if($logo && $tempLogo =='')						
 					{
 						?>
 							<br /><br />
 							<img src="<?php echo $logo;?>" width="150" alt="." />
+						<?php
+					}
+
+					if($tempLogo!='')
+					{
+						?>
+							<br /><br />
+							<img src="<?php echo $tempLogo;?>" width="150" alt="." />
 						<?php
 					}
 				?>				
@@ -70,13 +82,13 @@ if(!empty($receiptInfoData))
 			
 			<div class="form-group">
 				<label>Email Address for Testing</label>
-				<input name="test_email" value ="" type="text" class="form-control" >
+				<input name="test_email" value ="<?php echo $test_email;?>" type="text" class="form-control" >
 			</div>
 			
 			<br /><br />			
 			<button name="btn-receipt-info" value="submit" type="submit" class="btn btn-primary btn-cons">Save</button>
 			&nbsp; &nbsp;
-			<button name="btn-send-test-reciept" value="submit" type="submit" class="btn btn-warning btn-cons">Save & Send Test Email</button>
+			<button name="btn-send-test-reciept" value="submit" type="submit" class="btn btn-warning btn-cons">Send Test Email</button>
 			
 		</form>
 	</div>
