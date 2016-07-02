@@ -1446,10 +1446,27 @@ function _sendRecieptEmail($data=array(), $pdfFilePath)
 	$CI =& get_instance();
 	$storeDetails 		= @$data['storeDetails'];
 	$orderInfo 			= @$data['orderInfo'];
+	$userDetails 		= @$data['userDetails'];
 	
 	$customerEmail		= @$orderInfo['customer_email'];
 	$storeEmail			= @$storeDetails['email'];
 	$order_id 			= @$orderInfo['order_id'];
+	
+	$userEmail			= @$userDetails['email'];
+
+	if(!$storeEmail)
+	{
+		if($userEmail)
+		{
+			$storeEmail = $userEmail;
+		}
+	}
+	
+	if(!$storeEmail)
+	{
+		$storeEmail = 'test-store@gmail.com';
+	}
+	
 	//sending receipt to customer!
 	if($customerEmail && $storeEmail)
 	{

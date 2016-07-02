@@ -75,7 +75,7 @@ class Products extends CI_Controller {
 
 	 		$image     = $this->input->post('image');
 
-	 		$mediaType = mime_content_type(str_replace(base_url(), '',$image));
+	 		$mediaType = 'image'; //-->mime_content_type(str_replace(base_url(), '',$image));
 
 	 		$product_media = array();
 
@@ -117,7 +117,7 @@ class Products extends CI_Controller {
 	
 
     function save($productId=0)
-    {   
+    {
 		$data = array();
 		$storeId = getLoggedInStoreId();
 		$userId = getLoggedInUserId();
@@ -278,22 +278,23 @@ class Products extends CI_Controller {
 				
 				if($productId)
 				{	
-					
-
-					if(is_array($productMedia) && count($productMedia) > 0)
+					if(isset($productMedia))
 					{
-						for ($i=0; $i <count($productMedia); $i++) 
-						{ 
-							$mediaType = mime_content_type(str_replace(base_url(), '',$productMedia[$i]));
+						if(is_array($productMedia) && count($productMedia) > 0)
+						{
+							for ($i=0; $i <count($productMedia); $i++) 
+							{ 
+								$mediaType = 'image'; //-->mime_content_type(str_replace(base_url(), '',$productMedia[$i]));
 
-							$product_media['product_id']  = $productId;
-							$product_media['file_name']   = $productMedia[$i];
-							$product_media['media_type']  = $mediaType;
-							$product_media['status']      = CONST_STATUS_ID_ACTIVE;
-							$product_media['created']     = date("Y-m-d H:i:s");
-							$product_media['updated']     = date("Y-m-d H:i:s");
+								$product_media['product_id']  = $productId;
+								$product_media['file_name']   = $productMedia[$i];
+								$product_media['media_type']  = $mediaType;
+								$product_media['status']      = CONST_STATUS_ID_ACTIVE;
+								$product_media['created']     = date("Y-m-d H:i:s");
+								$product_media['updated']     = date("Y-m-d H:i:s");
 
-							$this->product->add_product_media($product_media);
+								$this->product->add_product_media($product_media);
+							}
 						}
 					}
 				}

@@ -89,7 +89,7 @@ if(isset($postedData) && !empty($postedData))
 											?>
 											<div>
 												<img src="<?php echo $productMedia[$i]['mediaPath'];?>" width="150" alt="." />
-												<button name="btn-submit" value="<?php echo $productMedia[$i]['mediaId'];?>" id="delete" class="btn btn-danger" type="button">Remove image</button>
+												<button name="btn-submit" value="<?php echo $productMedia[$i]['mediaId'];?>" id="delete" class="btn btn-danger" type="button">Remove Image</button>
 												<br /><br />
 											</div>
 											<?php
@@ -101,7 +101,7 @@ if(isset($postedData) && !empty($postedData))
 										?>
 										<div>
 											<img src="<?php echo $productMedia[$i];?>" width="150" alt="." />
-											<button name="btn-submit" value="<?php echo $productMedia[$i];?>" class="btn btn-danger" id="delete" type="button">Remove image</button>
+											<button name="btn-submit" value="<?php echo $productMedia[$i];?>" class="btn btn-danger" id="delete" type="button">Remove Image</button>
 											<br /><br />
 										</div>
 										<?php
@@ -233,7 +233,7 @@ $( document ).ready(function()
                 		
                 		}?>
 
-                		div = '<div><img src="' + imgSrc + '" width="150" alt="." /><button name="btn-submit" value="' + btnValue + '" class="btn btn-danger" type="button" id="delete">Delete</button>';
+                		div = '<div><img src="' + imgSrc + '" width="150" alt="." /> <button name="btn-submit" value="' + btnValue + '" class="btn btn-danger" type="button" id="delete">Delete</button>';
 	                	div		= div +	
 	                						'<br /><br />';
 	                	div		= div +
@@ -254,7 +254,7 @@ $( document ).ready(function()
 								        	'image' :imgSrc,	
 								        },
 								        success: function(mediaId)
-		               					{	alert(mediaId);
+		               					{
 											$('#images div:last-child button').attr('value', mediaId);
 		               					}
 								    });

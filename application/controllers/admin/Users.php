@@ -74,9 +74,19 @@ class Users extends CI_Controller {
                 $tplAction  = <<<EOT
 
                     <a onclick="return confirm('Are you sure, you want to delete Merchant account? It can not be reverted. So, please make sure before proceed','$deactiveLink')" href="$deactiveLink"
-                        <button class="btn btn-danger btn-cons">Deactivate Now</button>
+                        <button class="btn btn-danger btn-cons">De-Activate Now</button>
                     </a>
 EOT;
+
+				$loggedInMerchantId = getLoggedInUserId();
+				
+				$tplLoginAs  = '<a href="'.site_url("admin/users/login_merchant/".$userId).'" class="btn btn-warning">Log-In as this Merchant</a>';
+				
+				if($loggedInMerchantId == $userId)
+				{
+					$tplLoginAs  = '<span class="btn btn-primary">Already Logged-In</span>';
+				}
+				
                 $tempArray   = array();
 
                 $tempArray[] = $row['user_id'];
@@ -85,15 +95,14 @@ EOT;
                 $tempArray[] = $row['email'];
                 $tempArray[] = date(CONST_DATE_TIME_DISPLAY,strtotime($row['created']));
                 $tempArray[] = $tplAction;
-                $tempArray[] = '<a href="'.site_url("admin/users/login_merchant/".$userId).'" class="btn btn-warning">Log-In as this Merchant</a>
-                </p>';
+                $tempArray[] = $tplLoginAs;
 
                 $usersData[] = $tempArray;
             }
         }
 
         $data = array(
-            "draw"            =>isset ( $draw ) ? intval( $draw ) : 0,
+            "draw"            => isset ( $draw ) ? intval( $draw ) : 0,
             "recordsTotal"    => $recordsTotal,
             "recordsFiltered" => $recordsFiltered,
             "data"            => $usersData

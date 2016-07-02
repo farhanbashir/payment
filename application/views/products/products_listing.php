@@ -111,8 +111,10 @@ $(document).ready(function()
 
 } );
 
+/*
   $('#product-listing').on('click', 'tr', function () {
         $(this).find('.btn-primary').trigger('click');
     } );
+*/
 
 </script>

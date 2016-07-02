@@ -9,7 +9,7 @@
 					<?php
 					if($orderInfo['receipt'])
 					{
-		              echo '<a target="_blank" href="'.$receipt.'" class="btn btn-info">View Receipt</a>';
+		              echo '<a target="_blank" href="'.$orderInfo['receipt'].'" class="btn btn-info">View Receipt</a>';
 		            }
 		            else
 		            {

@@ -461,7 +461,7 @@ Class Settings extends CI_Controller
 
             $isImageUpload = uploadImage(CONST_IMAGE_UPLOAD_TEMP_ORDER_DIR);
 
-            $file_path = false;
+            $file_path = $_storeDetails['logo']; //-->false;
            
             if($isImageUpload)
             {
@@ -500,7 +500,7 @@ Class Settings extends CI_Controller
                $_storeDetails['receipt_footer_text']  = $footer_text;
                $_storeDetails['receipt_bg_color']     = $bg_color;
                $_storeDetails['receipt_text_color']   = $text_color;
-               $_storeDetails['logo']  = @$file_path;
+               $_storeDetails['logo']  				  = @$file_path;
                
                //paymentTransaction
                $paymentTransaction = array();

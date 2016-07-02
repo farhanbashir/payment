@@ -1262,6 +1262,8 @@ class Api extends REST_Controller {
         $created      = date('Y-m-d H:i:s');
         $updated      = date('Y-m-d H:i:s');
         $status       = 1;
+		
+		$image_count  = $this->post('image_count');
 
         if(!$name)
         {
@@ -1319,6 +1321,7 @@ class Api extends REST_Controller {
 			}
 		}        
         
+		/** //Not using it now!
         $temp_image_data = $this->__uploadFile($this->config->item('product_image_base'), asset_url('img/products'));
 
         if(count($temp_image_data) > 0)
@@ -1327,7 +1330,57 @@ class Api extends REST_Controller {
 
             $this->product->add_product_media($product_media);
         }
+		**/
+		
+		if($image_count)
+		{
+			if($image_count > 0) //if has product images!
+			{
+				for($im=1 ; $im <= $image_count ; $im++)
+				{
+					if(isset($_FILES))
+					{
+						if(isset($_FILES['file-'.$im]))
+						{
+							if(isset($_FILES['file-'.$im]['name']))
+							{
+								$fileName = basename($_FILES['file-'.$im]['name']);
+								
+								if($fileName)
+								{
+									$_imageIndex = $im;								
+									$uploadDir = $this->config->item('product_image_base');
+									
+									$fileExtension = 'jpg'; //-->end((explode(".", $fileName)));
+									
+									$imageName = $_imageIndex.'_'.time().'.'.$fileExtension;
+									$uploadFile = $uploadDir . $imageName;
 
+									if(move_uploaded_file($_FILES['file-'.$im]['tmp_name'], $uploadFile))
+									{
+										$_imageURL = asset_url('img/products').'/'.$imageName;
+										
+										if($_imageURL)
+										{
+											$product_media = array(
+																	"product_id"	=> $product_id, 
+																	"file_name"		=> $_imageURL,
+																	"media_type"	=> $fileExtension,
+																	"created"		=> $created,
+																	"updated"		=> $updated,
+																	"status"		=> $status
+																);
+
+											$this->product->add_product_media($product_media);
+										}
+									}
+								}
+							}	
+						}
+					}
+				}
+			}
+		}
 
         $data["header"]["error"]   = "0";
         $data["header"]["message"] = "Success";
@@ -1346,6 +1399,8 @@ class Api extends REST_Controller {
 		$created      = date('Y-m-d H:i:s');
         $updated      = date('Y-m-d H:i:s');
         $status       = 1;
+		
+		$image_count  = $this->post('image_count');
 
         if(!$product_id)
         {
@@ -1411,6 +1466,7 @@ class Api extends REST_Controller {
 				} 
 			}            
             
+			/** //Not using it now!
             $temp_image_data = $this->__uploadFile($this->config->item('product_image_base'), asset_url('img/products'));
 
             if(count($temp_image_data) > 0)
@@ -1421,7 +1477,59 @@ class Api extends REST_Controller {
 				
 				$this->product->delete_product_media($product_id);
 				$this->product->add_product_media($product_media);
-            }
+            }**/
+			
+			$this->product->delete_product_media($product_id);
+			
+			if($image_count)
+			{
+				if($image_count > 0) //if has product images!
+				{
+					for($im=1 ; $im <= $image_count ; $im++)
+					{
+						if(isset($_FILES))
+						{
+							if(isset($_FILES['file-'.$im]))
+							{
+								if(isset($_FILES['file-'.$im]['name']))
+								{
+									$fileName = basename($_FILES['file-'.$im]['name']);
+									
+									if($fileName)
+									{
+										$_imageIndex = $im;								
+										$uploadDir = $this->config->item('product_image_base');
+										
+										$fileExtension = 'jpg'; //-->end((explode(".", $fileName)));
+										
+										$imageName = $_imageIndex.'_'.time().'.'.$fileExtension;
+										$uploadFile = $uploadDir . $imageName;
+
+										if(move_uploaded_file($_FILES['file-'.$im]['tmp_name'], $uploadFile))
+										{
+											$_imageURL = asset_url('img/products').'/'.$imageName;
+											
+											if($_imageURL)
+											{
+												$product_media = array(
+																		"product_id"	=> $product_id, 
+																		"file_name"		=> $_imageURL,
+																		"media_type"	=> $fileExtension,
+																		"created"		=> $created,
+																		"updated"		=> $updated,
+																		"status"		=> $status
+																	);
+
+												$this->product->add_product_media($product_media);
+											}
+										}
+									}
+								}	
+							}
+						}
+					}
+				}
+			}
 
             $data["header"]["error"]   = "0";
             $data["header"]["message"] = "Success";
@@ -1433,10 +1541,7 @@ class Api extends REST_Controller {
             $data["header"]["error"] = "1";
             $data["header"]["message"] = "Some Error";
             $this->response($data, 200);
-        }    
-
-        
-        
+        }
     }
 
     function test_post()
