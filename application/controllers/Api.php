@@ -1296,18 +1296,22 @@ class Api extends REST_Controller {
 		$categories = array();
 		if(!$category_ids)
         {
+			/* //validation removed!
             $data["header"]["error"] = "1";
             $data["header"]["message"] = "Provide product category";
             $this->response($data, 200);
+			*/
         }
 		else
 		{
 			$categories = json_decode($category_ids,true);
 			if(!$categories)
 			{
+				/* //validation removed!
 				$data["header"]["error"] = "1";
-				$data["header"]["message"] = "Please provide data";
+				$data["header"]["message"] = "Please provide category";
 				$this->response($data, 200);
+				*/
 			}
 		}
 
@@ -1438,18 +1442,22 @@ class Api extends REST_Controller {
 		$categories = array();
 		if(!$category_ids)
         {
+			/*
             $data["header"]["error"] = "1";
             $data["header"]["message"] = "Provide product category";
             $this->response($data, 200);
+			*/
         }
 		else
 		{
 			$categories = json_decode($category_ids,true);
 			if(!$categories)
 			{
+				/*
 				$data["header"]["error"] = "1";
-				$data["header"]["message"] = "Please provide data";
+				$data["header"]["message"] = "Please provide category";
 				$this->response($data, 200);
+				*/
 			}
 		}
 
@@ -1567,7 +1575,7 @@ class Api extends REST_Controller {
 
     function getProducts_post()
     {
-        $products                = $this->product->get_all_products($this->store_id, $this->user_id);
+        $products                = $this->product->get_all_active_products($this->store_id, $this->user_id);
 		
 		if(is_array($products) && count($products) > 0)
 		{

@@ -39,6 +39,28 @@ Class Product extends CI_Model
         $query->free_result();
         return $result;
     }
+	
+	function get_all_active_products($storeId=0,$userId=0)
+    {
+		/*
+		$sql = "SELECT pc.product_id,pc.category_id,p.price,p.name AS product_name, c.name AS category_name FROM 
+                    product_categories AS pc
+                    LEFT JOIN products AS p
+                    ON pc.product_id = p.product_id
+                    LEFT JOIN categories AS c
+                    ON pc.category_id = c.category_id
+                    WHERE p.user_id ='$userId' AND p.store_id='$storeId'" ;
+		*/
+		
+		$sql = "SELECT p.* 
+				FROM products p 
+				WHERE p.user_id ='$userId' AND p.store_id='$storeId' AND status NOT IN (". CONST_STATUS_ID_DELETE .") "  ;
+		
+        $query = $this->db->query($sql);
+        $result = $query->result_array();
+        $query->free_result();
+        return $result;
+    }
 
     function get_order_products($order_id)
     {
