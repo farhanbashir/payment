@@ -14,10 +14,19 @@
         </div>
         <div class="clearfix"></div>
       </div>
-      <?php if($this->session->flashdata('Message')!='')
-      { 
-          echo getHTMLForSuccessMessage($this->session->flashdata('Message'));
-      }?>
+		
+		<?php 
+			if($this->session->flashdata('Message')!='')
+			{
+				echo getHTMLForSuccessMessage($this->session->flashdata('Message'));
+			}
+			
+			if($this->session->flashdata('showErrorMessage')!='')
+			{
+				echo getHTMLForErrorMessage($this->session->flashdata('showErrorMessage'));
+			}
+		?>
+	  
     <div class="panel-body">
       <div id="tableWithSearch_wrapper" class="dataTables_wrapper form-inline no-footer">
         <table id="category-listing" class="table table-hover demo-table-search dataTable no-footer"  role="grid" aria-describedby="tableWithSearch_info">

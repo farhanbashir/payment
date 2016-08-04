@@ -54,6 +54,7 @@ class Categories extends CI_Controller
                 
                 $categoryId      = $category['category_id'];
                 $category_name   = $category['name'];
+				$is_default   	 = @$category['is_default'];
 
                 $parentCategory = "";
                 
@@ -62,8 +63,15 @@ class Categories extends CI_Controller
                     $parentCategory = $category['parent_category'];
                 }
                 $deleteUrl   = site_url('admin/categories/delete_category/'.$categoryId); 
-                $editUrl     = site_url('admin/categories/save/'.$categoryId); 
-                $actionData  = <<<EOT
+                $editUrl     = site_url('admin/categories/save/'.$categoryId);
+				
+				if($is_default)
+				{
+					$actionData = '<i>its a default category!</i>';
+				}
+				else
+				{
+					$actionData  = <<<EOT
                         <p>
                             <a href="$editUrl">
                               <button class="btn btn-primary btn-cons">Edit</button>
@@ -73,6 +81,9 @@ class Categories extends CI_Controller
                             </a>
                         </p>
 EOT;
+
+				}
+                
                 //-->$tempArray[] = $categoryId;
                 $tempArray[] = $category_name;
                 //-->$tempArray[] = $parentCategory;
@@ -110,6 +121,14 @@ EOT;
             
             if($categoryInfo)
             {
+				$is_default = @$categoryInfo['is_default'];
+			
+				if($is_default)
+				{
+					$this->session->set_flashdata('showErrorMessage', "Default category can't be editable!");
+					redirect(site_url('admin/categories'));
+				}
+				
                 $formHeading = "Edit Category";
 
                 $postedData = $categoryInfo;
@@ -128,6 +147,14 @@ EOT;
             extract($postedData);
 
             $category_name = htmlentities($category_name);
+			
+			if($categoryId && $parent_category)
+			{
+				if($categoryId == $parent_category)
+				{
+					$aErrorMessage[] = "Category can't be its own parent";
+				}
+			}
 
             if(!$category_name)
             {
@@ -193,11 +220,22 @@ EOT;
         $userId  = getLoggedInUserId();
         $storeId = getLoggedInStoreId();
         $categoryInfo = $this->category->getById($categoryId, $userId, $storeId);
+		
         if($categoryInfo)
         {
-            $this->category->delete_category($categoryId);
-            $this->session->set_flashdata('Message','Category Delete successfully');
+			$is_default = @$categoryInfo['is_default'];
+			
+			if($is_default)
+			{
+				$this->session->set_flashdata('showErrorMessage', "Default category can't be deleted!");
+			}
+			else
+			{
+				$this->category->delete_category($categoryId);
+				$this->session->set_flashdata('Message','Category Delete successfully');
+			}
         }
+		
         redirect('admin/categories','refresh');
     }
     /*function edit_category($category_id)

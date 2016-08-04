@@ -121,7 +121,7 @@ function categoryTree2($data, $index=false, $parent_id=0, $level=0, $maxLevel=0,
 function getHTMLForSuccessMessage($message)
 {
 	$message = '<div class="alert alert-success">
-                <strong>Success!</strong>&nbsp;&nbsp;'.$message.'</div>';
+                <strong>Success: </strong> '.$message.'</div>';
 				
 	return $message;            
 }
@@ -129,7 +129,7 @@ function getHTMLForSuccessMessage($message)
 function getHTMLForErrorMessage($message)
 {
 	$message = '<div class="alert alert-danger">
-                <strong>Alert!!</strong>&nbsp;&nbsp;'.$message.'</div>';
+                <strong>Alert: </strong> '.$message.'</div>';
 				
 	return $message;            
 }
@@ -137,7 +137,7 @@ function getHTMLForErrorMessage($message)
 function getHTMLForNotificationMessage($message)
 {
 	$message = '<div class="alert alert-success">
-                <strong>Notification!</strong>&nbsp;&nbsp;'.$message.'</div>';
+                <strong>Notification: </strong> '.$message.'</div>';
 	
 	return $message;
 }

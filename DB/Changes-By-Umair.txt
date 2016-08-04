@@ -205,3 +205,7 @@ ALTER TABLE `transactions` ADD `cx_descriptor` TEXT NULL AFTER `cx_transaction_i
 *May 03, 2016:
 =================
 ALTER TABLE `user_banks` CHANGE `swift_code` `swift_code` VARCHAR(250) NULL DEFAULT NULL;
+
+*Aug 04, 2016:
+===============
+ALTER TABLE `categories` ADD `is_default` TINYINT(4) NULL DEFAULT '0' AFTER `status`;

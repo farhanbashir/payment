@@ -54,7 +54,8 @@ Class Product extends CI_Model
 		
 		$sql = "SELECT p.* 
 				FROM products p 
-				WHERE p.user_id ='$userId' AND p.store_id='$storeId' AND status NOT IN (". CONST_STATUS_ID_DELETE .") "  ;
+				WHERE p.user_id ='$userId' AND p.store_id='$storeId' AND status NOT IN (". CONST_STATUS_ID_DELETE .") 
+				ORDER BY product_id DESC"  ;
 		
         $query = $this->db->query($sql);
         $result = $query->result_array();
@@ -90,11 +91,11 @@ Class Product extends CI_Model
 		
 		if(is_array($_arrFilterCategories) && count($_arrFilterCategories) > 0)
         {
-			$sql = "select * from products where product_id IN (select product_id from product_categories where category_id IN (".implode(',', $_arrFilterCategories)." )) and status=1 " ;
+			$sql = "select * from products where product_id IN (select product_id from product_categories where category_id IN (".implode(',', $_arrFilterCategories)." )) and status=1 ORDER BY product_id DESC" ;
         }
 		else
 		{
-			$sql = "select * from products where product_id IN (select product_id from product_categories where category_id=$category_id) and status=1" ;
+			$sql = "select * from products where product_id IN (select product_id from product_categories where category_id=$category_id) and status=1 ORDER BY product_id DESC" ;
 		}		
         
         $query = $this->db->query($sql);

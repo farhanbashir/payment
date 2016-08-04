@@ -27,6 +27,7 @@ class Users extends CI_Controller {
 
         $this->load->model('user', '', TRUE);
         $this->load->model('profile', '', TRUE);
+		$this->load->model('category','',TRUE);
 
         if (!$this->session->userdata('logged_in')) {
             redirect(base_url());
@@ -45,7 +46,6 @@ class Users extends CI_Controller {
 
     public function index() 
     {
-
         $data = array();
         $content = $this->load->view('users/user_listing.php', $data, true);
         $this->load->view('main', array('content' => $content));
@@ -352,6 +352,7 @@ EOT;
             $parent_user_id = 0; 
             $role_id        = CONST_ROLE_ID_BUSINESS_ADMIN;
             $created        = date('Y-m-d H:i:s');
+			$updated        = date('Y-m-d H:i:s');
             $status         = 1;
 
             if(!$first_name)
@@ -435,7 +436,6 @@ EOT;
                     
                     if($user_id)
                     {
-
                         if($role_id == CONST_ROLE_ID_BUSINESS_ADMIN) //business admin
                         {
                             //if user role is business admin then create empty store
@@ -454,6 +454,20 @@ EOT;
                             $merchant_info['last_updated']              = $created;
                             
                             $this->profile->add_user_merchant_info($merchant_info);
+							
+							//Adding "Default" category for this new user!
+							$category_id = $this->category->add_category(
+																			array(
+																					"user_id" 		=> $user_id,
+																					"store_id" 		=> $store_id,
+																					"parent_id" 	=> 0,
+																					"name"			=> 'Default',
+																					"created"		=> $created,
+																					"updated"		=> $updated,
+																					"is_default" 	=> 1, 
+																					"status"		=> 1
+																				)
+																		);
                         }
                         
                         $this->session->set_flashdata('Message','Signup successfull');

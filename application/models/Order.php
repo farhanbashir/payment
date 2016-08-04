@@ -75,11 +75,17 @@ Class Order extends CI_Model
 			}
 		}
 		
+		$limit = ' LIMIT 0, 30 ';
+		if($where)			
+		{
+			$limit = '';
+		}
+		
 		
         $sql = "SELECT * 
 				FROM orders 
 				WHERE user_id='". $user_id ."' ". $where. " 
-				ORDER BY order_id DESC ";
+				ORDER BY order_id DESC ".$limit;
 		
         $query = $this->db->query($sql);
         $result = $query->result_array();

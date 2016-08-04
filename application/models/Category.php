@@ -99,7 +99,7 @@ Class Category extends CI_Model
 
     function getById($categoryId, $userId, $storeId)
     {
-        $sql = "SELECT name AS category_name, category_id, parent_id AS parent_category FROM categories WHERE category_id = '$categoryId' AND user_id = '$userId' AND store_id = '$storeId'";
+        $sql = "SELECT name AS category_name, category_id, parent_id AS parent_category, is_default FROM categories WHERE category_id = '$categoryId' AND user_id = '$userId' AND store_id = '$storeId'";
         $query = $this->db->query($sql);
         $result = $query->result_array();
         $query->free_result();
@@ -195,7 +195,7 @@ Class Category extends CI_Model
             $whereCondition = ' WHERE ' . implode(' AND ', $arrayWhereClause);
         }
 
-        $select = 't1.category_id,t1.name,t1.category_id,t1.parent_id,
+        $select = 't1.category_id,t1.name,t1.category_id,t1.parent_id,t1.is_default,
                     (SELECT COUNT(category_id) FROM product_categories 
                     WHERE category_id=t1.category_id) AS total_products, 
                     t2.name AS parent_category

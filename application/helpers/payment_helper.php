@@ -758,6 +758,86 @@ function refundPayment($userId=0, $_postParams=array())
 	return $apiResult;
 }
 
+function getCustomerDetails($userId=0, $_postParams=array())
+{
+	/*
+		Params:
+		
+			$postParams = array();
+			$postParams['api_key'] 		= '28966ac8a0af1447d6f5bfba0e1428fc';
+			$postParams['card_number'] 	= '41111111111111111';
+			$postParams['exp_month'] 	= '07';
+			$postParams['exp_year'] 	= '2020';
+			$postParams['card_cvv'] 	= '123';
+			
+		
+		Result:
+	
+			    "response": 
+				{
+					"success": "success",
+					"First Name": " First Name",
+					"Last Name": " Last Name",
+					"Street": " 1600 Amphitheatre Parkway ",
+					"City": " Mountain View",
+					"Email": "jhonsmith@gmail.com",
+					"Zip": "94043",
+					"Zip": "94043",
+					"State": "CA",
+				   "Phone": "171-701-6697",
+				   "hash": "835rdr4b2ab54563d60c229c55853c30"
+				}
+
+
+				
+			{
+				"response": {
+					"error": "No Information found!"
+				}
+			}
+	*/
+
+	$postParams					= array();
+	
+	$postParams['api_key']		= CONST_PAYMENT_API_KEY;
+	$postParams['card_number'] 	= @$_postParams['cc_number'];
+	$postParams['exp_month'] 	= @$_postParams['cc_expiry_month'];
+	$postParams['exp_year'] 	= @$_postParams['cc_expiry_year'];
+	$postParams['card_cvv'] 	= @$_postParams['cc_code'];
+	
+	$apiResponse = sendRequestToPaymentGateway($userId, 'getCustomerDetails', $postParams);
+	
+	$apiErrorMessage 	= '';
+	$apiSuccessMessage 	= 0;
+	$apiData 			= array();
+	if($apiResponse)
+	{
+		if(isset($apiResponse['error']))
+		{
+			$apiErrorMessage = $apiResponse['error'];
+		}
+		else if(isset($apiResponse['success']))
+		{
+			$apiSuccessMessage = 1;
+			
+			$apiData = @$apiResponse['data'];
+		}
+	}
+	
+	$apiResult = array();
+	if($apiErrorMessage)
+	{
+		$apiResult['error'] = $apiErrorMessage;
+	}
+	else if($apiSuccessMessage)
+	{
+		$apiResult['success'] = $apiSuccessMessage;
+		$apiResult['data'] = $apiData;
+	}
+	
+	return $apiResult;
+}
+
 /*************************************************************************/
 
 function getCardXecureSignature($postParams=array(), $merchantInfo=array())
@@ -831,6 +911,10 @@ function sendRequestToPaymentGateway($userId=0, $callFor, $postParams=array(), $
 	else if($callFor == 'getBankAccountStatus')
 	{
 		$urlToRequest = $apiURL.'api/getBankAccStatus';
+	}
+	else if($callFor == 'getCustomerDetails')
+	{
+		$urlToRequest = $apiURL.'api/checkCustomer';
 	}
 	else if($callFor == 'paymentAuthorize')
 	{

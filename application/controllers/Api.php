@@ -355,7 +355,7 @@ class Api extends REST_Controller {
 					
 				// }
 				
-				$user_id = $this->user->add_user($user);
+				$user_id = $this->user->add_user($user);				
 				
 				if($user_id)
 				{
@@ -367,6 +367,8 @@ class Api extends REST_Controller {
 						$this->device->insert_device($device_data);
 					}
 					*/
+					
+					$category_id = 0;
 					
 					if($role_id == CONST_ROLE_ID_BUSINESS_ADMIN) //business admin
 					{
@@ -386,11 +388,25 @@ class Api extends REST_Controller {
 						$merchant_info['last_updated'] 				= $created;
 						
 						$this->profile->add_user_merchant_info($merchant_info);
+						
+						//Adding "Default" category for this new user!
+						$category_id = $this->category->add_category(
+																		array(
+																				"user_id" 		=> $user_id,
+																				"store_id" 		=> $store_id,
+																				"parent_id" 	=> 0,
+																				"name"			=> 'Default',
+																				"created"		=> $created,
+																				"updated"		=> $updated,
+																				"is_default" 	=> 1, 
+																				"status"		=> 1
+																			)
+																	);
 					}
 					
 					$data["header"]["error"] = "0";
 					$data["header"]["message"] = "Signup successfull";
-					$data['body'] = array("user_id"=>$user_id);
+					$data['body'] = array("user_id" => $user_id, "default_category_id" => $category_id);
 					$this->response($data, 200);
 				}
 				else
@@ -2007,9 +2023,20 @@ class Api extends REST_Controller {
 
 						$this->order->add_order_line_item($order_line_item_data);
 					}
+					
+					$_customerInfo = array();
+					
+					$_customerInfo['name'] 		= 'test name';
+					$_customerInfo['email'] 	= 'test@email.com';
+					$_customerInfo['phone'] 	= '1112223334';
+					$_customerInfo['address1'] 	= 'test address1';
+					$_customerInfo['address2'] 	= 'test address2';
+					$_customerInfo['city'] 		= 'test city';
+					$_customerInfo['state'] 	= 'Texas';
+					$_customerInfo['zipcode']	= '12345';
 
 					$data["header"]["error"] = "0";
-					$data['body']            = array("order_id"=>$order_id, "descriptor" => $cx_descriptor);
+					$data['body']            = array("order_id" => $order_id, "descriptor" => $cx_descriptor, 'customer_info' => $_customerInfo);
 					$this->response($data, 200);
 				}
 				else
