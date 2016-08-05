@@ -1330,6 +1330,41 @@ class Api extends REST_Controller {
 				*/
 			}
 		}
+		
+		if(!$categories) // No Category Selected - START!
+		{
+			$defaultCategoryInfo = $this->category->getDefaultCategory($this->user_id, $store_id);
+			
+			$defaultCategoryId = 0;
+			if($defaultCategoryInfo)
+			{
+				$defaultCategoryId = @$defaultCategoryInfo['category_id'];
+			}
+			
+			if(!$defaultCategoryId)
+			{
+				//Adding "Default" category for this new user!
+				$defaultCategoryId = $this->category->add_category(
+																array(
+																		"user_id" 		=> $this->user_id,
+																		"store_id" 		=> $store_id,
+																		"parent_id" 	=> 0,
+																		"name"			=> 'Default',
+																		"created"		=> $created,
+																		"updated"		=> $updated,
+																		"is_default" 	=> 1, 
+																		"status"		=> 1
+																	)
+															);
+			}					
+			
+			if($defaultCategoryId)
+			{
+				$categories = array();
+				$categories[] = $defaultCategoryId;
+			}
+			
+		} // No Category Selected - END!
 
         $product_id = $this->product->add_product(array("user_id"=>$this->user_id,"store_id"=>$store_id,"name"=>$name,"description"=>$description,"price"=>$price,"created"=>$created,"updated"=>$updated,"status"=>$status));
         
@@ -1476,6 +1511,41 @@ class Api extends REST_Controller {
 				*/
 			}
 		}
+		
+		if(!$categories) // No Category Selected - START!
+		{
+			$defaultCategoryInfo = $this->category->getDefaultCategory($userId, $storeId);
+			
+			$defaultCategoryId = 0;
+			if($defaultCategoryInfo)
+			{
+				$defaultCategoryId = @$defaultCategoryInfo['category_id'];
+			}
+			
+			if(!$defaultCategoryId)
+			{
+				//Adding "Default" category for this new user!
+				$defaultCategoryId = $this->category->add_category(
+																array(
+																		"user_id" 		=> $userId,
+																		"store_id" 		=> $storeId,
+																		"parent_id" 	=> 0,
+																		"name"			=> 'Default',
+																		"created"		=> $created,
+																		"updated"		=> $updated,
+																		"is_default" 	=> 1, 
+																		"status"		=> 1
+																	)
+															);
+			}					
+			
+			if($defaultCategoryId)
+			{
+				$categories = array();
+				$categories[] = $defaultCategoryId;
+			}
+			
+		} // No Category Selected - END!
 
         if($this->product->edit_product($product_id, array("user_id"=>$this->user_id,"store_id"=>$store_id,"name"=>$name,"description"=>$description,"price"=>$price,"updated"=>$updated,"status"=>$status)))
         {

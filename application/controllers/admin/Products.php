@@ -126,6 +126,9 @@ class Products extends CI_Controller {
 		$showErrorMessage = "";
 		$formHeading = "Add New Product";
 		$arrProductMedia  =  array();
+		
+		$created        = date('Y-m-d H:i:s');
+		$updated        = date('Y-m-d H:i:s');
 
 		if($productId)
 		{
@@ -212,9 +215,10 @@ class Products extends CI_Controller {
 			{
 				$aErrorMessage[]= "Price is required";
 			}
+			
 			if(empty($categories))
 			{
-				$aErrorMessage[]= "Please select atlease one category";
+				//-->$aErrorMessage[]= "Please select atlease one category"; //NOT NEEDED NOW, after 'Default' category!
 			}
 			else
 			{
@@ -223,7 +227,6 @@ class Products extends CI_Controller {
 					$categoryIds[] = htmlentities($categories[$i]);
 				}
 			}
-
 		
 			if(is_array($aErrorMessage) && count($aErrorMessage))
 			{	
@@ -253,6 +256,41 @@ class Products extends CI_Controller {
 			}
 			else
 			{
+				if(empty($categories)) // No Category Selected - START!
+				{
+					$defaultCategoryInfo = $this->category->getDefaultCategory($userId, $storeId);
+					
+					$defaultCategoryId = 0;
+					if($defaultCategoryInfo)
+					{
+						$defaultCategoryId = @$defaultCategoryInfo['category_id'];
+					}
+					
+					if(!$defaultCategoryId)
+					{
+						//Adding "Default" category for this new user!
+						$defaultCategoryId = $this->category->add_category(
+																		array(
+																				"user_id" 		=> $userId,
+																				"store_id" 		=> $storeId,
+																				"parent_id" 	=> 0,
+																				"name"			=> 'Default',
+																				"created"		=> $created,
+																				"updated"		=> $updated,
+																				"is_default" 	=> 1, 
+																				"status"		=> 1
+																			)
+																	);
+					}					
+					
+					if($defaultCategoryId)
+					{
+						$categories = array();
+						$categories[] = $defaultCategoryId;
+					}
+					
+				} // No Category Selected - END!
+				
 				$saveData = array(
 					'store_id'      =>  $storeId,
 					'user_id'       =>  $userId,

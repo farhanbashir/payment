@@ -105,6 +105,23 @@ Class Category extends CI_Model
         $query->free_result();
         return $result[0];
     }     
+	
+	function getDefaultCategory($userId, $storeId)
+    {
+        $sql = "SELECT name AS category_name, category_id, parent_id AS parent_category, is_default FROM categories WHERE user_id = '$userId' AND store_id = '$storeId' AND is_default='1' LIMIT 1";
+        $query = $this->db->query($sql);
+        $result = $query->result_array();
+		
+		if($result)
+		{
+			$query->free_result();
+			return $result[0];
+		}
+		else			
+		{
+			return false;
+		}
+    }
 
     function add_product_category($data)
     {
