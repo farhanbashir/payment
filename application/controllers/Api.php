@@ -1743,6 +1743,17 @@ class Api extends REST_Controller {
 
     function createOrder_post()
     {
+		/*
+			*Header Params:
+				- Token
+				- Userid
+				- Storeid
+			
+			*POST Params:
+			
+				{"products":[{"product_id":1,"quantity":2},{"product_id":3,"quantity":5}],"customer_info":{"name":"Umair Jaffar","email":"umair.jaffar97@gmail.com","address1":"Address 1","address2":"Address 2","city":"New York City - NYC","state":"New York","zipcode":"12345","phone":"111-222-3334"},"numeric_pad_amount":"200","total_amount":"1600","pay_by_cash_amount":"300","pay_by_credit_card":{"is_swipe":"0","cc_name":"Umair","cc_number":"4111111111111111","cc_expiry_year":"2016","cc_expiry_month":"12","cc_code":"123"}}
+		*/
+		
         $created	= date('Y-m-d H:i:s');
         $store_id	= $this->store_id;
         $json		= $this->post('data');
@@ -1795,14 +1806,20 @@ class Api extends REST_Controller {
 			$is_cc_swipe = 1;
 		}
 		
-		//validations start!
-		/*
+		//validations start!		
+		if(!$customer_name)
+		{
+			$data["header"]["error"] = "1";
+            $data["header"]["message"] = "Customer name is required";
+            $this->response($data, 200);
+		}
+		
 		if(!$customer_email)
 		{
 			$data["header"]["error"] = "1";
             $data["header"]["message"] = "Customer email address is required";
             $this->response($data, 200);
-		}*/
+		}
 		
 		if($customer_email)
 		{
@@ -1812,6 +1829,41 @@ class Api extends REST_Controller {
 				$data["header"]["message"] = "Please provide valid email address";
 				$this->response($data, 200);
 			}
+		}
+		
+		if(!$customer_address1)
+		{
+			$data["header"]["error"] = "1";
+            $data["header"]["message"] = "Customer address is required";
+            $this->response($data, 200);
+		}
+		
+		if(!$customer_city)
+		{
+			$data["header"]["error"] = "1";
+            $data["header"]["message"] = "Customer city is required";
+            $this->response($data, 200);
+		}
+		
+		if(!$customer_state)
+		{
+			$data["header"]["error"] = "1";
+            $data["header"]["message"] = "Customer state is required";
+            $this->response($data, 200);
+		}
+		
+		if(!$customer_zipcode)
+		{
+			$data["header"]["error"] = "1";
+            $data["header"]["message"] = "Customer zipcode is required";
+            $this->response($data, 200);
+		}
+		
+		if(!$customer_phone)
+		{
+			$data["header"]["error"] = "1";
+            $data["header"]["message"] = "Customer phone is required";
+            $this->response($data, 200);
 		}
 		
 		if(!$total_amount || $total_amount <= 0)
@@ -2094,16 +2146,17 @@ class Api extends REST_Controller {
 						$this->order->add_order_line_item($order_line_item_data);
 					}
 					
+					//TODO: this _customerInfo needs to remove, even from response!
 					$_customerInfo = array();
 					
-					$_customerInfo['name'] 		= 'test name';
-					$_customerInfo['email'] 	= 'test@email.com';
-					$_customerInfo['phone'] 	= '1112223334';
-					$_customerInfo['address1'] 	= 'test address1';
-					$_customerInfo['address2'] 	= 'test address2';
-					$_customerInfo['city'] 		= 'test city';
-					$_customerInfo['state'] 	= 'Texas';
-					$_customerInfo['zipcode']	= '12345';
+					$_customerInfo['name'] 		= '';
+					$_customerInfo['email'] 	= '';
+					$_customerInfo['phone'] 	= '';
+					$_customerInfo['address1'] 	= '';
+					$_customerInfo['address2'] 	= '';
+					$_customerInfo['city'] 		= '';
+					$_customerInfo['state'] 	= '';
+					$_customerInfo['zipcode']	= '';
 
 					$data["header"]["error"] = "0";
 					$data['body']            = array("order_id" => $order_id, "descriptor" => $cx_descriptor, 'customer_info' => $_customerInfo);
@@ -2131,7 +2184,173 @@ class Api extends REST_Controller {
 		}
     }
 	
-	function setCustomerInfoForOrder_post()
+	function checkCustomer_post() 
+	{
+		/*
+			Header Params:
+				Token: 5cb78b2421d34eca7492d4ce4c9c6809
+				Userid: 21
+				Storeid: 17
+			
+			POST Params: 
+				{"cc_info":{"cc_number":"4111111111111111","cc_expiry_year":2020,"cc_expiry_month":7,"cc_code":123}}
+		*/
+		
+		$created	= date('Y-m-d H:i:s');
+        $store_id	= $this->store_id;
+        $json		= $this->post('data');
+
+        $input_data = json_decode($json, true);
+		
+		if(!$input_data)
+        {
+            $data["header"]["error"] = "1";
+            $data["header"]["message"] = "Please provide data";
+            $this->response($data, 200);
+        }
+		
+		//credit card info!
+		$cc_info = @$input_data['cc_info'];
+		
+		$cc_number			= @$cc_info['cc_number'];
+		$cc_expiry_year		= @$cc_info['cc_expiry_year'];
+		$cc_expiry_month	= @$cc_info['cc_expiry_month'];
+		$cc_code			= @$cc_info['cc_code'];
+		
+		if(!$cc_number)
+        {
+            $data["header"]["error"] = "1";
+            $data["header"]["message"] = "Please provide credit card number";
+            $this->response($data, 200);
+        }
+		
+		if(!$cc_expiry_year)
+        {
+            $data["header"]["error"] = "1";
+            $data["header"]["message"] = "Please provide credit card expiry year";
+            $this->response($data, 200);
+        }
+		
+		if(!$cc_expiry_month)
+        {
+            $data["header"]["error"] = "1";
+            $data["header"]["message"] = "Please provide credit card expiry month";
+            $this->response($data, 200);
+        }
+		
+		if(!$cc_code)
+        {
+            $data["header"]["error"] = "1";
+            $data["header"]["message"] = "Please provide credit card code";
+            $this->response($data, 200);
+        }
+
+		$postParams = array();
+		$postParams['cc_number'] 		= $cc_number;
+		$postParams['cc_expiry_year'] 	= $cc_expiry_year;
+		$postParams['cc_expiry_month'] 	= $cc_expiry_month;
+		$postParams['cc_code'] 			= $cc_code;		
+		
+		$apiStatus 	= false;
+		$apiData 	= array();
+		
+		$apiResponse = getCustomerDetails($this->user_id, $postParams);
+		
+		if($apiResponse)
+		{
+			if(isset($apiResponse['error']))
+			{
+				$apiStatus = false;
+			}
+			else if(isset($apiResponse['success']))
+			{
+				$apiStatus = true;
+				
+				$apiData = $apiResponse['data'];
+			}
+		}
+		
+		$_customerInfo = array();
+		
+		$_customerInfo['name'] 		= trim(@$apiData['first_name'].' '.@$apiData['last_name']);
+		$_customerInfo['email'] 	= @$apiData['email'];
+		$_customerInfo['phone'] 	= @$apiData['phone'];
+		$_customerInfo['address1'] 	= @$apiData['street'];
+		$_customerInfo['address2'] 	= '';					//Note: There is NO address2 field in the API from CardXecure!
+		$_customerInfo['city'] 		= @$apiData['city'];
+		$_customerInfo['state'] 	= @$apiData['state'];
+		$_customerInfo['zipcode']	= @$apiData['zip'];
+
+		$data["header"]["error"] = "0";
+		$data['body']            = array('customer_info' => $_customerInfo);
+		$this->response($data, 200);
+	}
+	
+	function setCustomerSignatureForOrder_post()
+	{
+		$created			= date('Y-m-d H:i:s');
+		$updated			= date('Y-m-d H:i:s');
+		 
+		$order_id 			= $this->post('order_id');
+		
+		if(!$order_id)
+		{
+			$data["header"]["error"] = "1";
+            $data["header"]["message"] = "Order ID is required";
+            $this->response($data, 200);
+		}
+		
+		$order_detail = $this->order->get_order_detail($order_id);
+		if($order_detail)
+		{
+			if($order_detail['user_id'] !== $this->user_id)
+			{
+				$data["header"]["error"] = "1";
+				$data["header"]["message"] = "Order do not belong to this user";
+				$this->response($data, 200);   
+			}
+		}
+		else
+		{	
+			$data["header"]["error"] = "1";
+			$data["header"]["message"] = "Order ID is not valid";
+			$this->response($data, 200);   
+		}
+		
+		$signature = '';
+		$signature_image_data = $this->__uploadFile($this->config->item('order_signature_image_base'), asset_url('img/orders/signature'));
+
+		if(is_array($signature_image_data) && count($signature_image_data) > 0)
+		{
+			if(isset($signature_image_data['path']))
+			{
+				$signature    = $signature_image_data['path'];
+			}
+		}
+						
+		if($signature)
+		{
+			$order_data = array(
+								"customer_signature"	=> $signature,
+								"updated"				=> $updated,
+						);
+			
+			// update order
+			$this->order->edit_order($order_id, $order_data);
+			
+			$receiptCreated = generateReceiptByOrderId($order_id, $this->user_id);
+			
+			$data["header"]["error"]   = "0";
+			$data["header"]["message"] = "Customer signature has been successfully saved for the order";
+			$this->response($data, 200);	
+		}
+		
+		$data["header"]["error"]   = "1";
+		$data["header"]["message"] = "Customer signature is required";
+		$this->response($data, 200);
+	}
+	
+	function setCustomerInfoForOrder_post() //TODO: NOT IN USE NOW!
 	{		
 		$created			= date('Y-m-d H:i:s');
 		$updated			= date('Y-m-d H:i:s');

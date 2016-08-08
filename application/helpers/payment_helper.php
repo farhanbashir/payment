@@ -820,7 +820,16 @@ function getCustomerDetails($userId=0, $_postParams=array())
 		{
 			$apiSuccessMessage = 1;
 			
-			$apiData = @$apiResponse['data'];
+			$apiData = array(
+								'first_name'	=> @$apiResponse['data']['First Name'],
+								'last_name'		=> @$apiResponse['data']['Last Name'],
+								'street'		=> @$apiResponse['data']['Street'],
+								'city'			=> @$apiResponse['data']['City'],
+								'email'			=> @$apiResponse['data']['Email'],
+								'zip'			=> @$apiResponse['data']['Zip'],
+								'state'			=> @$apiResponse['data']['State'],
+								'phone'			=> @$apiResponse['data']['Phone'],
+						);
 		}
 	}
 	
