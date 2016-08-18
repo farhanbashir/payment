@@ -2108,10 +2108,17 @@ abstract class REST_Controller extends CI_Controller {
 			$user_id = $headers['Userid'];
 		}
 		
+		$_post_params = json_encode($_POST);
+		
+		if(!$_post_params)
+		{
+			$_post_params = $_POST;
+		}
+		
 		$logData['user_id'] 		= $user_id; 
 		$logData['service'] 		= $CI->router->fetch_method();
 		$logData['header_params'] 	= json_encode($headers);
-		$logData['post_params'] 	= json_encode($_POST);
+		$logData['post_params'] 	= $_post_params; //-->json_encode($_POST);
 		$logData['response'] 		= '';
 		$logData['request_time'] 	= date('Y-m-d H:i:s');
 		$logData['response_time'] 	= '';

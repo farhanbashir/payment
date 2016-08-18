@@ -2159,7 +2159,7 @@ class Api extends REST_Controller {
 					$_customerInfo['zipcode']	= '';
 
 					$data["header"]["error"] = "0";
-					$data['body']            = array("order_id" => $order_id, "descriptor" => $cx_descriptor, 'customer_info' => $_customerInfo);
+					$data['body']            = array("order_id" => $order_id, "descriptor" => $cx_descriptor); //-->, 'customer_info' => $_customerInfo
 					$this->response($data, 200);
 				}
 				else
@@ -2253,6 +2253,15 @@ class Api extends REST_Controller {
 		
 		$apiStatus 	= false;
 		$apiData 	= array();
+		
+		$apiData['first_name'] 	= '';
+		$apiData['last_name'] 	= '';
+		$apiData['email'] 		= '';
+		$apiData['phone'] 		= '';
+		$apiData['street'] 		= '';
+		$apiData['city'] 		= '';
+		$apiData['state'] 		= '';
+		$apiData['zip'] 		= '';
 		
 		$apiResponse = getCustomerDetails($this->user_id, $postParams);
 		
